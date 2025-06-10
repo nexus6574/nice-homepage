@@ -285,6 +285,63 @@ h2 {
     color: #27ae60;
 }
 
+/* FAQセクション */
+.faq {
+    padding: 80px 20px;
+    background: #f8f9fa;
+}
+
+.faq h2 {
+    text-align: center;
+    font-size: 2.5rem;
+    margin-bottom: 3rem;
+    color: #333;
+}
+
+.faq-list {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.faq-item {
+    background: white;
+    margin-bottom: 1.5rem;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.faq-item:hover {
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+}
+
+.faq-item h3 {
+    background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+    color: white;
+    padding: 1.5rem;
+    margin: 0;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.faq-item h3:hover {
+    background: linear-gradient(135deg, #229954 0%, #27ae60 100%);
+}
+
+.faq-answer {
+    padding: 1.5rem;
+    background: white;
+}
+
+.faq-answer p {
+    margin: 0;
+    line-height: 1.6;
+    color: #555;
+    font-size: 1rem;
+}
+
 /* お問い合わせセクション */
 .contact {
     padding: 80px 20px;
