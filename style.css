@@ -169,9 +169,9 @@ nav {
 }
 
 .cta-button:hover {
-    background: linear-gradient(45deg, #c0392b, #a93226);
+    background: linear-gradient(45deg, #ff3f3f, #e63939);
     transform: translateY(-3px) scale(1.05);
-    box-shadow: 0 15px 35px rgba(255, 102, 102, 0.7);
+    box-shadow: 0 15px 35px rgba(255, 63, 63, 0.7);
     animation: none;
 }
 
