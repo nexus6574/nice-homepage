@@ -139,21 +139,21 @@ nav {
 
 .cta-button {
     display: inline-block;
-    background: #27ae60;
+    background: #e74c3c;
     color: white;
-    padding: 15px 40px;
+    padding: 20px 50px;
     text-decoration: none;
     border-radius: 50px;
-    font-size: 1.2rem;
+    font-size: 1.5rem;
     font-weight: bold;
     transition: all 0.3s ease;
-    box-shadow: 0 5px 15px rgba(39, 174, 96, 0.4);
+    box-shadow: 0 8px 20px rgba(231, 76, 60, 0.4);
 }
 
 .cta-button:hover {
-    background: #2ecc71;
+    background: #c0392b;
     transform: translateY(-3px);
-    box-shadow: 0 8px 20px rgba(39, 174, 96, 0.6);
+    box-shadow: 0 12px 30px rgba(231, 76, 60, 0.6);
 }
 
 /* 特徴セクション */
