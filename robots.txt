@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://nexus6574.github.io/nice-homepage/sitemap.xml
