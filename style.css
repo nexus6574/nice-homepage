@@ -142,7 +142,7 @@ nav {
     transform: scale(1.2) rotate(0.5deg);
     animation: heroImageEntrance 3s ease-out 0.5s forwards, 
                heroImageFloat 8s ease-in-out 3.5s infinite;
-    filter: brightness(0.7) contrast(1.2) saturate(1.3) hue-rotate(10deg);
+    filter: brightness(1.2) contrast(1.1) saturate(1.4) hue-rotate(5deg);
 }
 
 .hero-content {
@@ -278,35 +278,35 @@ nav {
     75% {
         opacity: 0.8;
         transform: scale(1.08) rotate(0.7deg);
-        filter: brightness(0.6) contrast(1.3) saturate(1.2) hue-rotate(10deg) blur(0px);
+        filter: brightness(0.8) contrast(1.3) saturate(1.2) hue-rotate(10deg) blur(0px);
     }
     100% {
         opacity: 1;
         transform: scale(1.05) rotate(0.5deg);
-        filter: brightness(0.7) contrast(1.2) saturate(1.3) hue-rotate(10deg);
+        filter: brightness(1.2) contrast(1.1) saturate(1.4) hue-rotate(5deg);
     }
 }
 
 @keyframes heroImageFloat {
     0% {
         transform: scale(1.05) rotate(0.5deg) translateX(0px) translateY(0px);
-        filter: brightness(0.7) contrast(1.2) saturate(1.3) hue-rotate(10deg);
+        filter: brightness(1.2) contrast(1.1) saturate(1.4) hue-rotate(5deg);
     }
     25% {
         transform: scale(1.06) rotate(0.3deg) translateX(-10px) translateY(-5px);
-        filter: brightness(0.75) contrast(1.25) saturate(1.4) hue-rotate(15deg);
+        filter: brightness(1.25) contrast(1.15) saturate(1.5) hue-rotate(8deg);
     }
     50% {
         transform: scale(1.07) rotate(0deg) translateX(0px) translateY(-10px);
-        filter: brightness(0.8) contrast(1.3) saturate(1.5) hue-rotate(20deg);
+        filter: brightness(1.3) contrast(1.2) saturate(1.6) hue-rotate(10deg);
     }
     75% {
         transform: scale(1.06) rotate(-0.3deg) translateX(10px) translateY(-5px);
-        filter: brightness(0.75) contrast(1.25) saturate(1.4) hue-rotate(15deg);
+        filter: brightness(1.25) contrast(1.15) saturate(1.5) hue-rotate(8deg);
     }
     100% {
         transform: scale(1.05) rotate(0.5deg) translateX(0px) translateY(0px);
-        filter: brightness(0.7) contrast(1.2) saturate(1.3) hue-rotate(10deg);
+        filter: brightness(1.2) contrast(1.1) saturate(1.4) hue-rotate(5deg);
     }
 }
 
