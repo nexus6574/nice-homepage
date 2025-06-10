@@ -139,7 +139,7 @@ nav {
 
 .cta-button {
     display: inline-block;
-    background: linear-gradient(45deg, #e74c3c, #c0392b);
+    background: linear-gradient(45deg, #ff6666, #ff4444);
     color: white;
     padding: 20px 50px;
     text-decoration: none;
@@ -147,7 +147,7 @@ nav {
     font-size: 1.5rem;
     font-weight: bold;
     transition: all 0.3s ease;
-    box-shadow: 0 8px 20px rgba(231, 76, 60, 0.4);
+    box-shadow: 0 8px 20px rgba(255, 102, 102, 0.4);
     position: relative;
     overflow: hidden;
     transform: scale(1);
@@ -171,7 +171,7 @@ nav {
 .cta-button:hover {
     background: linear-gradient(45deg, #c0392b, #a93226);
     transform: translateY(-3px) scale(1.05);
-    box-shadow: 0 15px 35px rgba(231, 76, 60, 0.7);
+    box-shadow: 0 15px 35px rgba(255, 102, 102, 0.7);
     animation: none;
 }
 
@@ -182,7 +182,7 @@ nav {
 
 .cta-button:active {
     transform: translateY(-1px) scale(1.02);
-    box-shadow: 0 5px 15px rgba(231, 76, 60, 0.8);
+    box-shadow: 0 5px 15px rgba(255, 102, 102, 0.8);
 }
 
 .button-text {
@@ -201,13 +201,13 @@ nav {
 
 @keyframes pulse {
     0% {
-        box-shadow: 0 8px 20px rgba(231, 76, 60, 0.4);
+        box-shadow: 0 8px 20px rgba(255, 102, 102, 0.4);
     }
     50% {
-        box-shadow: 0 8px 25px rgba(231, 76, 60, 0.6), 0 0 0 10px rgba(231, 76, 60, 0.1);
+        box-shadow: 0 8px 25px rgba(255, 102, 102, 0.6), 0 0 0 10px rgba(255, 102, 102, 0.1);
     }
     100% {
-        box-shadow: 0 8px 20px rgba(231, 76, 60, 0.4);
+        box-shadow: 0 8px 20px rgba(255, 102, 102, 0.4);
     }
 }
 
