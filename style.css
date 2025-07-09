@@ -398,6 +398,412 @@ h2 {
     color: #333;
 }
 
+/* キャバクラ一覧スライダー */
+.cabaret-list {
+    background: linear-gradient(135deg, #34495e 0%, #2c3e50 100%);
+    color: white;
+    padding: 4rem 0;
+}
+
+.cabaret-list h2 {
+    text-align: center;
+    margin-bottom: 1rem;
+    font-size: 2.5rem;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    color: white;
+}
+
+.section-subtitle {
+    text-align: center;
+    margin-bottom: 3rem;
+    font-size: 1.2rem;
+    opacity: 0.9;
+}
+
+.slider-container {
+    position: relative;
+    max-width: 800px;
+    margin: 0 auto;
+    overflow: hidden;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+.slider {
+    display: flex;
+    transition: transform 0.5s ease-in-out;
+}
+
+.slide {
+    min-width: 100%;
+    position: relative;
+    overflow: hidden;
+}
+
+.slide img {
+    width: 100%;
+    height: 400px;
+    object-fit: cover;
+    display: block;
+}
+
+.slide-content {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(transparent, rgba(0,0,0,0.8));
+    padding: 2rem;
+    color: white;
+    transform: translateY(0);
+    transition: transform 0.3s ease;
+}
+
+.slide-content h3 {
+    font-size: 1.8rem;
+    margin-bottom: 0.5rem;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+}
+
+.slide-content p {
+    margin-bottom: 0.5rem;
+    font-size: 1.1rem;
+}
+
+.slide-content .price {
+    display: inline-block;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 0.3rem 1rem;
+    border-radius: 20px;
+    font-weight: bold;
+    font-size: 1rem;
+}
+
+.slider-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(0,0,0,0.5);
+    color: white;
+    border: none;
+    font-size: 2rem;
+    padding: 1rem;
+    cursor: pointer;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+    z-index: 10;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.slider-btn:hover {
+    background: rgba(0,0,0,0.8);
+    transform: translateY(-50%) scale(1.1);
+}
+
+.prev-btn {
+    left: 20px;
+}
+
+.next-btn {
+    right: 20px;
+}
+
+.slider-dots {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+.dot {
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.3);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.dot.active,
+.dot:hover {
+    background: white;
+    transform: scale(1.2);
+}
+
+.slider-link-section {
+    text-align: center;
+    margin-top: 2rem;
+}
+
+.view-all-btn {
+    display: inline-block;
+    background: linear-gradient(45deg, #e74c3c, #c0392b);
+    color: white;
+    padding: 1rem 2rem;
+    text-decoration: none;
+    border-radius: 30px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 15px rgba(231, 76, 60, 0.4);
+    position: relative;
+    overflow: hidden;
+}
+
+.view-all-btn::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent, rgba(255,255,255,0.2), transparent);
+    transform: rotate(45deg);
+    transition: all 0.5s;
+    opacity: 0;
+}
+
+.view-all-btn:hover {
+    background: linear-gradient(45deg, #c0392b, #a93226);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(231, 76, 60, 0.6);
+}
+
+.view-all-btn:hover::before {
+    left: 100%;
+    opacity: 1;
+}
+
+.view-all-btn .button-icon {
+    margin-left: 0.5rem;
+    transition: transform 0.3s ease;
+}
+
+.view-all-btn:hover .button-icon {
+    transform: translateX(5px);
+}
+
+/* 店舗一覧ページ専用スタイル */
+.cabaret-list-page {
+    padding-top: 80px;
+}
+
+.page-hero {
+    background: linear-gradient(135deg, #34495e 0%, #2c3e50 100%);
+    color: white;
+    padding: 4rem 0;
+    text-align: center;
+}
+
+.page-hero h1 {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+.page-hero p {
+    font-size: 1.3rem;
+    margin-bottom: 2rem;
+    opacity: 0.9;
+}
+
+.store-list {
+    padding: 4rem 0;
+    background: #f8f9fa;
+}
+
+.store-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.store-card {
+    background: white;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+    transform: translateY(0);
+}
+
+.store-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+}
+
+.store-image {
+    position: relative;
+    overflow: hidden;
+    height: 250px;
+}
+
+.store-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.store-card:hover .store-image img {
+    transform: scale(1.1);
+}
+
+.store-badge {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: linear-gradient(45deg, #ff6b6b, #ff5252);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+}
+
+.store-info {
+    padding: 1.5rem;
+}
+
+.store-name {
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+    color: #2c3e50;
+    font-weight: bold;
+    text-align: center;
+}
+
+.store-details {
+    margin-bottom: 1.5rem;
+}
+
+.price-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding: 1rem;
+    background: linear-gradient(135deg, #27ae60, #2ecc71);
+    border-radius: 10px;
+    color: white;
+}
+
+.price-label {
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+.price-value {
+    font-size: 1.3rem;
+    font-weight: bold;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+}
+
+.remarks {
+    margin-top: 1rem;
+}
+
+.remarks-label {
+    display: block;
+    font-weight: bold;
+    color: #34495e;
+    margin-bottom: 0.5rem;
+    font-size: 1.1rem;
+}
+
+.remarks-text {
+    color: #555;
+    line-height: 1.6;
+    font-size: 1rem;
+}
+
+.store-features {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.feature-tag {
+    background: linear-gradient(135deg, #3498db, #2980b9);
+    color: white;
+    padding: 0.3rem 0.8rem;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+}
+
+.contact-section {
+    background: linear-gradient(135deg, #16a085 0%, #1abc9c 100%);
+    color: white;
+    padding: 4rem 0;
+    text-align: center;
+}
+
+.contact-section h2 {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+.contact-section p {
+    font-size: 1.2rem;
+    margin-bottom: 2rem;
+    opacity: 0.9;
+}
+
+.contact-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+}
+
+.contact-btn {
+    display: inline-block;
+    padding: 1rem 2rem;
+    border-radius: 30px;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+.phone-btn {
+    background: linear-gradient(45deg, #ff6666, #ff4444);
+    color: white;
+}
+
+.phone-btn:hover {
+    background: linear-gradient(45deg, #ff4444, #cc3333);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(255, 68, 68, 0.4);
+}
+
+.back-btn {
+    background: linear-gradient(45deg, #ffffff, #f1f1f1);
+    color: #2c3e50;
+}
+
+.back-btn:hover {
+    background: linear-gradient(45deg, #f1f1f1, #e0e0e0);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+}
+
+/* アクティブナビゲーション */
+.nav-links a.active {
+    color: #f1c40f;
+    font-weight: bold;
+}
+
 /* サービスセクション */
 .services {
     padding: 80px 20px;
@@ -629,6 +1035,133 @@ footer {
 
     .contact-info {
         font-size: 1.5rem;
+    }
+
+    /* スライダーのモバイル対応 */
+    .cabaret-list {
+        padding: 2rem 0;
+    }
+
+    .cabaret-list h2 {
+        font-size: 2rem;
+        padding: 0 1rem;
+    }
+
+    .section-subtitle {
+        font-size: 1rem;
+        padding: 0 1rem;
+    }
+
+    .slider-container {
+        margin: 0 1rem;
+        max-width: calc(100% - 2rem);
+    }
+
+    .slide img {
+        height: 250px;
+    }
+
+    .slide-content {
+        padding: 1rem;
+    }
+
+    .slide-content h3 {
+        font-size: 1.4rem;
+    }
+
+    .slide-content p {
+        font-size: 1rem;
+    }
+
+    .slider-btn {
+        width: 40px;
+        height: 40px;
+        font-size: 1.5rem;
+        padding: 0.5rem;
+    }
+
+    .prev-btn {
+        left: 10px;
+    }
+
+    .next-btn {
+        right: 10px;
+    }
+
+    .dot {
+        width: 12px;
+        height: 12px;
+    }
+
+    .slider-dots {
+        gap: 0.5rem;
+        margin-top: 1rem;
+    }
+
+    /* 店舗一覧ページのモバイル対応 */
+    .page-hero h1 {
+        font-size: 2.2rem;
+        padding: 0 1rem;
+    }
+
+    .page-hero p {
+        font-size: 1.1rem;
+        padding: 0 1rem;
+    }
+
+    .store-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+        padding: 0 1rem;
+    }
+
+    .store-card {
+        margin: 0;
+    }
+
+    .store-image {
+        height: 200px;
+    }
+
+    .store-name {
+        font-size: 1.5rem;
+    }
+
+    .price-info {
+        padding: 0.8rem;
+    }
+
+    .price-label {
+        font-size: 1rem;
+    }
+
+    .price-value {
+        font-size: 1.2rem;
+    }
+
+    .contact-section h2 {
+        font-size: 2rem;
+        padding: 0 1rem;
+    }
+
+    .contact-section p {
+        font-size: 1.1rem;
+        padding: 0 1rem;
+    }
+
+    .contact-buttons {
+        gap: 1rem;
+        padding: 0 1rem;
+    }
+
+    .contact-btn {
+        padding: 0.8rem 1.5rem;
+        font-size: 1rem;
+    }
+
+    .view-all-btn {
+        padding: 0.8rem 1.5rem;
+        font-size: 1.1rem;
     }
 }
 

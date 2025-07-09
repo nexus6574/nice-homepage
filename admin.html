@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理画面 - NICE キャバクラ一覧管理</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+    <!-- ログイン画面 -->
+    <div id="login-screen" class="login-container">
+        <div class="login-box">
+            <h1>管理画面ログイン</h1>
+            <p>認証が必要です</p>
+            <form id="login-form">
+                <div class="input-group">
+                    <label for="username">ユーザー名</label>
+                    <input type="text" id="username" required>
+                </div>
+                <div class="input-group">
+                    <label for="password">パスワード</label>
+                    <input type="password" id="password" required>
+                </div>
+                <button type="submit" class="login-btn">ログイン</button>
+            </form>
+            <div id="login-error" class="error-message"></div>
+            <a href="index.html" class="back-link">← トップページに戻る</a>
+        </div>
+    </div>
+
+    <!-- 管理画面メイン -->
+    <div id="admin-screen" class="admin-container" style="display: none;">
+        <header class="admin-header">
+            <div class="header-content">
+                <h1>NICE 管理画面</h1>
+                <div class="header-actions">
+                    <span class="user-info">管理者としてログイン中</span>
+                    <button id="logout-btn" class="logout-btn">ログアウト</button>
+                </div>
+            </div>
+        </header>
+
+        <main class="admin-main">
+            <div class="admin-controls">
+                <h2>キャバクラ店舗管理</h2>
+                <div class="controls-row">
+                    <button id="add-store-btn" class="control-btn add-btn">新規店舗追加</button>
+                    <button id="save-all-btn" class="control-btn save-btn">全ての変更を保存</button>
+                    <button id="reset-data-btn" class="control-btn reset-btn">データをリセット</button>
+                    <a href="cabaret-list.html" target="_blank" class="control-btn preview-btn">プレビュー</a>
+                </div>
+            </div>
+
+            <div id="stores-container" class="stores-grid">
+                <!-- 動的に店舗カードが挿入されます -->
+            </div>
+        </main>
+
+        <!-- 店舗編集モーダル -->
+        <div id="edit-modal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 id="modal-title">店舗情報編集</h3>
+                    <button class="close-btn">&times;</button>
+                </div>
+                <form id="store-form">
+                    <div class="form-group">
+                        <label for="store-name">店舗名</label>
+                        <input type="text" id="store-name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="store-image">画像URL</label>
+                        <input type="url" id="store-image" required>
+                        <small>Unsplash等の画像URLを入力してください</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="store-price">料金</label>
+                        <input type="text" id="store-price" placeholder="例: 3,000円〜" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="store-badge">バッジ</label>
+                        <select id="store-badge">
+                            <option value="高級店">高級店</option>
+                            <option value="上品">上品</option>
+                            <option value="人気">人気</option>
+                            <option value="ラグジュアリー">ラグジュアリー</option>
+                            <option value="王室級">王室級</option>
+                            <option value="新店">新店</option>
+                            <option value="おすすめ">おすすめ</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="store-description">備考・説明</label>
+                        <textarea id="store-description" rows="4" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="store-features">特徴タグ（カンマ区切り）</label>
+                        <input type="text" id="store-features" placeholder="例: 完全個室, 経験豊富, 高級内装">
+                        <small>カンマで区切って複数入力可能</small>
+                    </div>
+                    <div class="modal-actions">
+                        <button type="submit" class="submit-btn">保存</button>
+                        <button type="button" class="cancel-btn">キャンセル</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="admin.js"></script>
+</body>
+</html> 
