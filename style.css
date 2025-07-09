@@ -410,18 +410,28 @@ h2 {
     background-size: 300% 300%;
     animation: gradientShift 2s ease infinite;
     color: white;
-    padding: 8px 16px;
-    border-radius: 25px;
+    padding: 12px 24px;
+    border-radius: 30px;
     font-weight: 900;
-    font-size: 1.2em;
+    font-size: 1.4em;
     text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-    box-shadow: 0 4px 15px rgba(255, 107, 53, 0.6);
-    display: inline-block;
-    margin-right: 10px;
+    box-shadow: 0 6px 20px rgba(255, 107, 53, 0.6);
+    display: block;
+    margin: 0 auto 15px auto;
+    width: fit-content;
     position: relative;
     overflow: hidden;
     transform: scale(1);
     transition: all 0.3s ease;
+}
+
+.title-main {
+    font-size: 2rem;
+    font-weight: bold;
+    color: white;
+    text-align: center;
+    margin: 0;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
 }
 
 .special-offer::before {
@@ -496,6 +506,7 @@ h2 {
     font-size: 2.5rem;
     text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
     color: white;
+    line-height: 1.2;
 }
 
 .section-subtitle {
@@ -713,6 +724,11 @@ h2 {
     font-size: 3rem;
     margin-bottom: 1rem;
     text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    line-height: 1.2;
+}
+
+.page-hero .title-main {
+    font-size: 2.5rem;
 }
 
 .page-hero p {
@@ -1213,6 +1229,16 @@ footer {
         font-size: 2rem;
         padding: 0 1rem;
     }
+    
+    .special-offer {
+        font-size: 1.2em;
+        padding: 10px 20px;
+        margin-bottom: 10px;
+    }
+    
+    .title-main {
+        font-size: 1.8rem;
+    }
 
     .section-subtitle {
         font-size: 1rem;
@@ -1269,6 +1295,16 @@ footer {
     .page-hero h1 {
         font-size: 2.2rem;
         padding: 0 1rem;
+    }
+    
+    .page-hero .special-offer {
+        font-size: 1.1em;
+        padding: 8px 16px;
+        margin-bottom: 8px;
+    }
+    
+    .page-hero .title-main {
+        font-size: 2rem;
     }
 
     .page-hero p {
