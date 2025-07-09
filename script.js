@@ -117,13 +117,69 @@ function loadStoreData() {
     if (savedStores) {
         return JSON.parse(savedStores);
     }
-    return null;
+    
+    // デフォルトの店舗データを返す
+    return getDefaultStoreData();
+}
+
+// デフォルトの店舗データ
+function getDefaultStoreData() {
+    return [
+        {
+            name: "Premium Club TOKYO",
+            image: "nice-storefront.jpg",
+            price: "1,500円〜",
+            description: "最高級のサービスと洗練された空間で特別な時間をお過ごしください。厳選されたキャストが心を込めておもてなしいたします。",
+            features: ["VIP個室あり", "送迎サービス", "カラオケ完備", "高級シャンパン"],
+            badge: "人気No.1"
+        },
+        {
+            name: "Club Elegance",
+            image: "nice-storefront.jpg",
+            price: "1,200円〜",
+            description: "エレガントで落ち着いた雰囲気の中で、上品なキャストがお客様を優雅にお迎えいたします。",
+            features: ["落ち着いた雰囲気", "上品なキャスト", "個室完備", "ワイン豊富"],
+            badge: "上品さNo.1"
+        },
+        {
+            name: "Night Paradise",
+            image: "nice-storefront.jpg",
+            price: "1,000円〜",
+            description: "夜の楽園をコンセプトにしたアットホームな空間で、楽しい時間をお過ごしください。",
+            features: ["アットホーム", "リーズナブル", "イベント多数", "若いキャスト"],
+            badge: "コスパNo.1"
+        },
+        {
+            name: "Luxury Lounge",
+            image: "nice-storefront.jpg",
+            price: "2,000円〜",
+            description: "ラグジュアリーな空間と最高級のサービスで、贅沢なひとときをお約束いたします。",
+            features: ["最高級サービス", "豪華内装", "プレミアムドリンク", "VIPルーム"],
+            badge: "高級志向"
+        },
+        {
+            name: "Royal Cabinet",
+            image: "nice-storefront.jpg",
+            price: "1,750円〜",
+            description: "王室のような気品あふれる空間で、最上級のホスピタリティをご体験ください。",
+            features: ["格調高い", "知的なキャスト", "プライベート空間", "高級酒豊富"],
+            badge: "気品No.1"
+        },
+        {
+            name: "Diamond Club",
+            image: "nice-storefront.jpg",
+            price: "1,400円〜",
+            description: "ダイヤモンドのように輝く特別な時間をお約束いたします。美しいキャストがお迎えします。",
+            features: ["煌びやか", "美しいキャスト", "特別サービス", "記念日対応"],
+            badge: "輝きNo.1"
+        }
+    ];
 }
 
 // 店舗一覧ページのデータ更新
 function updateCabaretListPage() {
     const storeData = loadStoreData();
-    if (!storeData) return;
+    if (!storeData || storeData.length === 0) return;
     
     const storeGrid = document.querySelector('.store-grid');
     if (!storeGrid) return;
@@ -172,15 +228,64 @@ function createStoreCard(store) {
                 ${featuresHTML}
             </div>
         </div>
+        <div class="store-card-overlay">
+            <div class="store-card-action">
+                <span class="action-text">詳細を見る</span>
+                <span class="action-icon">→</span>
+            </div>
+        </div>
     `;
     
+    // クリックイベントを追加
+    card.style.cursor = 'pointer';
+    card.addEventListener('click', function() {
+        navigateToStoreDetail(store);
+    });
+    
+    // ホバー効果のためのイベント
+    card.addEventListener('mouseenter', function() {
+        const overlay = card.querySelector('.store-card-overlay');
+        if (overlay) {
+            overlay.style.opacity = '1';
+        }
+    });
+    
+    card.addEventListener('mouseleave', function() {
+        const overlay = card.querySelector('.store-card-overlay');
+        if (overlay) {
+            overlay.style.opacity = '0';
+        }
+    });
+    
     return card;
+}
+
+// 店舗詳細ページへのナビゲーション
+function navigateToStoreDetail(store) {
+    console.log('店舗詳細ページに移動:', store.name);
+    
+    // 店舗名からIDを生成
+    const storeId = generateStoreId(store.name);
+    
+    // 店舗詳細ページのURLを構築
+    const detailUrl = `store-detail.html?id=${encodeURIComponent(storeId)}&name=${encodeURIComponent(store.name)}`;
+    
+    // ページ遷移
+    window.location.href = detailUrl;
+}
+
+// 店舗名からIDを生成（日本語名を安全なIDに変換）
+function generateStoreId(storeName) {
+    return storeName
+        .replace(/\s+/g, '-')
+        .replace(/[^\w\-]/g, '')
+        .toLowerCase();
 }
 
 // メインページのスライダー更新
 function updateMainPageSlider() {
     const storeData = loadStoreData();
-    if (!storeData) return;
+    if (!storeData || storeData.length === 0) return;
     
     const slider = document.querySelector('.slider');
     const dots = document.querySelector('.slider-dots');
@@ -205,7 +310,20 @@ function updateMainPageSlider() {
                 <p>${store.description.split('。')[0]}。</p>
                 <span class="price">料金：${store.price}</span>
             </div>
+            <div class="slide-overlay">
+                <div class="slide-action">
+                    <span class="action-text">詳細を見る</span>
+                    <span class="action-icon">→</span>
+                </div>
+            </div>
         `;
+        
+        // スライドにクリックイベントを追加
+        slide.style.cursor = 'pointer';
+        slide.addEventListener('click', function() {
+            navigateToStoreDetail(store);
+        });
+        
         slider.appendChild(slide);
         
         // ドット作成

@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>店舗詳細 - NICE（ナイス）| 新宿歌舞伎町キャバクラ紹介</title>
+    <meta name="description" content="新宿歌舞伎町の優良キャバクラ店舗詳細ページ。初回料金でお得にご利用いただけます。">
+    <link rel="canonical" href="https://nice-shinjuku.com/store-detail.html">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="store-detail.css">
+</head>
+<body>
+    <header>
+        <nav class="container">
+            <a href="index.html" class="logo">
+                <img src="nice-storefront.jpg" alt="NICE ロゴ" class="logo-image">
+                <span>NICE</span>
+            </a>
+            <div class="mobile-menu-toggle" aria-label="メニューを開く">
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html">ホーム</a></li>
+                <li><a href="cabaret-list.html">店舗一覧</a></li>
+                <li><a href="index.html#contact">お問い合わせ</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="store-detail-page">
+        <!-- ローディング表示 -->
+        <div id="loading" class="loading-container">
+            <div class="loading-spinner"></div>
+            <p>店舗情報を読み込み中...</p>
+        </div>
+
+        <!-- 店舗詳細コンテンツ -->
+        <div id="store-content" class="store-detail-content" style="display: none;">
+            <!-- 店舗ヒーローセクション -->
+            <section class="store-hero">
+                <div class="store-hero-image">
+                    <img id="store-main-image" src="" alt="" loading="lazy">
+                    <div class="store-hero-overlay">
+                        <div class="container">
+                            <div class="store-hero-content">
+                                <span id="store-badge" class="hero-badge"></span>
+                                <h1 id="store-name" class="hero-title"></h1>
+                                <p id="store-description" class="hero-description"></p>
+                                <div class="hero-price">
+                                    <span class="price-label">初回料金</span>
+                                    <span id="store-price" class="price-value"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 店舗詳細情報 -->
+            <section class="store-details">
+                <div class="container">
+                    <div class="details-grid">
+                        <!-- 基本情報 -->
+                        <div class="detail-card">
+                            <h2>基本情報</h2>
+                            <div class="info-list">
+                                <div class="info-item">
+                                    <span class="info-label">店舗名</span>
+                                    <span id="detail-name" class="info-value"></span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">初回料金</span>
+                                    <span id="detail-price" class="info-value special-price"></span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">営業時間</span>
+                                    <span class="info-value">20:00 - 26:00</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">定休日</span>
+                                    <span class="info-value">日曜日</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">所在地</span>
+                                    <span class="info-value">東京都新宿区歌舞伎町</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 特徴・サービス -->
+                        <div class="detail-card">
+                            <h2>特徴・サービス</h2>
+                            <div id="store-features" class="features-list">
+                                <!-- JavaScriptで動的に生成 -->
+                            </div>
+                        </div>
+
+                        <!-- 店舗説明 -->
+                        <div class="detail-card full-width">
+                            <h2>店舗について</h2>
+                            <div id="store-full-description" class="description-content">
+                                <!-- JavaScriptで動的に生成 -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- お問い合わせセクション -->
+            <section class="contact-section">
+                <div class="container">
+                    <h2>この店舗のご予約・お問い合わせ</h2>
+                    <p>下記よりお気軽にお問い合わせください。</p>
+                    <div class="contact-buttons">
+                        <a href="tel:03-1234-5678" class="contact-btn phone-btn">
+                            📞 電話で問い合わせ
+                        </a>
+                        <a href="mailto:info@nice-shinjuku.com" class="contact-btn">
+                            ✉️ メールで問い合わせ
+                        </a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 戻るボタン -->
+            <section class="navigation-section">
+                <div class="container">
+                    <div class="nav-buttons">
+                        <a href="cabaret-list.html" class="back-btn">
+                            ← 店舗一覧に戻る
+                        </a>
+                        <a href="index.html" class="home-btn">
+                            🏠 ホームに戻る
+                        </a>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- エラー表示 -->
+        <div id="error-content" class="error-container" style="display: none;">
+            <div class="container">
+                <h1>店舗が見つかりません</h1>
+                <p>指定された店舗は存在しないか、削除された可能性があります。</p>
+                <a href="cabaret-list.html" class="back-btn">店舗一覧に戻る</a>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 NICE（ナイス）. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+    <script src="store-detail.js"></script>
+</body>
+</html> 
