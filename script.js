@@ -1,3 +1,60 @@
+// ハンバーガーメニューの初期化
+document.addEventListener('DOMContentLoaded', function() {
+    initializeMobileMenu();
+});
+
+function initializeMobileMenu() {
+    const mobileMenuToggle = document.querySelector('.mobile-menu-toggle');
+    const navLinks = document.querySelector('.nav-links');
+    
+    if (!mobileMenuToggle || !navLinks) return;
+    
+    // メニューボタンのクリックイベント
+    mobileMenuToggle.addEventListener('click', function() {
+        const isActive = navLinks.classList.contains('active');
+        
+        // メニューの表示/非表示を切り替え
+        navLinks.classList.toggle('active');
+        mobileMenuToggle.classList.toggle('active');
+        
+        // ARIA属性の更新
+        mobileMenuToggle.setAttribute('aria-expanded', !isActive);
+        mobileMenuToggle.setAttribute('aria-label', 
+            !isActive ? 'メニューを閉じる' : 'メニューを開く'
+        );
+    });
+    
+    // メニューリンクがクリックされたらメニューを閉じる
+    navLinks.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', function() {
+            navLinks.classList.remove('active');
+            mobileMenuToggle.classList.remove('active');
+            mobileMenuToggle.setAttribute('aria-expanded', 'false');
+            mobileMenuToggle.setAttribute('aria-label', 'メニューを開く');
+        });
+    });
+    
+    // ESCキーでメニューを閉じる
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && navLinks.classList.contains('active')) {
+            navLinks.classList.remove('active');
+            mobileMenuToggle.classList.remove('active');
+            mobileMenuToggle.setAttribute('aria-expanded', 'false');
+            mobileMenuToggle.setAttribute('aria-label', 'メニューを開く');
+        }
+    });
+    
+    // 画面サイズが変更されたときの処理
+    window.addEventListener('resize', function() {
+        if (window.innerWidth > 768) {
+            navLinks.classList.remove('active');
+            mobileMenuToggle.classList.remove('active');
+            mobileMenuToggle.setAttribute('aria-expanded', 'false');
+            mobileMenuToggle.setAttribute('aria-label', 'メニューを開く');
+        }
+    });
+}
+
 // スムーズスクロール
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', function (e) {

@@ -1,12 +1,28 @@
 #!/bin/bash
-echo "=== DNS確認スクリプト ==="
-echo "現在の設定:"
-dig nice-shinjuku.com A +short
+
+echo "🔍 DNS設定チェックツール - nice-shinjuku.com"
+echo "========================================="
+
+# Aレコードの確認
+echo "📌 Aレコード確認："
+dig +short nice-shinjuku.com A
+
 echo ""
-echo "正しい設定（以下のいずれかが表示されればOK）:"
-echo "185.199.108.153"
-echo "185.199.109.153" 
-echo "185.199.110.153"
-echo "185.199.111.153"
+echo "📌 CNAMEレコード確認（www）："
+dig +short www.nice-shinjuku.com CNAME
+
 echo ""
-echo "まだ 160.251.148.180 が表示される場合は、DNS反映待ちです。"
+echo "📌 GitHubのIPアドレス範囲確認："
+echo "期待値: 185.199.108.153, 185.199.109.153, 185.199.110.153, 185.199.111.153"
+
+echo ""
+echo "📌 HTTPSアクセステスト："
+curl -I https://nice-shinjuku.com 2>/dev/null | head -n 1
+
+echo ""
+echo "📌 反映状況："
+if dig +short nice-shinjuku.com A | grep -q "185.199"; then
+    echo "✅ DNS設定が正しく反映されています"
+else
+    echo "⏳ DNS設定がまだ反映されていません（最大48時間かかります）"
+fi
