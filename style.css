@@ -256,7 +256,7 @@ nav {
 .hero-buttons {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: 1.5rem;
     align-items: center;
     margin-top: 1rem;
 }
@@ -1548,7 +1548,7 @@ footer {
     }
 
     .hero-buttons {
-        gap: 0.8rem;
+        gap: 1.2rem;
         margin-top: 1.5rem;
     }
 
