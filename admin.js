@@ -6,12 +6,123 @@ const ADMIN_CREDENTIALS = {
     password: 'nice2024'
 };
 
-// デフォルト店舗データ
+// 利用可能な画像ギャラリー
+const AVAILABLE_IMAGES = [
+    {
+        id: 1,
+        url: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=800&h=600&fit=crop&crop=center',
+        name: '高級クラブ内装 1'
+    },
+    {
+        id: 2,
+        url: 'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=800&h=600&fit=crop&crop=center',
+        name: 'エレガントな空間 1'
+    },
+    {
+        id: 3,
+        url: 'https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=800&h=600&fit=crop&crop=center',
+        name: 'モダンなバー 1'
+    },
+    {
+        id: 4,
+        url: 'https://images.unsplash.com/photo-1549490349-8643362247b5?w=800&h=600&fit=crop&crop=center',
+        name: 'ラグジュアリーラウンジ 1'
+    },
+    {
+        id: 5,
+        url: 'https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=800&h=600&fit=crop&crop=center',
+        name: '豪華な内装 1'
+    },
+    {
+        id: 6,
+        url: 'https://images.unsplash.com/photo-1516997121675-4c2d1684aa3e?w=800&h=600&fit=crop&crop=center',
+        name: 'モダンクラブ 1'
+    },
+    {
+        id: 7,
+        url: 'https://images.unsplash.com/photo-1574391884720-bfafb0d70327?w=800&h=600&fit=crop&crop=center',
+        name: 'VIPルーム 1'
+    },
+    {
+        id: 8,
+        url: 'https://images.unsplash.com/photo-1543007630-9710e4a00a20?w=800&h=600&fit=crop&crop=center',
+        name: 'カウンターバー 1'
+    },
+    {
+        id: 9,
+        url: 'https://images.unsplash.com/photo-1520637836862-4d197d17c15a?w=800&h=600&fit=crop&crop=center',
+        name: 'プライベート空間 1'
+    },
+    {
+        id: 10,
+        url: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&h=600&fit=crop&crop=center',
+        name: 'ナイトクラブ 1'
+    },
+    {
+        id: 11,
+        url: 'https://images.unsplash.com/photo-1566737236500-c8ac43014a8e?w=800&h=600&fit=crop&crop=center',
+        name: 'ラウンジエリア 1'
+    },
+    {
+        id: 12,
+        url: 'https://images.unsplash.com/photo-1592861956120-e524fc739696?w=800&h=600&fit=crop&crop=center',
+        name: 'バーカウンター 1'
+    },
+    {
+        id: 13,
+        url: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800&h=600&fit=crop&crop=center',
+        name: 'クラブ照明 1'
+    },
+    {
+        id: 14,
+        url: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=800&h=600&fit=crop&crop=center',
+        name: '店内全景 1'
+    },
+    {
+        id: 15,
+        url: 'https://images.unsplash.com/photo-1485846234645-a62644f84728?w=800&h=600&fit=crop&crop=center',
+        name: 'イベントホール 1'
+    },
+    {
+        id: 16,
+        url: 'https://images.unsplash.com/photo-1527069398084-e64eec5dd6ab?w=800&h=600&fit=crop&crop=center',
+        name: 'ダンスフロア 1'
+    },
+    {
+        id: 17,
+        url: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop&crop=center',
+        name: 'テーブル席 1'
+    },
+    {
+        id: 18,
+        url: 'https://images.unsplash.com/photo-1597655601841-214a4cfe8b9c?w=800&h=600&fit=crop&crop=center',
+        name: 'VIPボックス 1'
+    },
+    {
+        id: 19,
+        url: 'https://images.unsplash.com/photo-1559339352-11d035aa65de?w=800&h=600&fit=crop&crop=center',
+        name: 'プレミアム空間 1'
+    },
+    {
+        id: 20,
+        url: 'https://images.unsplash.com/photo-1514933651103-005eec06c04b?w=800&h=600&fit=crop&crop=center',
+        name: 'エントランス 1'
+    }
+];
+
+// デフォルト店舗データ（写真ギャラリー付き）
 const DEFAULT_STORES = [
     {
         id: 1,
         name: 'Premium Club TOKYO',
-        image: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=400&h=300&fit=crop&crop=center',
+        image: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=800&h=600&fit=crop&crop=center',
+        images: [
+            'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=800&h=600&fit=crop&crop=center',
+            'https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=800&h=600&fit=crop&crop=center',
+            'https://images.unsplash.com/photo-1549490349-8643362247b5?w=800&h=600&fit=crop&crop=center',
+            'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=800&h=600&fit=crop&crop=center',
+            'https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=800&h=600&fit=crop&crop=center'
+        ],
         price: '3,000円〜',
         badge: '高級店',
         description: '高級感あふれる店内で最高のひと時を。経験豊富なキャストが心を込めてお客様をおもてなしいたします。完全個室も完備。',
@@ -20,7 +131,14 @@ const DEFAULT_STORES = [
     {
         id: 2,
         name: 'Club Elegance',
-        image: 'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=400&h=300&fit=crop&crop=center',
+        image: 'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=800&h=600&fit=crop&crop=center',
+        images: [
+            'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=800&h=600&fit=crop&crop=center',
+            'https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=800&h=600&fit=crop&crop=center',
+            'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=800&h=600&fit=crop&crop=center',
+            'https://images.unsplash.com/photo-1549490349-8643362247b5?w=800&h=600&fit=crop&crop=center',
+            'https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=800&h=600&fit=crop&crop=center'
+        ],
         price: '2,500円〜',
         badge: '上品',
         description: '上品で落ち着いた雰囲気のお店。大人の時間を楽しみたい方におすすめ。質の高いサービスと心地よい空間を提供します。',
@@ -29,7 +147,14 @@ const DEFAULT_STORES = [
     {
         id: 3,
         name: 'Night Paradise',
-        image: 'https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=400&h=300&fit=crop&crop=center',
+        image: 'https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=800&h=600&fit=crop&crop=center',
+        images: [
+            'https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=800&h=600&fit=crop&crop=center',
+            'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=800&h=600&fit=crop&crop=center',
+            'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=800&h=600&fit=crop&crop=center',
+            'https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=800&h=600&fit=crop&crop=center',
+            'https://images.unsplash.com/photo-1549490349-8643362247b5?w=800&h=600&fit=crop&crop=center'
+        ],
         price: '2,000円〜',
         badge: '人気',
         description: '活気あふれる楽しい空間。初心者の方でも気軽にお楽しみいただけます。明るいキャストと楽しい時間をお過ごしください。',
@@ -38,7 +163,14 @@ const DEFAULT_STORES = [
     {
         id: 4,
         name: 'Luxury Lounge',
-        image: 'https://images.unsplash.com/photo-1549490349-8643362247b5?w=400&h=300&fit=crop&crop=center',
+        image: 'https://images.unsplash.com/photo-1549490349-8643362247b5?w=800&h=600&fit=crop&crop=center',
+        images: [
+            'https://images.unsplash.com/photo-1549490349-8643362247b5?w=800&h=600&fit=crop&crop=center',
+            'https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=800&h=600&fit=crop&crop=center',
+            'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=800&h=600&fit=crop&crop=center',
+            'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=800&h=600&fit=crop&crop=center',
+            'https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=800&h=600&fit=crop&crop=center'
+        ],
         price: '4,000円〜',
         badge: 'ラグジュアリー',
         description: '極上のサービスと居心地の良さを追求した特別な空間。VIP待遇で最高級のおもてなしをお約束いたします。',
@@ -47,7 +179,14 @@ const DEFAULT_STORES = [
     {
         id: 5,
         name: 'Royal Cabinet',
-        image: 'https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=400&h=300&fit=crop&crop=center',
+        image: 'https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=800&h=600&fit=crop&crop=center',
+        images: [
+            'https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=800&h=600&fit=crop&crop=center',
+            'https://images.unsplash.com/photo-1549490349-8643362247b5?w=800&h=600&fit=crop&crop=center',
+            'https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=800&h=600&fit=crop&crop=center',
+            'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=800&h=600&fit=crop&crop=center',
+            'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=800&h=600&fit=crop&crop=center'
+        ],
         price: '3,500円〜',
         badge: '王室級',
         description: '王室のような豪華な内装と最上級のサービス。特別な日や接待にも最適な格式高いお店です。完全予約制。',
@@ -56,7 +195,14 @@ const DEFAULT_STORES = [
     {
         id: 6,
         name: 'Diamond Club',
-        image: 'https://images.unsplash.com/photo-1516997121675-4c2d1684aa3e?w=400&h=300&fit=crop&crop=center',
+        image: 'https://images.unsplash.com/photo-1516997121675-4c2d1684aa3e?w=800&h=600&fit=crop&crop=center',
+        images: [
+            'https://images.unsplash.com/photo-1516997121675-4c2d1684aa3e?w=800&h=600&fit=crop&crop=center',
+            'https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=800&h=600&fit=crop&crop=center',
+            'https://images.unsplash.com/photo-1549490349-8643362247b5?w=800&h=600&fit=crop&crop=center',
+            'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=800&h=600&fit=crop&crop=center',
+            'https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=800&h=600&fit=crop&crop=center'
+        ],
         price: '2,800円〜',
         badge: '新店',
         description: '新しくオープンした話題のお店。モダンな内装と若いキャストが魅力。オープン記念として特別料金でご案内中。',
@@ -68,6 +214,9 @@ const DEFAULT_STORES = [
 let currentStores = [];
 let editingStoreId = null;
 let isAuthenticated = false;
+let currentImageType = 'main'; // 'main' または 'gallery'
+let currentGalleryIndex = 0;
+let currentStoreImages = []; // 現在編集中の店舗の写真ギャラリー
 
 // DOM要素
 const loginScreen = document.getElementById('login-screen');
@@ -82,6 +231,7 @@ const resetDataBtn = document.getElementById('reset-data-btn');
 const editModal = document.getElementById('edit-modal');
 const storeForm = document.getElementById('store-form');
 const modalTitle = document.getElementById('modal-title');
+const imageGalleryModal = document.getElementById('image-gallery-modal');
 
 // 初期化
 document.addEventListener('DOMContentLoaded', function() {
@@ -228,15 +378,112 @@ function editStore(id) {
     editingStoreId = id;
     modalTitle.textContent = '店舗情報編集';
     
-    // フォームに既存データを設定
+    // 基本情報を設定
     document.getElementById('store-name').value = store.name;
-    document.getElementById('store-image').value = store.image;
     document.getElementById('store-price').value = store.price;
     document.getElementById('store-badge').value = store.badge;
     document.getElementById('store-description').value = store.description;
     document.getElementById('store-features').value = store.features.join(', ');
     
+    // メイン画像を設定
+    setMainImage(store.image);
+    
+    // ギャラリー画像を設定
+    currentStoreImages = store.images ? [...store.images] : [];
+    updateGalleryPreview();
+    
     showModal();
+}
+
+// メイン画像を設定
+function setMainImage(imageUrl) {
+    const preview = document.getElementById('selected-main-image');
+    const noImageText = document.querySelector('.no-image-text');
+    
+    if (imageUrl) {
+        preview.src = imageUrl;
+        preview.style.display = 'block';
+        noImageText.style.display = 'none';
+    } else {
+        preview.style.display = 'none';
+        noImageText.style.display = 'block';
+    }
+}
+
+// ギャラリー画像プレビューを更新
+function updateGalleryPreview() {
+    for (let i = 0; i < 5; i++) {
+        const slot = document.querySelector(`[data-index="${i}"]`);
+        const preview = slot.querySelector('.gallery-preview');
+        const selectBtn = slot.querySelector('.select-gallery-btn');
+        const removeBtn = slot.querySelector('.remove-gallery-btn');
+        
+        if (currentStoreImages[i]) {
+            preview.src = currentStoreImages[i];
+            preview.style.display = 'block';
+            selectBtn.textContent = '変更';
+            removeBtn.style.display = 'block';
+            slot.classList.add('has-image');
+        } else {
+            preview.style.display = 'none';
+            selectBtn.textContent = '選択';
+            removeBtn.style.display = 'none';
+            slot.classList.remove('has-image');
+        }
+    }
+}
+
+// 画像ギャラリーを表示
+function showImageGallery(type, index = 0) {
+    currentImageType = type;
+    currentGalleryIndex = index;
+    
+    const galleryGrid = document.querySelector('.image-gallery-grid');
+    galleryGrid.innerHTML = '';
+    
+    AVAILABLE_IMAGES.forEach(image => {
+        const imageOption = document.createElement('div');
+        imageOption.className = 'gallery-image-option';
+        imageOption.onclick = () => selectImage(image.url);
+        
+        imageOption.innerHTML = `
+            <img src="${image.url}" alt="${image.name}" loading="lazy">
+            <div class="gallery-image-label">${image.name}</div>
+        `;
+        
+        galleryGrid.appendChild(imageOption);
+    });
+    
+    imageGalleryModal.style.display = 'flex';
+}
+
+// 画像を選択
+function selectImage(imageUrl) {
+    if (currentImageType === 'main') {
+        setMainImage(imageUrl);
+    } else if (currentImageType === 'gallery') {
+        currentStoreImages[currentGalleryIndex] = imageUrl;
+        updateGalleryPreview();
+    }
+    
+    hideImageGallery();
+}
+
+// ギャラリー画像を削除
+function removeGalleryImage(index) {
+    currentStoreImages[index] = null;
+    // 配列を詰める
+    currentStoreImages = currentStoreImages.filter((img, i) => i !== index || img !== null);
+    // 5枚になるまで空要素を追加
+    while (currentStoreImages.length < 5) {
+        currentStoreImages.push(null);
+    }
+    updateGalleryPreview();
+}
+
+// 画像ギャラリーを非表示
+function hideImageGallery() {
+    imageGalleryModal.style.display = 'none';
 }
 
 function deleteStore(id) {
@@ -255,6 +502,12 @@ function showAddStoreModal() {
     editingStoreId = null;
     modalTitle.textContent = '新規店舗追加';
     storeForm.reset();
+    
+    // 画像をリセット
+    setMainImage('');
+    currentStoreImages = [];
+    updateGalleryPreview();
+    
     showModal();
 }
 
@@ -263,15 +516,18 @@ function handleStoreSubmit(e) {
     
     const formData = {
         name: document.getElementById('store-name').value,
-        image: document.getElementById('store-image').value,
+        image: document.getElementById('selected-main-image').src || '',
+        images: currentStoreImages.filter(img => img !== null), // nullを除外
         price: document.getElementById('store-price').value,
         badge: document.getElementById('store-badge').value,
         description: document.getElementById('store-description').value,
-        features: document.getElementById('store-features').value
-            .split(',')
-            .map(f => f.trim())
-            .filter(f => f.length > 0)
+        features: document.getElementById('store-features').value.split(',').map(f => f.trim()).filter(f => f)
     };
+    
+    if (!formData.image) {
+        showMessage('メイン画像を選択してください', 'error');
+        return;
+    }
     
     if (editingStoreId) {
         // 編集

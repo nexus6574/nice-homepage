@@ -70,9 +70,73 @@
                         <input type="text" id="store-name" required>
                     </div>
                     <div class="form-group">
-                        <label for="store-image">画像URL</label>
-                        <input type="url" id="store-image" required>
-                        <small>Unsplash等の画像URLを入力してください</small>
+                        <label for="store-image">メイン画像</label>
+                        <div class="image-selector">
+                            <div class="selected-image-preview">
+                                <img id="selected-main-image" src="" alt="選択された画像" style="display: none;">
+                                <span class="no-image-text">画像を選択してください</span>
+                            </div>
+                            <button type="button" class="select-image-btn" onclick="showImageGallery('main')">
+                                画像を選択
+                            </button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>店舗写真ギャラリー（5枚）</label>
+                        <div class="gallery-images-manager">
+                            <div class="gallery-images-grid">
+                                <div class="gallery-image-slot" data-index="0">
+                                    <img class="gallery-preview" src="" alt="" style="display: none;">
+                                    <span class="slot-number">1</span>
+                                    <button type="button" class="select-gallery-btn" onclick="showImageGallery('gallery', 0)">
+                                        選択
+                                    </button>
+                                    <button type="button" class="remove-gallery-btn" onclick="removeGalleryImage(0)" style="display: none;">
+                                        削除
+                                    </button>
+                                </div>
+                                <div class="gallery-image-slot" data-index="1">
+                                    <img class="gallery-preview" src="" alt="" style="display: none;">
+                                    <span class="slot-number">2</span>
+                                    <button type="button" class="select-gallery-btn" onclick="showImageGallery('gallery', 1)">
+                                        選択
+                                    </button>
+                                    <button type="button" class="remove-gallery-btn" onclick="removeGalleryImage(1)" style="display: none;">
+                                        削除
+                                    </button>
+                                </div>
+                                <div class="gallery-image-slot" data-index="2">
+                                    <img class="gallery-preview" src="" alt="" style="display: none;">
+                                    <span class="slot-number">3</span>
+                                    <button type="button" class="select-gallery-btn" onclick="showImageGallery('gallery', 2)">
+                                        選択
+                                    </button>
+                                    <button type="button" class="remove-gallery-btn" onclick="removeGalleryImage(2)" style="display: none;">
+                                        削除
+                                    </button>
+                                </div>
+                                <div class="gallery-image-slot" data-index="3">
+                                    <img class="gallery-preview" src="" alt="" style="display: none;">
+                                    <span class="slot-number">4</span>
+                                    <button type="button" class="select-gallery-btn" onclick="showImageGallery('gallery', 3)">
+                                        選択
+                                    </button>
+                                    <button type="button" class="remove-gallery-btn" onclick="removeGalleryImage(3)" style="display: none;">
+                                        削除
+                                    </button>
+                                </div>
+                                <div class="gallery-image-slot" data-index="4">
+                                    <img class="gallery-preview" src="" alt="" style="display: none;">
+                                    <span class="slot-number">5</span>
+                                    <button type="button" class="select-gallery-btn" onclick="showImageGallery('gallery', 4)">
+                                        選択
+                                    </button>
+                                    <button type="button" class="remove-gallery-btn" onclick="removeGalleryImage(4)" style="display: none;">
+                                        削除
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <div class="form-group">
                         <label for="store-price">料金</label>
@@ -104,6 +168,19 @@
                         <button type="button" class="cancel-btn">キャンセル</button>
                     </div>
                 </form>
+            </div>
+        </div>
+
+        <!-- 画像ギャラリー選択モーダル -->
+        <div id="image-gallery-modal" class="modal">
+            <div class="modal-content gallery-modal-content">
+                <div class="modal-header">
+                    <h3>画像を選択</h3>
+                    <button class="close-btn" onclick="hideImageGallery()">&times;</button>
+                </div>
+                <div class="image-gallery-grid">
+                    <!-- 画像は JavaScript で動的に生成 -->
+                </div>
             </div>
         </div>
     </div>
