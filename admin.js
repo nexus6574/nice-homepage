@@ -214,9 +214,10 @@ const DEFAULT_STORES = [
 let currentStores = [];
 let editingStoreId = null;
 let isAuthenticated = false;
+// 画像ギャラリー管理変数
 let currentImageType = 'main'; // 'main' または 'gallery'
 let currentGalleryIndex = 0;
-let currentStoreImages = []; // 現在編集中の店舗の写真ギャラリー
+let currentStoreImages = [null, null, null, null, null]; // ギャラリー画像（5枚）
 
 // DOM要素
 const loginScreen = document.getElementById('login-screen');
@@ -389,7 +390,7 @@ function editStore(id) {
     setMainImage(store.image);
     
     // ギャラリー画像を設定
-    currentStoreImages = store.images ? [...store.images] : [];
+    currentStoreImages = store.images ? [...store.images] : [null, null, null, null, null];
     updateGalleryPreview();
     
     showModal();
@@ -472,12 +473,6 @@ function selectImage(imageUrl) {
 // ギャラリー画像を削除
 function removeGalleryImage(index) {
     currentStoreImages[index] = null;
-    // 配列を詰める
-    currentStoreImages = currentStoreImages.filter((img, i) => i !== index || img !== null);
-    // 5枚になるまで空要素を追加
-    while (currentStoreImages.length < 5) {
-        currentStoreImages.push(null);
-    }
     updateGalleryPreview();
 }
 
@@ -505,7 +500,7 @@ function showAddStoreModal() {
     
     // 画像をリセット
     setMainImage('');
-    currentStoreImages = [];
+    currentStoreImages = [null, null, null, null, null];
     updateGalleryPreview();
     
     showModal();
@@ -608,6 +603,58 @@ function exportStoreData() {
     const data = JSON.stringify(currentStores, null, 2);
     console.log('Store Data:', data);
     return data;
+}
+
+// ファイルアップロード機能
+function uploadImage(type, index = 0) {
+    currentImageType = type;
+    currentGalleryIndex = index;
+    
+    const fileInput = document.getElementById('image-upload-input');
+    fileInput.onchange = handleFileUpload;
+    fileInput.click();
+}
+
+function handleFileUpload(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    // ファイルタイプチェック
+    if (!file.type.startsWith('image/')) {
+        alert('画像ファイルを選択してください。');
+        return;
+    }
+    
+    // ファイルサイズチェック（10MB以下）
+    if (file.size > 10 * 1024 * 1024) {
+        alert('ファイルサイズは10MB以下にしてください。');
+        return;
+    }
+    
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const imageUrl = e.target.result; // base64データ
+        
+        // プレビュー表示と選択処理
+        if (currentImageType === 'main') {
+            setMainImage(imageUrl);
+        } else if (currentImageType === 'gallery') {
+            currentStoreImages[currentGalleryIndex] = imageUrl;
+            updateGalleryPreview();
+        }
+        
+        // 成功メッセージ
+        showMessage('画像をアップロードしました', 'success');
+    };
+    
+    reader.onerror = function() {
+        showMessage('画像の読み込みに失敗しました', 'error');
+    };
+    
+    reader.readAsDataURL(file);
+    
+    // ファイル入力をリセット
+    event.target.value = '';
 }
 
 // グローバル関数として露出（HTMLから呼び出すため）

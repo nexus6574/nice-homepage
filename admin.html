@@ -76,9 +76,14 @@
                                 <img id="selected-main-image" src="" alt="選択された画像" style="display: none;">
                                 <span class="no-image-text">画像を選択してください</span>
                             </div>
-                            <button type="button" class="select-image-btn" onclick="showImageGallery('main')">
-                                画像を選択
-                            </button>
+                            <div class="image-selector-buttons">
+                                <button type="button" class="select-image-btn" onclick="showImageGallery('main')">
+                                    プリセット画像
+                                </button>
+                                <button type="button" class="upload-image-btn" onclick="uploadImage('main')">
+                                    ファイルアップロード
+                                </button>
+                            </div>
                         </div>
                     </div>
                     <div class="form-group">
@@ -88,52 +93,77 @@
                                 <div class="gallery-image-slot" data-index="0">
                                     <img class="gallery-preview" src="" alt="" style="display: none;">
                                     <span class="slot-number">1</span>
-                                    <button type="button" class="select-gallery-btn" onclick="showImageGallery('gallery', 0)">
-                                        選択
-                                    </button>
-                                    <button type="button" class="remove-gallery-btn" onclick="removeGalleryImage(0)" style="display: none;">
-                                        削除
-                                    </button>
+                                    <div class="gallery-slot-buttons">
+                                        <button type="button" class="select-gallery-btn" onclick="showImageGallery('gallery', 0)">
+                                            プリセット
+                                        </button>
+                                        <button type="button" class="upload-gallery-btn" onclick="uploadImage('gallery', 0)">
+                                            アップロード
+                                        </button>
+                                        <button type="button" class="remove-gallery-btn" onclick="removeGalleryImage(0)" style="display: none;">
+                                            削除
+                                        </button>
+                                    </div>
                                 </div>
                                 <div class="gallery-image-slot" data-index="1">
                                     <img class="gallery-preview" src="" alt="" style="display: none;">
                                     <span class="slot-number">2</span>
-                                    <button type="button" class="select-gallery-btn" onclick="showImageGallery('gallery', 1)">
-                                        選択
-                                    </button>
-                                    <button type="button" class="remove-gallery-btn" onclick="removeGalleryImage(1)" style="display: none;">
-                                        削除
-                                    </button>
+                                    <div class="gallery-slot-buttons">
+                                        <button type="button" class="select-gallery-btn" onclick="showImageGallery('gallery', 1)">
+                                            プリセット
+                                        </button>
+                                        <button type="button" class="upload-gallery-btn" onclick="uploadImage('gallery', 1)">
+                                            アップロード
+                                        </button>
+                                        <button type="button" class="remove-gallery-btn" onclick="removeGalleryImage(1)" style="display: none;">
+                                            削除
+                                        </button>
+                                    </div>
                                 </div>
                                 <div class="gallery-image-slot" data-index="2">
                                     <img class="gallery-preview" src="" alt="" style="display: none;">
                                     <span class="slot-number">3</span>
-                                    <button type="button" class="select-gallery-btn" onclick="showImageGallery('gallery', 2)">
-                                        選択
-                                    </button>
-                                    <button type="button" class="remove-gallery-btn" onclick="removeGalleryImage(2)" style="display: none;">
-                                        削除
-                                    </button>
+                                    <div class="gallery-slot-buttons">
+                                        <button type="button" class="select-gallery-btn" onclick="showImageGallery('gallery', 2)">
+                                            プリセット
+                                        </button>
+                                        <button type="button" class="upload-gallery-btn" onclick="uploadImage('gallery', 2)">
+                                            アップロード
+                                        </button>
+                                        <button type="button" class="remove-gallery-btn" onclick="removeGalleryImage(2)" style="display: none;">
+                                            削除
+                                        </button>
+                                    </div>
                                 </div>
                                 <div class="gallery-image-slot" data-index="3">
                                     <img class="gallery-preview" src="" alt="" style="display: none;">
                                     <span class="slot-number">4</span>
-                                    <button type="button" class="select-gallery-btn" onclick="showImageGallery('gallery', 3)">
-                                        選択
-                                    </button>
-                                    <button type="button" class="remove-gallery-btn" onclick="removeGalleryImage(3)" style="display: none;">
-                                        削除
-                                    </button>
+                                    <div class="gallery-slot-buttons">
+                                        <button type="button" class="select-gallery-btn" onclick="showImageGallery('gallery', 3)">
+                                            プリセット
+                                        </button>
+                                        <button type="button" class="upload-gallery-btn" onclick="uploadImage('gallery', 3)">
+                                            アップロード
+                                        </button>
+                                        <button type="button" class="remove-gallery-btn" onclick="removeGalleryImage(3)" style="display: none;">
+                                            削除
+                                        </button>
+                                    </div>
                                 </div>
                                 <div class="gallery-image-slot" data-index="4">
                                     <img class="gallery-preview" src="" alt="" style="display: none;">
                                     <span class="slot-number">5</span>
-                                    <button type="button" class="select-gallery-btn" onclick="showImageGallery('gallery', 4)">
-                                        選択
-                                    </button>
-                                    <button type="button" class="remove-gallery-btn" onclick="removeGalleryImage(4)" style="display: none;">
-                                        削除
-                                    </button>
+                                    <div class="gallery-slot-buttons">
+                                        <button type="button" class="select-gallery-btn" onclick="showImageGallery('gallery', 4)">
+                                            プリセット
+                                        </button>
+                                        <button type="button" class="upload-gallery-btn" onclick="uploadImage('gallery', 4)">
+                                            アップロード
+                                        </button>
+                                        <button type="button" class="remove-gallery-btn" onclick="removeGalleryImage(4)" style="display: none;">
+                                            削除
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -184,6 +214,9 @@
             </div>
         </div>
     </div>
+
+    <!-- 隠しファイル入力 -->
+    <input type="file" id="image-upload-input" accept="image/*" style="display: none;">
 
     <script src="admin.js"></script>
 </body>

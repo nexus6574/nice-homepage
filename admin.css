@@ -545,20 +545,30 @@
     font-style: italic;
 }
 
-.select-image-btn {
-    background: linear-gradient(45deg, #3498db, #2980b9);
-    color: white;
-    border: none;
-    padding: 0.8rem 1.5rem;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: bold;
-    transition: all 0.3s ease;
+/* 画像選択ボタンのコンテナ */
+.image-selector-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
 }
 
-.select-image-btn:hover {
-    background: linear-gradient(45deg, #2980b9, #21618c);
-    transform: translateY(-2px);
+.upload-image-btn {
+    background: linear-gradient(135deg, #28a745, #20c997);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 16px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    flex: 1;
+}
+
+.upload-image-btn:hover {
+    background: linear-gradient(135deg, #218838, #1ea085);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
 }
 
 /* ギャラリー画像管理 */
@@ -626,40 +636,81 @@
     z-index: 2;
 }
 
-.select-gallery-btn {
-    background: linear-gradient(45deg, #27ae60, #2ecc71);
+/* ギャラリー画像スロットのボタンコンテナ */
+.gallery-slot-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin-top: 5px;
+}
+
+.gallery-slot-buttons button {
+    padding: 6px 8px;
+    font-size: 12px;
+    border-radius: 4px;
+}
+
+.upload-gallery-btn {
+    background: linear-gradient(135deg, #28a745, #20c997);
     color: white;
     border: none;
-    padding: 0.5rem 0.8rem;
-    border-radius: 5px;
+    font-weight: 500;
     cursor: pointer;
-    font-size: 0.9rem;
-    font-weight: bold;
     transition: all 0.3s ease;
-    z-index: 2;
+}
+
+.upload-gallery-btn:hover {
+    background: linear-gradient(135deg, #218838, #1ea085);
+    transform: translateY(-1px);
+}
+
+/* 既存のselect-image-btnも更新 */
+.select-image-btn {
+    flex: 1;
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 16px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.select-image-btn:hover {
+    background: linear-gradient(135deg, #0056b3, #004085);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);
+}
+
+/* 小さなボタンのスタイル調整 */
+.select-gallery-btn {
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    color: white;
+    border: none;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
 }
 
 .select-gallery-btn:hover {
-    background: linear-gradient(45deg, #229954, #27ae60);
+    background: linear-gradient(135deg, #0056b3, #004085);
     transform: translateY(-1px);
 }
 
 .remove-gallery-btn {
-    background: linear-gradient(45deg, #e74c3c, #c0392b);
+    background: linear-gradient(135deg, #dc3545, #c82333);
     color: white;
     border: none;
-    padding: 0.3rem 0.6rem;
-    border-radius: 3px;
+    font-weight: 500;
     cursor: pointer;
-    font-size: 0.8rem;
-    position: absolute;
-    top: 5px;
-    right: 5px;
-    z-index: 3;
+    transition: all 0.3s ease;
 }
 
 .remove-gallery-btn:hover {
-    background: linear-gradient(45deg, #c0392b, #a93226);
+    background: linear-gradient(135deg, #c82333, #bd2130);
+    transform: translateY(-1px);
 }
 
 /* 画像ギャラリーモーダル */
@@ -734,6 +785,20 @@
     .gallery-modal-content {
         margin: 1rem;
         max-height: 70vh;
+    }
+
+    .image-selector-buttons {
+        flex-direction: column;
+    }
+    
+    .gallery-slot-buttons {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+    
+    .gallery-slot-buttons button {
+        flex: 1;
+        min-width: 70px;
     }
 }
 
