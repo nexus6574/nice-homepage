@@ -1,5 +1,14 @@
 // 店舗詳細ページのJavaScript
 
+// スライダーの状態管理
+let storeSliderState = {
+    currentSlide: 0,
+    totalSlides: 0,
+    autoSlideInterval: null,
+    isTransitioning: false,
+    isInitialized: false
+};
+
 // DOM読み込み完了後に実行
 document.addEventListener('DOMContentLoaded', function() {
     initializeMobileMenu();
@@ -70,9 +79,10 @@ function displayStoreDetail(store) {
     // ページタイトルを更新
     document.title = `${store.name} - 店舗詳細 | NICE（ナイス）`;
     
+    // 写真スライダーを初期化
+    initializeStoreImageSlider(store.images || [store.image]);
+    
     // 基本情報を設定
-    document.getElementById('store-main-image').src = store.image;
-    document.getElementById('store-main-image').alt = `${store.name} 店内`;
     document.getElementById('store-badge').textContent = store.badge;
     document.getElementById('store-name').textContent = store.name;
     document.getElementById('store-description').textContent = store.description;
@@ -99,6 +109,195 @@ function displayStoreDetail(store) {
     
     // コンテンツを表示
     document.getElementById('store-content').style.display = 'block';
+}
+
+// 店舗写真スライダーの初期化
+function initializeStoreImageSlider(images) {
+    const sliderContainer = document.querySelector('.store-slider');
+    const dotsContainer = document.querySelector('.store-slider-dots');
+    
+    if (!sliderContainer || !dotsContainer) {
+        console.error('スライダーコンテナが見つかりません');
+        return;
+    }
+    
+    // スライダーをリセット
+    sliderContainer.innerHTML = '';
+    dotsContainer.innerHTML = '';
+    
+    // 画像スライドを生成
+    images.forEach((imageSrc, index) => {
+        const slide = document.createElement('div');
+        slide.className = 'store-slide';
+        slide.innerHTML = `<img src="${imageSrc}" alt="店舗写真 ${index + 1}" loading="lazy">`;
+        sliderContainer.appendChild(slide);
+        
+        // ドットを生成
+        const dot = document.createElement('span');
+        dot.className = `store-dot ${index === 0 ? 'active' : ''}`;
+        dot.dataset.slide = index;
+        dotsContainer.appendChild(dot);
+    });
+    
+    // スライダー状態を初期化
+    storeSliderState.currentSlide = 0;
+    storeSliderState.totalSlides = images.length;
+    storeSliderState.isTransitioning = false;
+    
+    // イベントリスナーを設定
+    setupStoreSliderEvents();
+    
+    // 自動スライドを開始（複数の画像がある場合のみ）
+    if (images.length > 1) {
+        startStoreAutoSlide();
+    }
+    
+    storeSliderState.isInitialized = true;
+    console.log(`店舗スライダーが初期化されました（${images.length}枚の写真）`);
+}
+
+// 店舗スライダーのイベントリスナーを設定
+function setupStoreSliderEvents() {
+    const prevBtn = document.querySelector('.store-prev-btn');
+    const nextBtn = document.querySelector('.store-next-btn');
+    const dots = document.querySelectorAll('.store-dot');
+    const sliderContainer = document.querySelector('.store-image-slider');
+    
+    // ボタンクリックイベント
+    if (nextBtn) {
+        nextBtn.onclick = function(e) {
+            e.preventDefault();
+            nextStoreSlide();
+        };
+    }
+    
+    if (prevBtn) {
+        prevBtn.onclick = function(e) {
+            e.preventDefault();
+            prevStoreSlide();
+        };
+    }
+    
+    // ドットクリックイベント
+    dots.forEach((dot, index) => {
+        dot.onclick = function(e) {
+            e.preventDefault();
+            goToStoreSlide(index);
+        };
+    });
+    
+    // マウス・タッチイベント
+    if (sliderContainer) {
+        sliderContainer.addEventListener('mouseenter', stopStoreAutoSlide);
+        sliderContainer.addEventListener('mouseleave', startStoreAutoSlide);
+        
+        // タッチスワイプ対応
+        let startX = 0;
+        let endX = 0;
+        
+        sliderContainer.addEventListener('touchstart', function(e) {
+            startX = e.touches[0].clientX;
+            stopStoreAutoSlide();
+        }, { passive: true });
+        
+        sliderContainer.addEventListener('touchend', function(e) {
+            endX = e.changedTouches[0].clientX;
+            handleStoreSwipe();
+            if (storeSliderState.totalSlides > 1) {
+                startStoreAutoSlide();
+            }
+        }, { passive: true });
+        
+        function handleStoreSwipe() {
+            const threshold = 50;
+            const diff = startX - endX;
+            
+            if (Math.abs(diff) > threshold) {
+                if (diff > 0) {
+                    nextStoreSlide();
+                } else {
+                    prevStoreSlide();
+                }
+            }
+        }
+    }
+}
+
+// 店舗スライダーの位置を更新
+function updateStoreSliderPosition() {
+    const sliderContainer = document.querySelector('.store-slider');
+    if (sliderContainer) {
+        const translateX = -storeSliderState.currentSlide * 100;
+        sliderContainer.style.transform = `translateX(${translateX}%)`;
+    }
+}
+
+// 店舗スライダーのドットを更新
+function updateStoreSliderDots() {
+    const dots = document.querySelectorAll('.store-dot');
+    dots.forEach((dot, index) => {
+        dot.classList.toggle('active', index === storeSliderState.currentSlide);
+    });
+}
+
+// 次の店舗スライドに移動
+function nextStoreSlide() {
+    if (storeSliderState.isTransitioning || storeSliderState.totalSlides <= 1) return;
+    storeSliderState.isTransitioning = true;
+    
+    storeSliderState.currentSlide = (storeSliderState.currentSlide + 1) % storeSliderState.totalSlides;
+    updateStoreSliderPosition();
+    updateStoreSliderDots();
+    
+    setTimeout(() => {
+        storeSliderState.isTransitioning = false;
+    }, 500);
+}
+
+// 前の店舗スライドに移動
+function prevStoreSlide() {
+    if (storeSliderState.isTransitioning || storeSliderState.totalSlides <= 1) return;
+    storeSliderState.isTransitioning = true;
+    
+    storeSliderState.currentSlide = (storeSliderState.currentSlide - 1 + storeSliderState.totalSlides) % storeSliderState.totalSlides;
+    updateStoreSliderPosition();
+    updateStoreSliderDots();
+    
+    setTimeout(() => {
+        storeSliderState.isTransitioning = false;
+    }, 500);
+}
+
+// 指定した店舗スライドに移動
+function goToStoreSlide(slideIndex) {
+    if (storeSliderState.isTransitioning || slideIndex === storeSliderState.currentSlide || storeSliderState.totalSlides <= 1) return;
+    storeSliderState.isTransitioning = true;
+    
+    storeSliderState.currentSlide = slideIndex;
+    updateStoreSliderPosition();
+    updateStoreSliderDots();
+    
+    setTimeout(() => {
+        storeSliderState.isTransitioning = false;
+    }, 500);
+}
+
+// 店舗スライダーの自動スライドを開始
+function startStoreAutoSlide() {
+    if (storeSliderState.totalSlides <= 1) return;
+    
+    if (storeSliderState.autoSlideInterval) {
+        clearInterval(storeSliderState.autoSlideInterval);
+    }
+    storeSliderState.autoSlideInterval = setInterval(nextStoreSlide, 4000);
+}
+
+// 店舗スライダーの自動スライドを停止
+function stopStoreAutoSlide() {
+    if (storeSliderState.autoSlideInterval) {
+        clearInterval(storeSliderState.autoSlideInterval);
+        storeSliderState.autoSlideInterval = null;
+    }
 }
 
 // 詳細説明を生成
@@ -170,18 +369,86 @@ function showError(message) {
     }
 }
 
-// 店舗データを読み込み（script.jsと同じ関数）
+// 店舗データを読み込み（複数の写真を含む）
 function loadStoreData() {
     const savedStores = localStorage.getItem('cabaret_stores');
     if (savedStores) {
-        return JSON.parse(savedStores);
+        // 保存されているデータがあるが、写真を追加する必要がある
+        const stores = JSON.parse(savedStores);
+        return addImageDataToStores(stores);
     }
     
-    // デフォルトの店舗データ
+    // デフォルトの店舗データ（複数写真付き）
+    return getDefaultStoreDataWithImages();
+}
+
+// 既存の店舗データに写真配列を追加
+function addImageDataToStores(stores) {
+    const imageData = getImageDataForStores();
+    
+    return stores.map(store => ({
+        ...store,
+        images: imageData[store.name] || [store.image || "nice-storefront.jpg"]
+    }));
+}
+
+// 店舗ごとの写真データを取得
+function getImageDataForStores() {
+    return {
+        "Premium Club TOKYO": [
+            "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=800&h=600&fit=crop&crop=center",
+            "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=800&h=600&fit=crop&crop=center",
+            "https://images.unsplash.com/photo-1549490349-8643362247b5?w=800&h=600&fit=crop&crop=center",
+            "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=800&h=600&fit=crop&crop=center",
+            "https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=800&h=600&fit=crop&crop=center"
+        ],
+        "Club Elegance": [
+            "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=800&h=600&fit=crop&crop=center",
+            "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=800&h=600&fit=crop&crop=center",
+            "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=800&h=600&fit=crop&crop=center",
+            "https://images.unsplash.com/photo-1549490349-8643362247b5?w=800&h=600&fit=crop&crop=center",
+            "https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=800&h=600&fit=crop&crop=center"
+        ],
+        "Night Paradise": [
+            "https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=800&h=600&fit=crop&crop=center",
+            "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=800&h=600&fit=crop&crop=center",
+            "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=800&h=600&fit=crop&crop=center",
+            "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=800&h=600&fit=crop&crop=center",
+            "https://images.unsplash.com/photo-1549490349-8643362247b5?w=800&h=600&fit=crop&crop=center"
+        ],
+        "Luxury Lounge": [
+            "https://images.unsplash.com/photo-1549490349-8643362247b5?w=800&h=600&fit=crop&crop=center",
+            "https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=800&h=600&fit=crop&crop=center",
+            "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=800&h=600&fit=crop&crop=center",
+            "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=800&h=600&fit=crop&crop=center",
+            "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=800&h=600&fit=crop&crop=center"
+        ],
+        "Royal Cabinet": [
+            "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=800&h=600&fit=crop&crop=center",
+            "https://images.unsplash.com/photo-1549490349-8643362247b5?w=800&h=600&fit=crop&crop=center",
+            "https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=800&h=600&fit=crop&crop=center",
+            "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=800&h=600&fit=crop&crop=center",
+            "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=800&h=600&fit=crop&crop=center"
+        ],
+        "Diamond Club": [
+            "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=800&h=600&fit=crop&crop=center",
+            "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=800&h=600&fit=crop&crop=center",
+            "https://images.unsplash.com/photo-1549490349-8643362247b5?w=800&h=600&fit=crop&crop=center",
+            "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=800&h=600&fit=crop&crop=center",
+            "https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=800&h=600&fit=crop&crop=center"
+        ]
+    };
+}
+
+// 複数写真付きのデフォルト店舗データ
+function getDefaultStoreDataWithImages() {
+    const imageData = getImageDataForStores();
+    
     return [
         {
             name: "Premium Club TOKYO",
-            image: "nice-storefront.jpg",
+            image: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=800&h=600&fit=crop&crop=center",
+            images: imageData["Premium Club TOKYO"],
             price: "1,500円〜",
             description: "最高級のサービスと洗練された空間で特別な時間をお過ごしください。厳選されたキャストが心を込めておもてなしいたします。",
             features: ["VIP個室あり", "送迎サービス", "カラオケ完備", "高級シャンパン"],
@@ -189,7 +456,8 @@ function loadStoreData() {
         },
         {
             name: "Club Elegance",
-            image: "nice-storefront.jpg",
+            image: "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=800&h=600&fit=crop&crop=center",
+            images: imageData["Club Elegance"],
             price: "1,200円〜",
             description: "エレガントで落ち着いた雰囲気の中で、上品なキャストがお客様を優雅にお迎えいたします。",
             features: ["落ち着いた雰囲気", "上品なキャスト", "個室完備", "ワイン豊富"],
@@ -197,7 +465,8 @@ function loadStoreData() {
         },
         {
             name: "Night Paradise",
-            image: "nice-storefront.jpg",
+            image: "https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=800&h=600&fit=crop&crop=center",
+            images: imageData["Night Paradise"],
             price: "1,000円〜",
             description: "夜の楽園をコンセプトにしたアットホームな空間で、楽しい時間をお過ごしください。",
             features: ["アットホーム", "リーズナブル", "イベント多数", "若いキャスト"],
@@ -205,7 +474,8 @@ function loadStoreData() {
         },
         {
             name: "Luxury Lounge",
-            image: "nice-storefront.jpg",
+            image: "https://images.unsplash.com/photo-1549490349-8643362247b5?w=800&h=600&fit=crop&crop=center",
+            images: imageData["Luxury Lounge"],
             price: "2,000円〜",
             description: "ラグジュアリーな空間と最高級のサービスで、贅沢なひとときをお約束いたします。",
             features: ["最高級サービス", "豪華内装", "プレミアムドリンク", "VIPルーム"],
@@ -213,7 +483,8 @@ function loadStoreData() {
         },
         {
             name: "Royal Cabinet",
-            image: "nice-storefront.jpg",
+            image: "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=800&h=600&fit=crop&crop=center",
+            images: imageData["Royal Cabinet"],
             price: "1,750円〜",
             description: "王室のような気品あふれる空間で、最上級のホスピタリティをご体験ください。",
             features: ["格調高い", "知的なキャスト", "プライベート空間", "高級酒豊富"],
@@ -221,7 +492,8 @@ function loadStoreData() {
         },
         {
             name: "Diamond Club",
-            image: "nice-storefront.jpg",
+            image: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=800&h=600&fit=crop&crop=center",
+            images: imageData["Diamond Club"],
             price: "1,400円〜",
             description: "ダイヤモンドのように輝く特別な時間をお約束いたします。美しいキャストがお迎えします。",
             features: ["煌びやか", "美しいキャスト", "特別サービス", "記念日対応"],
