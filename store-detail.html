@@ -40,15 +40,8 @@
         <div id="store-content" class="store-detail-content" style="display: none;">
             <!-- 店舗ヒーローセクション -->
             <section class="store-hero">
-                <div class="store-image-slider">
-                    <div class="store-slider">
-                        <!-- 写真は JavaScript で動的に生成 -->
-                    </div>
-                    <button class="store-slider-btn store-prev-btn">❮</button>
-                    <button class="store-slider-btn store-next-btn">❯</button>
-                    <div class="store-slider-dots">
-                        <!-- ドットは JavaScript で動的に生成 -->
-                    </div>
+                <div class="store-hero-image">
+                    <img id="store-main-image" src="" alt="" loading="lazy">
                     <div class="store-hero-overlay">
                         <div class="container">
                             <div class="store-hero-content">
@@ -60,6 +53,23 @@
                                     <span id="store-price" class="price-value"></span>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 店舗写真ギャラリー -->
+            <section class="store-gallery">
+                <div class="container">
+                    <h2>店舗写真</h2>
+                    <div class="gallery-slider-container">
+                        <div class="gallery-slider">
+                            <!-- 写真は JavaScript で動的に生成 -->
+                        </div>
+                        <button class="gallery-btn gallery-prev-btn">❮</button>
+                        <button class="gallery-btn gallery-next-btn">❯</button>
+                        <div class="gallery-dots">
+                            <!-- ドットは JavaScript で動的に生成 -->
                         </div>
                     </div>
                 </div>

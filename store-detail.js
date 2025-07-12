@@ -1,7 +1,7 @@
 // 店舗詳細ページのJavaScript
 
-// スライダーの状態管理
-let storeSliderState = {
+// ギャラリースライダーの状態管理
+let gallerySliderState = {
     currentSlide: 0,
     totalSlides: 0,
     autoSlideInterval: null,
@@ -79,10 +79,9 @@ function displayStoreDetail(store) {
     // ページタイトルを更新
     document.title = `${store.name} - 店舗詳細 | NICE（ナイス）`;
     
-    // 写真スライダーを初期化
-    initializeStoreImageSlider(store.images || [store.image]);
-    
-    // 基本情報を設定
+    // 基本情報を設定（メイン画像）
+    document.getElementById('store-main-image').src = store.image;
+    document.getElementById('store-main-image').alt = `${store.name} 店内`;
     document.getElementById('store-badge').textContent = store.badge;
     document.getElementById('store-name').textContent = store.name;
     document.getElementById('store-description').textContent = store.description;
@@ -91,6 +90,9 @@ function displayStoreDetail(store) {
     // 詳細情報を設定
     document.getElementById('detail-name').textContent = store.name;
     document.getElementById('detail-price').textContent = store.price;
+    
+    // 写真ギャラリーを初期化
+    initializeGallerySlider(store.images || [store.image]);
     
     // 特徴・サービスを表示
     const featuresContainer = document.getElementById('store-features');
@@ -111,13 +113,13 @@ function displayStoreDetail(store) {
     document.getElementById('store-content').style.display = 'block';
 }
 
-// 店舗写真スライダーの初期化
-function initializeStoreImageSlider(images) {
-    const sliderContainer = document.querySelector('.store-slider');
-    const dotsContainer = document.querySelector('.store-slider-dots');
+// ギャラリースライダーの初期化
+function initializeGallerySlider(images) {
+    const sliderContainer = document.querySelector('.gallery-slider');
+    const dotsContainer = document.querySelector('.gallery-dots');
     
     if (!sliderContainer || !dotsContainer) {
-        console.error('スライダーコンテナが見つかりません');
+        console.error('ギャラリースライダーコンテナが見つかりません');
         return;
     }
     
@@ -128,53 +130,53 @@ function initializeStoreImageSlider(images) {
     // 画像スライドを生成
     images.forEach((imageSrc, index) => {
         const slide = document.createElement('div');
-        slide.className = 'store-slide';
+        slide.className = 'gallery-slide';
         slide.innerHTML = `<img src="${imageSrc}" alt="店舗写真 ${index + 1}" loading="lazy">`;
         sliderContainer.appendChild(slide);
         
         // ドットを生成
         const dot = document.createElement('span');
-        dot.className = `store-dot ${index === 0 ? 'active' : ''}`;
+        dot.className = `gallery-dot ${index === 0 ? 'active' : ''}`;
         dot.dataset.slide = index;
         dotsContainer.appendChild(dot);
     });
     
     // スライダー状態を初期化
-    storeSliderState.currentSlide = 0;
-    storeSliderState.totalSlides = images.length;
-    storeSliderState.isTransitioning = false;
+    gallerySliderState.currentSlide = 0;
+    gallerySliderState.totalSlides = images.length;
+    gallerySliderState.isTransitioning = false;
     
     // イベントリスナーを設定
-    setupStoreSliderEvents();
+    setupGallerySliderEvents();
     
     // 自動スライドを開始（複数の画像がある場合のみ）
     if (images.length > 1) {
-        startStoreAutoSlide();
+        startGalleryAutoSlide();
     }
     
-    storeSliderState.isInitialized = true;
-    console.log(`店舗スライダーが初期化されました（${images.length}枚の写真）`);
+    gallerySliderState.isInitialized = true;
+    console.log(`ギャラリースライダーが初期化されました（${images.length}枚の写真）`);
 }
 
-// 店舗スライダーのイベントリスナーを設定
-function setupStoreSliderEvents() {
-    const prevBtn = document.querySelector('.store-prev-btn');
-    const nextBtn = document.querySelector('.store-next-btn');
-    const dots = document.querySelectorAll('.store-dot');
-    const sliderContainer = document.querySelector('.store-image-slider');
+// ギャラリースライダーのイベントリスナーを設定
+function setupGallerySliderEvents() {
+    const prevBtn = document.querySelector('.gallery-prev-btn');
+    const nextBtn = document.querySelector('.gallery-next-btn');
+    const dots = document.querySelectorAll('.gallery-dot');
+    const sliderContainer = document.querySelector('.gallery-slider-container');
     
     // ボタンクリックイベント
     if (nextBtn) {
         nextBtn.onclick = function(e) {
             e.preventDefault();
-            nextStoreSlide();
+            nextGallerySlide();
         };
     }
     
     if (prevBtn) {
         prevBtn.onclick = function(e) {
             e.preventDefault();
-            prevStoreSlide();
+            prevGallerySlide();
         };
     }
     
@@ -182,14 +184,14 @@ function setupStoreSliderEvents() {
     dots.forEach((dot, index) => {
         dot.onclick = function(e) {
             e.preventDefault();
-            goToStoreSlide(index);
+            goToGallerySlide(index);
         };
     });
     
     // マウス・タッチイベント
     if (sliderContainer) {
-        sliderContainer.addEventListener('mouseenter', stopStoreAutoSlide);
-        sliderContainer.addEventListener('mouseleave', startStoreAutoSlide);
+        sliderContainer.addEventListener('mouseenter', stopGalleryAutoSlide);
+        sliderContainer.addEventListener('mouseleave', startGalleryAutoSlide);
         
         // タッチスワイプ対応
         let startX = 0;
@@ -197,106 +199,106 @@ function setupStoreSliderEvents() {
         
         sliderContainer.addEventListener('touchstart', function(e) {
             startX = e.touches[0].clientX;
-            stopStoreAutoSlide();
+            stopGalleryAutoSlide();
         }, { passive: true });
         
         sliderContainer.addEventListener('touchend', function(e) {
             endX = e.changedTouches[0].clientX;
-            handleStoreSwipe();
-            if (storeSliderState.totalSlides > 1) {
-                startStoreAutoSlide();
+            handleGallerySwipe();
+            if (gallerySliderState.totalSlides > 1) {
+                startGalleryAutoSlide();
             }
         }, { passive: true });
         
-        function handleStoreSwipe() {
+        function handleGallerySwipe() {
             const threshold = 50;
             const diff = startX - endX;
             
             if (Math.abs(diff) > threshold) {
                 if (diff > 0) {
-                    nextStoreSlide();
+                    nextGallerySlide();
                 } else {
-                    prevStoreSlide();
+                    prevGallerySlide();
                 }
             }
         }
     }
 }
 
-// 店舗スライダーの位置を更新
-function updateStoreSliderPosition() {
-    const sliderContainer = document.querySelector('.store-slider');
+// ギャラリースライダーの位置を更新
+function updateGallerySliderPosition() {
+    const sliderContainer = document.querySelector('.gallery-slider');
     if (sliderContainer) {
-        const translateX = -storeSliderState.currentSlide * 100;
+        const translateX = -gallerySliderState.currentSlide * 100;
         sliderContainer.style.transform = `translateX(${translateX}%)`;
     }
 }
 
-// 店舗スライダーのドットを更新
-function updateStoreSliderDots() {
-    const dots = document.querySelectorAll('.store-dot');
+// ギャラリースライダーのドットを更新
+function updateGallerySliderDots() {
+    const dots = document.querySelectorAll('.gallery-dot');
     dots.forEach((dot, index) => {
-        dot.classList.toggle('active', index === storeSliderState.currentSlide);
+        dot.classList.toggle('active', index === gallerySliderState.currentSlide);
     });
 }
 
-// 次の店舗スライドに移動
-function nextStoreSlide() {
-    if (storeSliderState.isTransitioning || storeSliderState.totalSlides <= 1) return;
-    storeSliderState.isTransitioning = true;
+// 次のギャラリースライドに移動
+function nextGallerySlide() {
+    if (gallerySliderState.isTransitioning || gallerySliderState.totalSlides <= 1) return;
+    gallerySliderState.isTransitioning = true;
     
-    storeSliderState.currentSlide = (storeSliderState.currentSlide + 1) % storeSliderState.totalSlides;
-    updateStoreSliderPosition();
-    updateStoreSliderDots();
+    gallerySliderState.currentSlide = (gallerySliderState.currentSlide + 1) % gallerySliderState.totalSlides;
+    updateGallerySliderPosition();
+    updateGallerySliderDots();
     
     setTimeout(() => {
-        storeSliderState.isTransitioning = false;
+        gallerySliderState.isTransitioning = false;
     }, 500);
 }
 
-// 前の店舗スライドに移動
-function prevStoreSlide() {
-    if (storeSliderState.isTransitioning || storeSliderState.totalSlides <= 1) return;
-    storeSliderState.isTransitioning = true;
+// 前のギャラリースライドに移動
+function prevGallerySlide() {
+    if (gallerySliderState.isTransitioning || gallerySliderState.totalSlides <= 1) return;
+    gallerySliderState.isTransitioning = true;
     
-    storeSliderState.currentSlide = (storeSliderState.currentSlide - 1 + storeSliderState.totalSlides) % storeSliderState.totalSlides;
-    updateStoreSliderPosition();
-    updateStoreSliderDots();
+    gallerySliderState.currentSlide = (gallerySliderState.currentSlide - 1 + gallerySliderState.totalSlides) % gallerySliderState.totalSlides;
+    updateGallerySliderPosition();
+    updateGallerySliderDots();
     
     setTimeout(() => {
-        storeSliderState.isTransitioning = false;
+        gallerySliderState.isTransitioning = false;
     }, 500);
 }
 
-// 指定した店舗スライドに移動
-function goToStoreSlide(slideIndex) {
-    if (storeSliderState.isTransitioning || slideIndex === storeSliderState.currentSlide || storeSliderState.totalSlides <= 1) return;
-    storeSliderState.isTransitioning = true;
+// 指定したギャラリースライドに移動
+function goToGallerySlide(slideIndex) {
+    if (gallerySliderState.isTransitioning || slideIndex === gallerySliderState.currentSlide || gallerySliderState.totalSlides <= 1) return;
+    gallerySliderState.isTransitioning = true;
     
-    storeSliderState.currentSlide = slideIndex;
-    updateStoreSliderPosition();
-    updateStoreSliderDots();
+    gallerySliderState.currentSlide = slideIndex;
+    updateGallerySliderPosition();
+    updateGallerySliderDots();
     
     setTimeout(() => {
-        storeSliderState.isTransitioning = false;
+        gallerySliderState.isTransitioning = false;
     }, 500);
 }
 
-// 店舗スライダーの自動スライドを開始
-function startStoreAutoSlide() {
-    if (storeSliderState.totalSlides <= 1) return;
+// ギャラリースライダーの自動スライドを開始
+function startGalleryAutoSlide() {
+    if (gallerySliderState.totalSlides <= 1) return;
     
-    if (storeSliderState.autoSlideInterval) {
-        clearInterval(storeSliderState.autoSlideInterval);
+    if (gallerySliderState.autoSlideInterval) {
+        clearInterval(gallerySliderState.autoSlideInterval);
     }
-    storeSliderState.autoSlideInterval = setInterval(nextStoreSlide, 4000);
+    gallerySliderState.autoSlideInterval = setInterval(nextGallerySlide, 4000);
 }
 
-// 店舗スライダーの自動スライドを停止
-function stopStoreAutoSlide() {
-    if (storeSliderState.autoSlideInterval) {
-        clearInterval(storeSliderState.autoSlideInterval);
-        storeSliderState.autoSlideInterval = null;
+// ギャラリースライダーの自動スライドを停止
+function stopGalleryAutoSlide() {
+    if (gallerySliderState.autoSlideInterval) {
+        clearInterval(gallerySliderState.autoSlideInterval);
+        gallerySliderState.autoSlideInterval = null;
     }
 }
 
