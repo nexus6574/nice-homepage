@@ -113,11 +113,24 @@ window.addEventListener('scroll', function() {
 
 // 店舗データ管理
 function loadStoreData() {
+    console.log('loadStoreData: データ読み込み開始');
+    
     const savedStores = localStorage.getItem('cabaret_stores');
     if (savedStores) {
-        return JSON.parse(savedStores);
+        try {
+            const parsedData = JSON.parse(savedStores);
+            console.log('loadStoreData: LocalStorageからデータを読み込み成功');
+            console.log('店舗数:', parsedData.length);
+            console.log('店舗データサンプル:', parsedData[0]?.name || 'なし');
+            return parsedData;
+        } catch (error) {
+            console.error('loadStoreData: JSONパースエラー:', error);
+            console.log('デフォルトデータにフォールバック');
+            return getDefaultStoreData();
+        }
     }
     
+    console.log('loadStoreData: LocalStorageにデータなし - デフォルトデータを使用');
     // デフォルトの店舗データを返す
     return getDefaultStoreData();
 }
@@ -520,17 +533,25 @@ function cleanupSlider() {
 
 // ページロード時にデータを更新
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOMContentLoaded: ページ初期化開始');
+    
     // 現在のページに応じて更新
     if (document.querySelector('.store-grid')) {
-        // 店舗一覧ページ
+        console.log('店舗一覧ページを検出 - データ更新中...');
         updateCabaretListPage();
     } else if (document.querySelector('.slider')) {
-        // メインページ
+        console.log('メインページを検出 - スライダー更新中...');
         updateMainPageSlider();
     }
     
     // 管理画面リンクを追加（開発用）
     addAdminLink();
+    
+    // データ同期監視を開始
+    startDataSyncMonitoring();
+    
+    // 強制リフレッシュボタンを追加
+    addForceRefreshButton();
 });
 
 // 管理画面へのリンクを追加（デバッグ用）
@@ -570,4 +591,206 @@ function addAdminLink() {
     
     document.body.appendChild(adminLink);
 }
+
+// データ同期監視機能
+function startDataSyncMonitoring() {
+    console.log('データ同期監視を開始');
+    
+    // 初期データのハッシュを保存
+    let currentDataHash = getDataHash();
+    
+    // 定期的にlocalStorageをチェック（3秒ごと）
+    setInterval(function() {
+        const newDataHash = getDataHash();
+        if (newDataHash !== currentDataHash) {
+            console.log('データの変更を検出しました - 自動更新中...');
+            currentDataHash = newDataHash;
+            
+            // ページを自動更新
+            refreshPageData();
+            
+            // 通知を表示
+            showDataUpdateNotification();
+        }
+    }, 3000);
+    
+    // StorageEventでリアルタイム検出（同一オリジン内）
+    window.addEventListener('storage', function(e) {
+        if (e.key === 'cabaret_stores') {
+            console.log('Storage event: データ変更を検出');
+            refreshPageData();
+            showDataUpdateNotification();
+        }
+    });
+}
+
+// データのハッシュを生成（変更検出用）
+function getDataHash() {
+    const data = localStorage.getItem('cabaret_stores');
+    return data ? data.length + '_' + data.substring(0, 50) : 'empty';
+}
+
+// ページデータを強制リフレッシュ
+function refreshPageData() {
+    console.log('ページデータを強制リフレッシュ中...');
+    
+    try {
+        if (document.querySelector('.store-grid')) {
+            console.log('店舗一覧ページを更新中...');
+            updateCabaretListPage();
+        } else if (document.querySelector('.slider')) {
+            console.log('メインページスライダーを更新中...');
+            updateMainPageSlider();
+        }
+        console.log('ページデータのリフレッシュ完了');
+    } catch (error) {
+        console.error('データリフレッシュエラー:', error);
+    }
+}
+
+// データ更新通知を表示
+function showDataUpdateNotification() {
+    // 既存の通知を削除
+    const existingNotification = document.querySelector('.data-update-notification');
+    if (existingNotification) {
+        existingNotification.remove();
+    }
+    
+    const notification = document.createElement('div');
+    notification.className = 'data-update-notification';
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 10000;
+        background: linear-gradient(45deg, #27ae60, #2ecc71);
+        color: white;
+        padding: 15px 20px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: bold;
+        box-shadow: 0 5px 15px rgba(39, 174, 96, 0.4);
+        animation: slideInRight 0.5s ease;
+        max-width: 300px;
+    `;
+    
+    notification.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <span>🔄</span>
+            <span>データが更新されました</span>
+        </div>
+    `;
+    
+    // アニメーションのCSSを追加
+    if (!document.getElementById('notification-styles')) {
+        const styles = document.createElement('style');
+        styles.id = 'notification-styles';
+        styles.textContent = `
+            @keyframes slideInRight {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            @keyframes slideOutRight {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(styles);
+    }
+    
+    document.body.appendChild(notification);
+    
+    // 3秒後に非表示
+    setTimeout(() => {
+        if (notification.parentNode) {
+            notification.style.animation = 'slideOutRight 0.5s ease';
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.remove();
+                }
+            }, 500);
+        }
+    }, 3000);
+}
+
+// 強制リフレッシュボタンを追加
+function addForceRefreshButton() {
+    const refreshButton = document.createElement('div');
+    refreshButton.style.cssText = `
+        position: fixed;
+        bottom: 20px;
+        left: 20px;
+        z-index: 1000;
+        background: linear-gradient(45deg, #3498db, #2980b9);
+        color: white;
+        padding: 12px 16px;
+        border-radius: 25px;
+        font-size: 12px;
+        font-weight: bold;
+        box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-block;
+        user-select: none;
+    `;
+    refreshButton.innerHTML = '🔄 データ更新';
+    
+    refreshButton.onclick = function() {
+        console.log('強制リフレッシュボタンがクリックされました');
+        
+        // ボタンを一時的に無効化
+        refreshButton.style.opacity = '0.6';
+        refreshButton.style.pointerEvents = 'none';
+        refreshButton.innerHTML = '🔄 更新中...';
+        
+        // データを強制リフレッシュ
+        refreshPageData();
+        
+        // 成功メッセージを表示
+        showDataUpdateNotification();
+        
+        // ボタンを元に戻す
+        setTimeout(() => {
+            refreshButton.style.opacity = '1';
+            refreshButton.style.pointerEvents = 'auto';
+            refreshButton.innerHTML = '🔄 データ更新';
+        }, 1000);
+    };
+    
+    refreshButton.addEventListener('mouseenter', function() {
+        this.style.transform = 'translateY(-3px)';
+        this.style.boxShadow = '0 8px 25px rgba(52, 152, 219, 0.6)';
+    });
+    
+    refreshButton.addEventListener('mouseleave', function() {
+        this.style.transform = 'translateY(0)';
+        this.style.boxShadow = '0 5px 15px rgba(52, 152, 219, 0.4)';
+    });
+    
+    document.body.appendChild(refreshButton);
+}
+
+// 緊急データ復旧機能（グローバル関数として公開）
+window.NICE_FORCE_REFRESH = function() {
+    console.log('緊急データリフレッシュ実行');
+    try {
+        refreshPageData();
+        showDataUpdateNotification();
+        console.log('緊急リフレッシュ完了');
+        return '成功: データを強制更新しました';
+    } catch (error) {
+        console.error('緊急リフレッシュエラー:', error);
+        return 'エラー: ' + error.message;
+    }
+};
+
+// ページ可視性変更時にデータをチェック（タブ切り替え時など）
+document.addEventListener('visibilitychange', function() {
+    if (!document.hidden) {
+        console.log('ページが再表示されました - データをチェック中...');
+        // 少し遅延してからチェック
+        setTimeout(refreshPageData, 500);
+    }
+});
 
