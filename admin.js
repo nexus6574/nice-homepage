@@ -707,17 +707,33 @@ function handleExportData() {
         // JSON化して簡易圧縮
         const jsonString = JSON.stringify(miniData);
         const compressed = simpleCompress(jsonString);
-        const base64Compressed = btoa(encodeURIComponent(compressed));
+        
+        // UTF-8対応のBase64エンコード
+        const utf8Bytes = new TextEncoder().encode(compressed);
+        const base64Compressed = btoa(String.fromCharCode(...utf8Bytes));
         
         // 最終エンコード（さらに短縮）
-        const finalData = `V2:${base64Compressed}`;
+        const finalData = `V3:${base64Compressed}`;
         
         // エクスポートモーダルに表示
         document.getElementById('export-data-text').value = finalData;
         showExportModal();
         
         const compressionRatio = Math.round((1 - finalData.length / jsonString.length) * 100);
-        showMessage(`データをエクスポートしました（${finalData.length}文字、${compressionRatio}%圧縮）`, 'success');
+        
+        // 緊急時用の非圧縮バックアップも生成
+        const backupData = JSON.stringify({
+            version: "backup",
+            timestamp: new Date().toISOString(),
+            device: navigator.userAgent.includes('Mobile') ? 'mobile' : 'desktop',
+            storeCount: currentStores.length,
+            stores: currentStores
+        });
+        
+        console.log('バックアップデータ（非圧縮）:', backupData.substring(0, 100) + '...');
+        console.log('バックアップデータ文字数:', backupData.length);
+        
+        showMessage(`データをエクスポートしました（${finalData.length}文字、${compressionRatio}%圧縮）\n\n※万が一インポートに失敗する場合は、\nブラウザのコンソールから「バックアップデータ」をコピーしてください`, 'success');
         
     } catch (error) {
         console.error('Export error:', error);
@@ -780,10 +796,17 @@ function handlePasteImport() {
         
         let importData, stores, timestamp, device, storeCount;
         
-        // 新しい圧縮形式かチェック（V2形式）
-        if (inputData.startsWith('V2:')) {
+        // 新しい圧縮形式かチェック（V3形式）
+        if (inputData.startsWith('V3:')) {
             const compressedData = inputData.substring(3);
-            const decodedData = decodeURIComponent(atob(compressedData));
+            
+            // UTF-8対応のBase64デコード
+            const binaryString = atob(compressedData);
+            const utf8Bytes = new Uint8Array(binaryString.length);
+            for (let i = 0; i < binaryString.length; i++) {
+                utf8Bytes[i] = binaryString.charCodeAt(i);
+            }
+            const decodedData = new TextDecoder().decode(utf8Bytes);
             const jsonString = simpleDecompress(decodedData);
             importData = JSON.parse(jsonString);
             
@@ -801,6 +824,10 @@ function handlePasteImport() {
             timestamp = importData.t ? new Date(importData.t * 1000).toLocaleString('ja-JP') : '不明';
             device = importData.d === 1 ? '携帯' : 'パソコン';
             storeCount = importData.c || stores.length;
+        }
+        // V2形式（旧バージョン）
+        else if (inputData.startsWith('V2:')) {
+            throw new Error('V2形式は非対応です。新しいエクスポートを使用してください。');
         }
         // 旧V1形式（エラーが出やすいのでスキップするか簡単な処理）
         else if (inputData.startsWith('V1:')) {
@@ -856,6 +883,25 @@ ${storeCount}件の店舗データをインポートします。
     } catch (error) {
         console.error('Paste import error:', error);
         console.error('Input data preview:', inputData.substring(0, 100) + '...');
+        
+        // フォールバック：圧縮なしの直接JSONとして試す
+        if (inputData.startsWith('{') && inputData.includes('"stores"')) {
+            try {
+                const fallbackData = JSON.parse(inputData);
+                if (fallbackData.stores && Array.isArray(fallbackData.stores)) {
+                    console.log('フォールバック：直接JSONとして処理');
+                    currentStores = fallbackData.stores;
+                    saveStores();
+                    renderStores();
+                    hideImportModal();
+                    showMessage(`フォールバック処理で${fallbackData.stores.length}件のデータをインポートしました`, 'warning');
+                    return;
+                }
+            } catch (fallbackError) {
+                console.error('フォールバックも失敗:', fallbackError);
+            }
+        }
+        
         showMessage('インポートに失敗しました: ' + error.message + '\n\nデバッグ情報: ' + inputData.substring(0, 50) + '...', 'error');
     }
 }
@@ -880,8 +926,8 @@ function handleImportFile(event) {
         try {
             const inputData = e.target.result;
             
-            // V2形式かどうかチェック
-            if (inputData.startsWith('V2:')) {
+            // V3形式かどうかチェック
+            if (inputData.startsWith('V3:') || inputData.startsWith('V2:') || inputData.startsWith('V1:')) {
                 // ペーストインポートと同じ処理を呼び出す
                 document.getElementById('import-data-text').value = inputData;
                 hideImportModal();
