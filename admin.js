@@ -699,10 +699,15 @@ function handleExportData() {
                 ),
                 store.price,
                 store.badge,
-                (store.description || '').substring(0, 30),
+                store.description || '',
                 store.features || []
             ])
         };
+        
+        console.log('エクスポート中のデータ:');
+        console.log('Original currentStores:', currentStores);
+        console.log('Mini data format:', miniData);
+        console.log('Sample store array:', miniData.s[0]);
         
         // JSON化して簡易圧縮
         const jsonString = JSON.stringify(miniData);
@@ -810,17 +815,29 @@ function handlePasteImport() {
             const jsonString = simpleDecompress(decodedData);
             importData = JSON.parse(jsonString);
             
+            // デバッグ情報を出力
+            console.log('V3形式データをデコード中...');
+            console.log('Raw importData:', importData);
+            console.log('Store array sample:', importData.s[0]);
+            
             // 配列形式から復元
-            stores = importData.s.map(storeArray => ({
-                id: storeArray[0],
-                name: storeArray[1],
-                image: restoreImageUrl(storeArray[2]),
-                images: storeArray[3].map(restoreImageUrl),
-                price: storeArray[4],
-                badge: storeArray[5],
-                description: storeArray[6],
-                features: storeArray[7] || []
-            }));
+            stores = importData.s.map((storeArray, index) => {
+                console.log(`Store ${index}:`, storeArray);
+                const restored = {
+                    id: storeArray[0],
+                    name: storeArray[1],
+                    image: restoreImageUrl(storeArray[2]),
+                    images: (storeArray[3] || []).map(restoreImageUrl),
+                    price: storeArray[4],
+                    badge: storeArray[5],
+                    description: storeArray[6],
+                    features: storeArray[7] || []
+                };
+                console.log(`Restored store ${index}:`, restored);
+                return restored;
+            });
+            
+            console.log('Final restored stores:', stores);
             timestamp = importData.t ? new Date(importData.t * 1000).toLocaleString('ja-JP') : '不明';
             device = importData.d === 1 ? '携帯' : 'パソコン';
             storeCount = importData.c || stores.length;
@@ -874,11 +891,26 @@ ${storeCount}件の店舗データをインポートします。
 現在のデータは上書きされます。続行しますか？`;
         
         if (confirm(confirmMessage)) {
+            console.log('インポート実行中...');
+            console.log('Old currentStores:', currentStores);
+            console.log('New stores to import:', stores);
+            
             currentStores = stores;
+            console.log('Updated currentStores:', currentStores);
+            
             saveStores();
+            console.log('Data saved to localStorage');
+            
             renderStores();
+            console.log('Stores re-rendered');
+            
             hideImportModal();
-            showMessage(`${stores.length}件のデータをインポートしました`, 'success');
+            showMessage(`${stores.length}件のデータをインポートしました\n\n3秒後にページを再読み込みします...`, 'success');
+            
+            // 3秒後にページを再読み込み
+            setTimeout(() => {
+                window.location.reload();
+            }, 3000);
         }
     } catch (error) {
         console.error('Paste import error:', error);
@@ -894,7 +926,12 @@ ${storeCount}件の店舗データをインポートします。
                     saveStores();
                     renderStores();
                     hideImportModal();
-                    showMessage(`フォールバック処理で${fallbackData.stores.length}件のデータをインポートしました`, 'warning');
+                    showMessage(`フォールバック処理で${fallbackData.stores.length}件のデータをインポートしました\n\n3秒後にページを再読み込みします...`, 'warning');
+                    
+                    // 3秒後にページを再読み込み
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 3000);
                     return;
                 }
             } catch (fallbackError) {
