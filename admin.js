@@ -616,45 +616,109 @@ function exportStoreData() {
 // エクスポート/インポート機能
 function handleExportData() {
     try {
-        // 画像URLを短縮する関数
-        function compressImageUrl(url) {
-            if (!url) return '';
-            // UnsplashのURLから不要な部分を削除
-            const match = url.match(/photo-([a-zA-Z0-9_-]+)\?/);
-            return match ? match[1] : url.substring(url.lastIndexOf('/') + 1);
+        // 簡易圧縮（問題のあるLZ圧縮を避ける）
+        function simpleCompress(jsonData) {
+            // 重複文字列を置換する簡単な圧縮
+            let compressed = jsonData;
+            
+            // よく使われる文字列を短い記号に置換
+            const replacements = {
+                '"https://images.unsplash.com/photo-': '"U:',
+                '?w=800&h=600&fit=crop&crop=center"': '"',
+                '"price"': '"p"',
+                '"badge"': '"b"',
+                '"name"': '"n"',
+                '"description"': '"d"',
+                '"features"': '"f"',
+                '"image"': '"i"',
+                '"images"': '"g"',
+                '"id"': '"x"',
+                '高級店': 'H1',
+                '上品': 'H2', 
+                '人気': 'H3',
+                'ラグジュアリー': 'H4',
+                '王室級': 'H5',
+                '新店': 'H6',
+                'おすすめ': 'H7'
+            };
+            
+            for (const [original, replacement] of Object.entries(replacements)) {
+                compressed = compressed.split(original).join(replacement);
+            }
+            
+            return compressed;
         }
         
-        // 説明文を短縮する関数
-        function compressDescription(desc) {
-            if (!desc) return '';
-            return desc.length > 50 ? desc.substring(0, 50) + '…' : desc;
+        // 簡易解凍
+        function simpleDecompress(compressed) {
+            // 圧縮時の置換を逆に戻す
+            const replacements = {
+                '"U:': '"https://images.unsplash.com/photo-',
+                'H1': '高級店',
+                'H2': '上品',
+                'H3': '人気', 
+                'H4': 'ラグジュアリー',
+                'H5': '王室級',
+                'H6': '新店',
+                'H7': 'おすすめ',
+                '"p"': '"price"',
+                '"b"': '"badge"',
+                '"n"': '"name"',
+                '"d"': '"description"',
+                '"f"': '"features"',
+                '"i"': '"image"',
+                '"g"': '"images"',
+                '"x"': '"id"'
+            };
+            
+            let decompressed = compressed;
+            for (const [replacement, original] of Object.entries(replacements)) {
+                decompressed = decompressed.split(replacement).join(original);
+            }
+            
+            // UnsplashのURL修復
+            decompressed = decompressed.replace(/"U:([a-zA-Z0-9_-]+)"/g, '"https://images.unsplash.com/photo-$1?w=800&h=600&fit=crop&crop=center"');
+            
+            return decompressed;
         }
         
-        const exportData = {
-            v: '1.0',
-            t: Math.floor(Date.now() / 1000), // UNIXタイムスタンプで短縮
-            d: navigator.userAgent.includes('Mobile') ? 'M' : 'D', // MobileかDesktopを1文字で
+        // 超短縮データ形式
+        const miniData = {
+            v: 1,
+            t: Math.floor(Date.now() / 1000),
+            d: navigator.userAgent.includes('Mobile') ? 1 : 0,
             c: currentStores.length,
-            s: currentStores.map(store => ({
-                i: store.id,
-                n: store.name,
-                img: compressImageUrl(store.image),
-                imgs: (store.images || []).map(compressImageUrl),
-                p: store.price,
-                b: store.badge,
-                d: compressDescription(store.description),
-                f: store.features || []
-            }))
+            s: currentStores.map(store => [
+                store.id,
+                store.name,
+                store.image?.includes('unsplash') ? store.image.match(/photo-([a-zA-Z0-9_-]+)/)?.[1] || '' : 
+                store.image?.startsWith('data:') ? 'L' : store.image || '',
+                (store.images || []).map(img => 
+                    img?.includes('unsplash') ? img.match(/photo-([a-zA-Z0-9_-]+)/)?.[1] || '' : 
+                    img?.startsWith('data:') ? 'L' : img || ''
+                ),
+                store.price,
+                store.badge,
+                (store.description || '').substring(0, 30),
+                store.features || []
+            ])
         };
         
-        // 最小形式のJSONString（インデントなし）
-        const jsonString = JSON.stringify(exportData);
+        // JSON化して簡易圧縮
+        const jsonString = JSON.stringify(miniData);
+        const compressed = simpleCompress(jsonString);
+        const base64Compressed = btoa(encodeURIComponent(compressed));
+        
+        // 最終エンコード（さらに短縮）
+        const finalData = `V2:${base64Compressed}`;
         
         // エクスポートモーダルに表示
-        document.getElementById('export-data-text').value = jsonString;
+        document.getElementById('export-data-text').value = finalData;
         showExportModal();
         
-        showMessage(`データをエクスポートしました（${jsonString.length}文字）`, 'success');
+        const compressionRatio = Math.round((1 - finalData.length / jsonString.length) * 100);
+        showMessage(`データをエクスポートしました（${finalData.length}文字、${compressionRatio}%圧縮）`, 'success');
+        
     } catch (error) {
         console.error('Export error:', error);
         showMessage('エクスポートに失敗しました: ' + error.message, 'error');
@@ -667,54 +731,111 @@ function handleImportData() {
 
 function handlePasteImport() {
     const textArea = document.getElementById('import-data-text');
-    const jsonString = textArea.value.trim();
+    const inputData = textArea.value.trim();
     
-    if (!jsonString) {
+    if (!inputData) {
         showMessage('インポートするデータを入力してください', 'error');
         return;
     }
     
     try {
-        const importData = JSON.parse(jsonString);
-        let stores = [];
-        let timestamp = '';
-        let device = '';
-        let storeCount = 0;
+        // 簡易解凍関数
+        function simpleDecompress(compressed) {
+            const replacements = {
+                '"U:': '"https://images.unsplash.com/photo-',
+                'H1': '高級店',
+                'H2': '上品',
+                'H3': '人気', 
+                'H4': 'ラグジュアリー',
+                'H5': '王室級',
+                'H6': '新店',
+                'H7': 'おすすめ',
+                '"p"': '"price"',
+                '"b"': '"badge"',
+                '"n"': '"name"',
+                '"d"': '"description"',
+                '"f"': '"features"',
+                '"i"': '"image"',
+                '"g"': '"images"',
+                '"x"': '"id"'
+            };
+            
+            let decompressed = compressed;
+            for (const [replacement, original] of Object.entries(replacements)) {
+                decompressed = decompressed.split(replacement).join(original);
+            }
+            
+            // UnsplashのURL修復
+            decompressed = decompressed.replace(/"U:([a-zA-Z0-9_-]+)"/g, '"https://images.unsplash.com/photo-$1?w=800&h=600&fit=crop&crop=center"');
+            
+            return decompressed;
+        }
         
-        // 画像URLを復元する関数
         function restoreImageUrl(compressed) {
             if (!compressed) return '';
-            // 短縮されたIDかどうかチェック
-            if (compressed.includes('http')) return compressed; // 既に完全URL
-            // Unsplash URLを復元
+            if (compressed === 'L') return ''; // ローカル画像
+            if (compressed.includes('http')) return compressed;
             return `https://images.unsplash.com/photo-${compressed}?w=800&h=600&fit=crop&crop=center`;
         }
         
-        // 新形式（短縮版）の場合
-        if (importData.s && Array.isArray(importData.s)) {
-            stores = importData.s.map(store => ({
-                id: store.i,
-                name: store.n,
-                image: restoreImageUrl(store.img),
-                images: (store.imgs || []).map(restoreImageUrl),
-                price: store.p,
-                badge: store.b,
-                description: store.d, // 短縮されていても問題なく使用
-                features: store.f || []
+        let importData, stores, timestamp, device, storeCount;
+        
+        // 新しい圧縮形式かチェック（V2形式）
+        if (inputData.startsWith('V2:')) {
+            const compressedData = inputData.substring(3);
+            const decodedData = decodeURIComponent(atob(compressedData));
+            const jsonString = simpleDecompress(decodedData);
+            importData = JSON.parse(jsonString);
+            
+            // 配列形式から復元
+            stores = importData.s.map(storeArray => ({
+                id: storeArray[0],
+                name: storeArray[1],
+                image: restoreImageUrl(storeArray[2]),
+                images: storeArray[3].map(restoreImageUrl),
+                price: storeArray[4],
+                badge: storeArray[5],
+                description: storeArray[6],
+                features: storeArray[7] || []
             }));
             timestamp = importData.t ? new Date(importData.t * 1000).toLocaleString('ja-JP') : '不明';
-            device = importData.d === 'M' ? '携帯' : importData.d === 'D' ? 'パソコン' : '不明';
+            device = importData.d === 1 ? '携帯' : 'パソコン';
             storeCount = importData.c || stores.length;
         }
-        // 旧形式の場合
-        else if (importData.stores && Array.isArray(importData.stores)) {
-            stores = importData.stores;
-            timestamp = importData.timestamp ? new Date(importData.timestamp).toLocaleString('ja-JP') : '不明';
-            device = importData.device === 'mobile' ? '携帯' : importData.device === 'desktop' ? 'パソコン' : '不明';
-            storeCount = importData.storeCount || stores.length;
+        // 旧V1形式（エラーが出やすいのでスキップするか簡単な処理）
+        else if (inputData.startsWith('V1:')) {
+            throw new Error('V1形式は非対応です。新しいエクスポートを使用してください。');
         }
         else {
-            throw new Error('無効なデータ形式です');
+            // 旧形式のJSONを試す
+            importData = JSON.parse(inputData);
+            
+            // 中間圧縮形式の場合
+            if (importData.s && Array.isArray(importData.s)) {
+                stores = importData.s.map(store => ({
+                    id: store.i,
+                    name: store.n,
+                    image: restoreImageUrl(store.img),
+                    images: (store.imgs || []).map(restoreImageUrl),
+                    price: store.p,
+                    badge: store.b,
+                    description: store.d,
+                    features: store.f || []
+                }));
+                timestamp = importData.t ? new Date(importData.t * 1000).toLocaleString('ja-JP') : '不明';
+                device = importData.d === 'M' ? '携帯' : importData.d === 'D' ? 'パソコン' : '不明';
+                storeCount = importData.c || stores.length;
+            }
+            // 元の形式の場合
+            else if (importData.stores && Array.isArray(importData.stores)) {
+                stores = importData.stores;
+                timestamp = importData.timestamp ? new Date(importData.timestamp).toLocaleString('ja-JP') : '不明';
+                device = importData.device === 'mobile' ? '携帯' : importData.device === 'desktop' ? 'パソコン' : '不明';
+                storeCount = importData.storeCount || stores.length;
+            }
+            else {
+                throw new Error('無効なデータ形式です');
+            }
         }
         
         // 確認ダイアログ
@@ -734,7 +855,8 @@ ${storeCount}件の店舗データをインポートします。
         }
     } catch (error) {
         console.error('Paste import error:', error);
-        showMessage('インポートに失敗しました: ' + error.message, 'error');
+        console.error('Input data preview:', inputData.substring(0, 100) + '...');
+        showMessage('インポートに失敗しました: ' + error.message + '\n\nデバッグ情報: ' + inputData.substring(0, 50) + '...', 'error');
     }
 }
 
@@ -756,8 +878,20 @@ function handleImportFile(event) {
     const reader = new FileReader();
     reader.onload = function(e) {
         try {
-            const jsonString = e.target.result;
-            const importData = JSON.parse(jsonString);
+            const inputData = e.target.result;
+            
+            // V2形式かどうかチェック
+            if (inputData.startsWith('V2:')) {
+                // ペーストインポートと同じ処理を呼び出す
+                document.getElementById('import-data-text').value = inputData;
+                hideImportModal();
+                setTimeout(() => {
+                    handlePasteImport();
+                }, 100);
+                return;
+            }
+            
+            const importData = JSON.parse(inputData);
             let stores = [];
             let timestamp = '';
             let device = '';
@@ -766,9 +900,14 @@ function handleImportFile(event) {
             // 画像URLを復元する関数
             function restoreImageUrl(compressed) {
                 if (!compressed) return '';
-                // 短縮されたIDかどうかチェック
-                if (compressed.includes('http')) return compressed; // 既に完全URL
-                // Unsplash URLを復元
+                
+                // ローカル画像の場合は空にする（データが省略されているため）
+                if (compressed === '[LOCAL]') return '';
+                
+                // 既に完全URLの場合はそのまま
+                if (compressed.includes('http')) return compressed;
+                
+                // Unsplash写真IDからURLを復元
                 return `https://images.unsplash.com/photo-${compressed}?w=800&h=600&fit=crop&crop=center`;
             }
             
