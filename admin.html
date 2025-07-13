@@ -50,6 +50,11 @@
                     <button id="reset-data-btn" class="control-btn reset-btn">データをリセット</button>
                     <a href="cabaret-list.html" target="_blank" class="control-btn preview-btn">プレビュー</a>
                 </div>
+                <div class="controls-row sync-controls">
+                    <button id="export-data-btn" class="control-btn sync-btn">データをエクスポート</button>
+                    <button id="import-data-btn" class="control-btn sync-btn">データをインポート</button>
+                    <span class="sync-info">💡 デバイス間でデータを共有する場合に使用</span>
+                </div>
             </div>
 
             <div id="stores-container" class="stores-grid">
@@ -217,6 +222,25 @@
 
     <!-- 隠しファイル入力 -->
     <input type="file" id="image-upload-input" accept="image/*" style="display: none;">
+    <input type="file" id="data-import-input" accept=".json" style="display: none;">
+
+    <!-- エクスポート結果モーダル -->
+    <div id="export-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>データエクスポート結果</h3>
+                <button class="close-btn" onclick="hideExportModal()">&times;</button>
+            </div>
+            <div class="export-content">
+                <p>以下のデータをコピーして、他のデバイスで「インポート」してください：</p>
+                <textarea id="export-data-text" readonly></textarea>
+                <div class="export-actions">
+                    <button id="copy-export-btn" class="control-btn">📋 クリップボードにコピー</button>
+                    <button id="download-export-btn" class="control-btn">💾 ファイルでダウンロード</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script src="admin.js"></script>
 </body>

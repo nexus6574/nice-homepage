@@ -285,6 +285,12 @@ function setupEventListeners() {
     saveAllBtn.addEventListener('click', handleSaveAll);
     resetDataBtn.addEventListener('click', handleResetData);
     
+    // エクスポート/インポート
+    document.getElementById('export-data-btn').addEventListener('click', handleExportData);
+    document.getElementById('import-data-btn').addEventListener('click', handleImportData);
+    document.getElementById('copy-export-btn').addEventListener('click', copyExportToClipboard);
+    document.getElementById('download-export-btn').addEventListener('click', downloadExportFile);
+    
     // モーダル
     document.querySelector('.close-btn').addEventListener('click', hideModal);
     document.querySelector('.cancel-btn').addEventListener('click', hideModal);
@@ -605,6 +611,134 @@ function exportStoreData() {
     return data;
 }
 
+// エクスポート/インポート機能
+function handleExportData() {
+    try {
+        const exportData = {
+            version: '1.0.0',
+            timestamp: new Date().toISOString(),
+            device: navigator.userAgent.includes('Mobile') ? 'mobile' : 'desktop',
+            storeCount: currentStores.length,
+            stores: currentStores
+        };
+        
+        const jsonString = JSON.stringify(exportData, null, 2);
+        
+        // エクスポートモーダルに表示
+        document.getElementById('export-data-text').value = jsonString;
+        showExportModal();
+        
+        showMessage('データをエクスポートしました', 'success');
+    } catch (error) {
+        console.error('Export error:', error);
+        showMessage('エクスポートに失敗しました: ' + error.message, 'error');
+    }
+}
+
+function handleImportData() {
+    const fileInput = document.getElementById('data-import-input');
+    fileInput.onchange = handleImportFile;
+    fileInput.click();
+}
+
+function handleImportFile(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    if (file.type !== 'application/json' && !file.name.endsWith('.json')) {
+        showMessage('JSONファイルを選択してください', 'error');
+        return;
+    }
+    
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const jsonString = e.target.result;
+            const importData = JSON.parse(jsonString);
+            
+            // データ形式の検証
+            if (!importData.stores || !Array.isArray(importData.stores)) {
+                throw new Error('無効なデータ形式です');
+            }
+            
+            // 確認ダイアログ
+            const confirmMessage = `
+${importData.storeCount || importData.stores.length}件の店舗データをインポートします。
+エクスポート日時: ${importData.timestamp ? new Date(importData.timestamp).toLocaleString('ja-JP') : '不明'}
+エクスポート元: ${importData.device || '不明'}
+
+現在のデータは上書きされます。続行しますか？`;
+            
+            if (confirm(confirmMessage)) {
+                currentStores = importData.stores;
+                saveStores();
+                renderStores();
+                showMessage(`${importData.stores.length}件のデータをインポートしました`, 'success');
+            }
+        } catch (error) {
+            console.error('Import error:', error);
+            showMessage('インポートに失敗しました: ' + error.message, 'error');
+        }
+    };
+    
+    reader.onerror = function() {
+        showMessage('ファイルの読み込みに失敗しました', 'error');
+    };
+    
+    reader.readAsText(file);
+    
+    // ファイル入力をリセット
+    event.target.value = '';
+}
+
+function copyExportToClipboard() {
+    const textArea = document.getElementById('export-data-text');
+    textArea.select();
+    textArea.setSelectionRange(0, 99999); // モバイル対応
+    
+    try {
+        document.execCommand('copy');
+        showMessage('クリップボードにコピーしました', 'success');
+    } catch (error) {
+        console.error('Copy error:', error);
+        showMessage('コピーに失敗しました', 'error');
+    }
+}
+
+function downloadExportFile() {
+    try {
+        const textArea = document.getElementById('export-data-text');
+        const data = textArea.value;
+        const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+        const filename = `nice-stores-data-${timestamp}.json`;
+        
+        const blob = new Blob([data], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        a.style.display = 'none';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        
+        showMessage('ファイルをダウンロードしました', 'success');
+    } catch (error) {
+        console.error('Download error:', error);
+        showMessage('ダウンロードに失敗しました: ' + error.message, 'error');
+    }
+}
+
+function showExportModal() {
+    document.getElementById('export-modal').style.display = 'flex';
+}
+
+function hideExportModal() {
+    document.getElementById('export-modal').style.display = 'none';
+}
+
 // ファイルアップロード機能
 function uploadImage(type, index = 0) {
     currentImageType = type;
@@ -661,3 +795,4 @@ function handleFileUpload(event) {
 window.editStore = editStore;
 window.deleteStore = deleteStore;
 window.exportStoreData = exportStoreData; 
+window.hideExportModal = hideExportModal; 

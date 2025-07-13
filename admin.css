@@ -811,3 +811,100 @@
         grid-template-columns: repeat(2, 1fr);
     }
 } 
+
+/* 同期コントロール */
+.sync-controls {
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    padding: 15px;
+    border-radius: 10px;
+    border: 2px dashed #dee2e6;
+    margin-top: 15px;
+    align-items: center;
+}
+
+.sync-btn {
+    background: linear-gradient(135deg, #17a2b8, #138496);
+    color: white;
+}
+
+.sync-btn:hover {
+    background: linear-gradient(135deg, #138496, #117a8b);
+    transform: translateY(-1px);
+}
+
+.sync-info {
+    color: #6c757d;
+    font-size: 14px;
+    font-style: italic;
+    margin-left: 10px;
+}
+
+/* エクスポートモーダル */
+#export-modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+}
+
+.export-content {
+    padding: 20px;
+}
+
+.export-content p {
+    margin-bottom: 15px;
+    color: #495057;
+}
+
+#export-data-text {
+    width: 100%;
+    height: 200px;
+    resize: vertical;
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    padding: 10px;
+    border: 2px solid #dee2e6;
+    border-radius: 6px;
+    background-color: #f8f9fa;
+    margin-bottom: 15px;
+}
+
+.export-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+.export-actions button {
+    flex: 1;
+    max-width: 200px;
+}
+
+/* レスポンシブ対応 */
+@media (max-width: 768px) {
+    .sync-controls {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .sync-info {
+        margin-left: 0;
+        margin-top: 10px;
+    }
+    
+    .export-actions {
+        flex-direction: column;
+    }
+    
+    #export-data-text {
+        height: 150px;
+        font-size: 10px;
+    }
+} 
