@@ -247,6 +247,37 @@ function initializeApp() {
     // URLパラメータからのインポートをチェック
     if (isAuthenticated) {
         checkForImportParameter();
+        
+        // 5秒後にURL共有機能のテスト実行
+        setTimeout(() => {
+            console.log('📱 モバイル対応チェック実行中...');
+            console.log('User Agent:', navigator.userAgent);
+            console.log('Touch support:', 'ontouchstart' in window);
+            console.log('Clipboard API:', !!navigator.clipboard);
+            
+            // 緊急時のURL共有機能を グローバル関数として追加
+            window.NICE_EMERGENCY_SHARE = function() {
+                console.log('🆘 緊急URL共有機能実行');
+                try {
+                    const data = JSON.stringify(currentStores);
+                    const url = `${window.location.origin}${window.location.pathname}?emergency=${encodeURIComponent(data)}`;
+                    
+                    if (navigator.share) {
+                        navigator.share({
+                            title: 'NICE店舗データ',
+                            url: url
+                        });
+                    } else {
+                        console.log('緊急共有URL:', url);
+                        alert('以下のURLをコピーしてください:\n\n' + url);
+                    }
+                } catch (error) {
+                    console.error('緊急共有機能エラー:', error);
+                }
+            };
+            
+            console.log('緊急時機能: NICE_EMERGENCY_SHARE() がコンソールで利用可能です');
+        }, 5000);
     }
     
     // 店舗データを初期化
@@ -298,9 +329,117 @@ function setupEventListeners() {
     document.getElementById('paste-import-btn').addEventListener('click', handlePasteImport);
     
     // 簡単同期機能
-    document.getElementById('generate-qr-btn').addEventListener('click', generateQRCode);
-    document.getElementById('share-url-btn').addEventListener('click', generateShareURL);
-    document.getElementById('scan-qr-btn').addEventListener('click', scanQRCode);
+    const generateQRBtn = document.getElementById('generate-qr-btn');
+    const shareUrlBtn = document.getElementById('share-url-btn');
+    const scanQRBtn = document.getElementById('scan-qr-btn');
+    
+    console.log('同期ボタンの初期化チェック:');
+    console.log('generateQRBtn:', generateQRBtn);
+    console.log('shareUrlBtn:', shareUrlBtn);
+    console.log('scanQRBtn:', scanQRBtn);
+    
+    if (generateQRBtn) {
+        generateQRBtn.addEventListener('click', generateQRCode);
+        console.log('QRコード生成ボタンのイベント設定完了');
+    } else {
+        console.error('QRコード生成ボタンが見つかりません');
+    }
+    
+    if (shareUrlBtn) {
+        // クリックイベント
+        shareUrlBtn.addEventListener('click', function(e) {
+            console.log('URL共有ボタンがクリックされました (click event)');
+            e.preventDefault();
+            e.stopPropagation();
+            
+            // 視覚的フィードバック
+            shareUrlBtn.style.transform = 'scale(0.95)';
+            shareUrlBtn.style.background = 'linear-gradient(45deg, #00a085, #00b894)';
+            
+            setTimeout(() => {
+                shareUrlBtn.style.transform = '';
+                shareUrlBtn.style.background = '';
+            }, 150);
+            
+            generateShareURL();
+        });
+        
+        // モバイル用タッチイベント
+        shareUrlBtn.addEventListener('touchend', function(e) {
+            console.log('URL共有ボタンがタッチされました (touchend event)');
+            e.preventDefault();
+            e.stopPropagation();
+            
+            // 視覚的フィードバック
+            shareUrlBtn.style.transform = 'scale(0.95)';
+            shareUrlBtn.style.background = 'linear-gradient(45deg, #00a085, #00b894)';
+            
+            setTimeout(() => {
+                shareUrlBtn.style.transform = '';
+                shareUrlBtn.style.background = '';
+                generateShareURL();
+            }, 100);
+        });
+        
+        // タッチ開始時の視覚効果
+        shareUrlBtn.addEventListener('touchstart', function(e) {
+            console.log('URL共有ボタンタッチ開始 (touchstart event)');
+            shareUrlBtn.style.transform = 'scale(0.95)';
+            shareUrlBtn.style.background = 'linear-gradient(45deg, #ff7675, #fd79a8)';
+        });
+        
+        // ボタンの状態詳細チェック
+        console.log('URL共有ボタンのイベント設定完了');
+        console.log('ボタンの詳細情報:');
+        console.log('- 位置:', shareUrlBtn.getBoundingClientRect());
+        console.log('- スタイル display:', getComputedStyle(shareUrlBtn).display);
+        console.log('- スタイル visibility:', getComputedStyle(shareUrlBtn).visibility);
+        console.log('- スタイル pointer-events:', getComputedStyle(shareUrlBtn).pointerEvents);
+        console.log('- スタイル z-index:', getComputedStyle(shareUrlBtn).zIndex);
+        console.log('- 親要素:', shareUrlBtn.parentElement);
+        
+        // 強制診断ボタンを一時的に追加
+        const debugBtn = document.createElement('button');
+        debugBtn.textContent = '🔧 URL共有デバッグ';
+        debugBtn.style.cssText = `
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            z-index: 99999;
+            background: red;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            font-size: 12px;
+        `;
+        debugBtn.onclick = function() {
+            console.log('デバッグボタンから直接呼び出し');
+            generateShareURL();
+        };
+        document.body.appendChild(debugBtn);
+        
+        // 5秒後にデバッグボタンを削除
+        setTimeout(() => {
+            if (debugBtn.parentNode) {
+                debugBtn.remove();
+            }
+        }, 10000);
+        
+    } else {
+        console.error('URL共有ボタンが見つかりません');
+        console.log('DOM内の全要素をチェック:');
+        console.log('quick-sync-controls:', document.querySelector('.quick-sync-controls'));
+        console.log('control-btn要素数:', document.querySelectorAll('.control-btn').length);
+        console.log('quick-sync-btn要素数:', document.querySelectorAll('.quick-sync-btn').length);
+    }
+    
+    if (scanQRBtn) {
+        scanQRBtn.addEventListener('click', scanQRCode);
+        console.log('QRスキャンボタンのイベント設定完了');
+    } else {
+        console.error('QRスキャンボタンが見つかりません');
+    }
     
     // 強制リフレッシュボタンを動的に追加
     const syncControls = document.querySelector('.sync-controls');
@@ -1376,37 +1515,99 @@ function generateQRCode() {
 }
 
 function generateShareURL() {
+    console.log('🔗 generateShareURL関数が呼び出されました');
+    
     try {
+        console.log('現在のcurrentStores:', currentStores);
+        console.log('データ生成開始...');
+        
         const data = createQuickExportData();
+        console.log('エクスポートデータ生成完了:', data.length, '文字');
+        
         const baseUrl = window.location.origin + window.location.pathname;
         const shareUrl = `${baseUrl}?import=${encodeURIComponent(data)}`;
+        console.log('共有URL生成完了:', shareUrl.length, '文字');
         
-        // クリップボードにコピー
-        navigator.clipboard.writeText(shareUrl).then(() => {
-            showMessage('共有URLをクリップボードにコピーしました！\n\n他のデバイスのブラウザでペーストして開いてください', 'success');
-        }).catch(error => {
-            console.error('クリップボードへのコピーに失敗:', error);
-            // フォールバック: テキストエリアに表示
-            const textArea = document.createElement('textarea');
-            textArea.value = shareUrl;
-            textArea.style.cssText = 'position: fixed; top: -9999px; left: -9999px;';
-            document.body.appendChild(textArea);
-            textArea.select();
-            document.execCommand('copy');
-            document.body.removeChild(textArea);
-            showMessage('共有URLをクリップボードにコピーしました！', 'success');
-        });
+        // 成功メッセージを最初に表示（クリップボード操作の前に）
+        showMessage('📋 URL共有機能を実行中...', 'info');
+        
+        // クリップボードAPI対応チェック
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            console.log('モダンなクリップボードAPIを使用');
+            navigator.clipboard.writeText(shareUrl).then(() => {
+                console.log('クリップボードコピー成功');
+                showMessage('✅ 共有URLをクリップボードにコピーしました！\n\n他のデバイスのブラウザでペーストして開いてください', 'success');
+            }).catch(error => {
+                console.error('モダンクリップボードAPI失敗:', error);
+                fallbackCopyToClipboard(shareUrl);
+            });
+        } else {
+            console.log('フォールバック方式を使用');
+            fallbackCopyToClipboard(shareUrl);
+        }
         
         // URLを画面にも表示
         const urlDisplay = document.getElementById('share-url-display');
         if (urlDisplay) {
             urlDisplay.value = shareUrl;
             urlDisplay.style.display = 'block';
+            console.log('URL表示エリアに設定完了');
+        } else {
+            console.log('URL表示エリアが見つかりません');
         }
         
     } catch (error) {
         console.error('URL生成エラー:', error);
-        showMessage('URL生成に失敗しました: ' + error.message, 'error');
+        showMessage('❌ URL生成に失敗しました: ' + error.message, 'error');
+        
+        // 緊急時の簡単な共有URL生成
+        try {
+            const simpleData = JSON.stringify(currentStores);
+            const simpleUrl = `${window.location.origin}${window.location.pathname}?simple=${encodeURIComponent(simpleData)}`;
+            console.log('緊急用シンプルURL:', simpleUrl);
+            showMessage('⚠️ 簡易モードでURL生成しました', 'warning');
+        } catch (simpleError) {
+            console.error('緊急URL生成も失敗:', simpleError);
+        }
+    }
+}
+
+// フォールバック用のクリップボードコピー関数
+function fallbackCopyToClipboard(text) {
+    console.log('フォールバッククリップボード処理開始');
+    
+    try {
+        // テキストエリア方式
+        const textArea = document.createElement('textarea');
+        textArea.value = text;
+        textArea.style.cssText = 'position: fixed; top: -9999px; left: -9999px; opacity: 0;';
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        
+        const success = document.execCommand('copy');
+        document.body.removeChild(textArea);
+        
+        if (success) {
+            console.log('フォールバッククリップボードコピー成功');
+            showMessage('✅ 共有URLをクリップボードにコピーしました！（フォールバック方式）', 'success');
+        } else {
+            throw new Error('execCommand failed');
+        }
+    } catch (error) {
+        console.error('フォールバッククリップボードも失敗:', error);
+        
+        // 最終手段: URLを表示して手動コピーを促す
+        const copyMessage = `📋 以下のURLを手動でコピーしてください：\n\n${text.substring(0, 100)}...`;
+        showMessage(copyMessage, 'warning');
+        
+        // モーダルに表示
+        const urlDisplay = document.getElementById('share-url-display');
+        if (urlDisplay) {
+            urlDisplay.value = text;
+            urlDisplay.style.display = 'block';
+            urlDisplay.select();
+        }
     }
 }
 
@@ -1466,6 +1667,7 @@ function scanQRCode() {
 function checkForImportParameter() {
     const urlParams = new URLSearchParams(window.location.search);
     const importData = urlParams.get('import');
+    const emergencyData = urlParams.get('emergency');
     
     if (importData) {
         console.log('URLからインポートデータを検出:', importData);
@@ -1489,6 +1691,42 @@ function checkForImportParameter() {
             }
         } else {
             // キャンセルした場合もURLをクリーンアップ
+            const newUrl = window.location.origin + window.location.pathname;
+            window.history.replaceState({}, document.title, newUrl);
+        }
+    }
+    
+    // 緊急時のシンプルインポート
+    if (emergencyData) {
+        console.log('緊急データを検出:', emergencyData);
+        
+        const confirmEmergency = confirm('🆘 緊急モードでデータを検出しました。\n\nインポートしますか？');
+        
+        if (confirmEmergency) {
+            try {
+                const parsedData = JSON.parse(decodeURIComponent(emergencyData));
+                if (Array.isArray(parsedData)) {
+                    currentStores = parsedData;
+                    saveStores();
+                    renderStores();
+                    showMessage('✅ 緊急モードでデータをインポートしました', 'success');
+                    
+                    // 3秒後にページリロード
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 3000);
+                }
+                
+                // URLクリーンアップ
+                const newUrl = window.location.origin + window.location.pathname;
+                window.history.replaceState({}, document.title, newUrl);
+                
+            } catch (error) {
+                console.error('緊急インポートエラー:', error);
+                showMessage('緊急インポートに失敗しました: ' + error.message, 'error');
+            }
+        } else {
+            // URLクリーンアップ
             const newUrl = window.location.origin + window.location.pathname;
             window.history.replaceState({}, document.title, newUrl);
         }
