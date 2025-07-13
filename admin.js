@@ -290,6 +290,8 @@ function setupEventListeners() {
     document.getElementById('import-data-btn').addEventListener('click', handleImportData);
     document.getElementById('copy-export-btn').addEventListener('click', copyExportToClipboard);
     document.getElementById('download-export-btn').addEventListener('click', downloadExportFile);
+    document.getElementById('paste-import-btn').addEventListener('click', handlePasteImport);
+    document.getElementById('file-import-btn').addEventListener('click', handleFileImport);
     
     // モーダル
     document.querySelector('.close-btn').addEventListener('click', hideModal);
@@ -636,6 +638,48 @@ function handleExportData() {
 }
 
 function handleImportData() {
+    showImportModal();
+}
+
+function handlePasteImport() {
+    const textArea = document.getElementById('import-data-text');
+    const jsonString = textArea.value.trim();
+    
+    if (!jsonString) {
+        showMessage('インポートするデータを入力してください', 'error');
+        return;
+    }
+    
+    try {
+        const importData = JSON.parse(jsonString);
+        
+        // データ形式の検証
+        if (!importData.stores || !Array.isArray(importData.stores)) {
+            throw new Error('無効なデータ形式です');
+        }
+        
+        // 確認ダイアログ
+        const confirmMessage = `
+${importData.storeCount || importData.stores.length}件の店舗データをインポートします。
+エクスポート日時: ${importData.timestamp ? new Date(importData.timestamp).toLocaleString('ja-JP') : '不明'}
+エクスポート元: ${importData.device || '不明'}
+
+現在のデータは上書きされます。続行しますか？`;
+        
+        if (confirm(confirmMessage)) {
+            currentStores = importData.stores;
+            saveStores();
+            renderStores();
+            hideImportModal();
+            showMessage(`${importData.stores.length}件のデータをインポートしました`, 'success');
+        }
+    } catch (error) {
+        console.error('Paste import error:', error);
+        showMessage('インポートに失敗しました: ' + error.message, 'error');
+    }
+}
+
+function handleFileImport() {
     const fileInput = document.getElementById('data-import-input');
     fileInput.onchange = handleImportFile;
     fileInput.click();
@@ -673,6 +717,7 @@ ${importData.storeCount || importData.stores.length}件の店舗データをイ�
                 currentStores = importData.stores;
                 saveStores();
                 renderStores();
+                hideImportModal();
                 showMessage(`${importData.stores.length}件のデータをインポートしました`, 'success');
             }
         } catch (error) {
@@ -739,6 +784,14 @@ function hideExportModal() {
     document.getElementById('export-modal').style.display = 'none';
 }
 
+function showImportModal() {
+    document.getElementById('import-modal').style.display = 'flex';
+}
+
+function hideImportModal() {
+    document.getElementById('import-modal').style.display = 'none';
+}
+
 // ファイルアップロード機能
 function uploadImage(type, index = 0) {
     currentImageType = type;
@@ -796,3 +849,4 @@ window.editStore = editStore;
 window.deleteStore = deleteStore;
 window.exportStoreData = exportStoreData; 
 window.hideExportModal = hideExportModal; 
+window.hideImportModal = hideImportModal; 

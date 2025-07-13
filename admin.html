@@ -242,6 +242,32 @@
         </div>
     </div>
 
+    <!-- インポートモーダル -->
+    <div id="import-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>データインポート</h3>
+                <button class="close-btn" onclick="hideImportModal()">&times;</button>
+            </div>
+            <div class="import-content">
+                <div class="import-options">
+                    <div class="import-option">
+                        <h4>📋 コピーしたデータをペースト</h4>
+                        <p>他のデバイスでエクスポートしたデータをここにペーストしてください：</p>
+                        <textarea id="import-data-text" placeholder="エクスポートしたJSONデータをここにペーストしてください..."></textarea>
+                        <button id="paste-import-btn" class="control-btn">📥 ペーストしたデータをインポート</button>
+                    </div>
+                    <div class="import-divider">または</div>
+                    <div class="import-option">
+                        <h4>📁 ファイルから選択</h4>
+                        <p>ダウンロードしたJSONファイルを選択してください：</p>
+                        <button id="file-import-btn" class="control-btn">📂 ファイルを選択</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="admin.js"></script>
 </body>
 </html> 
