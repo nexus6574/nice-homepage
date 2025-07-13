@@ -244,6 +244,11 @@ function initializeApp() {
     // 認証状態をチェック
     checkAuthStatus();
     
+    // URLパラメータからのインポートをチェック
+    if (isAuthenticated) {
+        checkForImportParameter();
+    }
+    
     // 店舗データを初期化
     initializeStoreData();
     
@@ -291,6 +296,11 @@ function setupEventListeners() {
     document.getElementById('copy-export-btn').addEventListener('click', copyExportToClipboard);
     document.getElementById('download-export-btn').addEventListener('click', downloadExportFile);
     document.getElementById('paste-import-btn').addEventListener('click', handlePasteImport);
+    
+    // 簡単同期機能
+    document.getElementById('generate-qr-btn').addEventListener('click', generateQRCode);
+    document.getElementById('share-url-btn').addEventListener('click', generateShareURL);
+    document.getElementById('scan-qr-btn').addEventListener('click', scanQRCode);
     
     // 強制リフレッシュボタンを動的に追加
     const syncControls = document.querySelector('.sync-controls');
@@ -1309,9 +1319,200 @@ function handleFileUpload(event) {
     event.target.value = '';
 }
 
+// 簡単同期機能の実装
+function generateQRCode() {
+    try {
+        // データをエクスポート
+        const data = createQuickExportData();
+        
+        // QRコード用のURLを生成
+        const baseUrl = window.location.origin + window.location.pathname;
+        const qrUrl = `${baseUrl}?import=${encodeURIComponent(data)}`;
+        
+        // QRコード生成（qrcode.jsライブラリを使用）
+        const qrContainer = document.getElementById('qr-code-container');
+        qrContainer.innerHTML = ''; // 既存のQRコードをクリア
+        
+        // QRコードライブラリが読み込まれていない場合はフォールバック
+        if (typeof QRCode === 'undefined') {
+            // QRコードAPIを使用
+            const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(qrUrl)}`;
+            const img = document.createElement('img');
+            img.src = qrApiUrl;
+            img.alt = 'QRコード';
+            img.style.cssText = 'max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);';
+            qrContainer.appendChild(img);
+        } else {
+            // qrcode.jsライブラリを使用
+            new QRCode(qrContainer, {
+                text: qrUrl,
+                width: 250,
+                height: 250,
+                colorDark: "#000000",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.M
+            });
+        }
+        
+        // URL情報も表示
+        const urlInfo = document.createElement('div');
+        urlInfo.style.cssText = 'margin-top: 1rem; padding: 1rem; background: #f8f9fa; border-radius: 8px; font-size: 12px; word-break: break-all;';
+        urlInfo.innerHTML = `
+            <strong>🔗 共有URL:</strong><br>
+            <span style="color: #666;">${qrUrl}</span><br><br>
+            <strong>📱 使用方法:</strong><br>
+            1. QRコードを他のデバイスでスキャン<br>
+            2. 自動的にデータがインポートされます
+        `;
+        qrContainer.appendChild(urlInfo);
+        
+        showQRModal();
+        showMessage('QRコードを生成しました！他のデバイスでスキャンしてください', 'success');
+        
+    } catch (error) {
+        console.error('QRコード生成エラー:', error);
+        showMessage('QRコード生成に失敗しました: ' + error.message, 'error');
+    }
+}
+
+function generateShareURL() {
+    try {
+        const data = createQuickExportData();
+        const baseUrl = window.location.origin + window.location.pathname;
+        const shareUrl = `${baseUrl}?import=${encodeURIComponent(data)}`;
+        
+        // クリップボードにコピー
+        navigator.clipboard.writeText(shareUrl).then(() => {
+            showMessage('共有URLをクリップボードにコピーしました！\n\n他のデバイスのブラウザでペーストして開いてください', 'success');
+        }).catch(error => {
+            console.error('クリップボードへのコピーに失敗:', error);
+            // フォールバック: テキストエリアに表示
+            const textArea = document.createElement('textarea');
+            textArea.value = shareUrl;
+            textArea.style.cssText = 'position: fixed; top: -9999px; left: -9999px;';
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            showMessage('共有URLをクリップボードにコピーしました！', 'success');
+        });
+        
+        // URLを画面にも表示
+        const urlDisplay = document.getElementById('share-url-display');
+        if (urlDisplay) {
+            urlDisplay.value = shareUrl;
+            urlDisplay.style.display = 'block';
+        }
+        
+    } catch (error) {
+        console.error('URL生成エラー:', error);
+        showMessage('URL生成に失敗しました: ' + error.message, 'error');
+    }
+}
+
+function createQuickExportData() {
+    // 軽量版のエクスポートデータを生成
+    const localImages = {};
+    let localImageCounter = 0;
+    
+    function processImageForQuickExport(img) {
+        if (!img) return '';
+        if (img.includes('unsplash')) {
+            return img.match(/photo-([a-zA-Z0-9_-]+)/)?.[1] || '';
+        }
+        if (img.startsWith('data:')) {
+            const localId = `LOCAL_${++localImageCounter}`;
+            localImages[localId] = img;
+            return localId;
+        }
+        return img || '';
+    }
+    
+    const quickData = {
+        v: 2,
+        t: Math.floor(Date.now() / 1000),
+        d: navigator.userAgent.includes('Mobile') ? 1 : 0,
+        c: currentStores.length,
+        l: localImages,
+        s: currentStores.map(store => [
+            store.id,
+            store.name,
+            processImageForQuickExport(store.image),
+            (store.images || []).map(processImageForQuickExport),
+            store.price,
+            store.badge,
+            store.description || '',
+            store.features || []
+        ])
+    };
+    
+    const jsonString = JSON.stringify(quickData);
+    const utf8Bytes = new TextEncoder().encode(jsonString);
+    const base64Compressed = btoa(String.fromCharCode(...utf8Bytes));
+    
+    return `V3:${base64Compressed}`;
+}
+
+function scanQRCode() {
+    // モバイルデバイスでカメラを使用してQRコードをスキャン
+    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        showMessage('QRコードスキャン機能は開発中です。\n\n代わりに「URL共有」機能をお使いください：\n1. 送信側で「URL共有」をクリック\n2. 受信側のブラウザにURLをペースト', 'info');
+    } else {
+        showMessage('このデバイスではカメラアクセスができません。\n\n「URL共有」機能をお使いください。', 'warning');
+    }
+}
+
+// ページ読み込み時にURLパラメータをチェック
+function checkForImportParameter() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const importData = urlParams.get('import');
+    
+    if (importData) {
+        console.log('URLからインポートデータを検出:', importData);
+        
+        // 確認ダイアログを表示
+        const confirmImport = confirm('他のデバイスからのデータを検出しました。\n\nインポートしますか？\n\n※現在のデータは上書きされます。');
+        
+        if (confirmImport) {
+            try {
+                // インポートデータを処理
+                document.getElementById('import-data-text').value = importData;
+                handlePasteImport();
+                
+                // URLからパラメータを削除（履歴に残さない）
+                const newUrl = window.location.origin + window.location.pathname;
+                window.history.replaceState({}, document.title, newUrl);
+                
+            } catch (error) {
+                console.error('URL経由インポートエラー:', error);
+                showMessage('データのインポートに失敗しました: ' + error.message, 'error');
+            }
+        } else {
+            // キャンセルした場合もURLをクリーンアップ
+            const newUrl = window.location.origin + window.location.pathname;
+            window.history.replaceState({}, document.title, newUrl);
+        }
+    }
+}
+
+function showQRModal() {
+    const modal = document.getElementById('qr-modal');
+    if (modal) {
+        modal.style.display = 'flex';
+    }
+}
+
+function hideQRModal() {
+    const modal = document.getElementById('qr-modal');
+    if (modal) {
+        modal.style.display = 'none';
+    }
+}
+
 // グローバル関数として露出（HTMLから呼び出すため）
 window.editStore = editStore;
 window.deleteStore = deleteStore;
 window.exportStoreData = exportStoreData; 
 window.hideExportModal = hideExportModal; 
-window.hideImportModal = hideImportModal; 
+window.hideImportModal = hideImportModal;
+window.hideQRModal = hideQRModal; 

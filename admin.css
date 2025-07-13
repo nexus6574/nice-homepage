@@ -1001,4 +1001,168 @@
     .import-option {
         padding: 15px;
     }
+}
+
+/* 簡単同期機能のスタイル */
+.quick-sync-controls {
+    background: linear-gradient(135deg, #74b9ff, #0984e3);
+    border-radius: 12px;
+    padding: 1rem;
+    margin-top: 1rem;
+    border: 1px solid #e3f2fd;
+    box-shadow: 0 4px 12px rgba(116, 185, 255, 0.2);
+}
+
+.quick-sync-btn {
+    background: linear-gradient(45deg, #00b894, #00a085);
+    color: white;
+    border: none;
+    padding: 0.75rem 1.2rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 3px 8px rgba(0, 184, 148, 0.3);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.quick-sync-btn:hover {
+    background: linear-gradient(45deg, #00a085, #00b894);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 184, 148, 0.4);
+}
+
+.quick-sync-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 3px 8px rgba(0, 184, 148, 0.3);
+}
+
+/* QRコードモーダルのスタイル */
+#qr-modal .modal-content {
+    max-width: 600px;
+    width: 90%;
+}
+
+.qr-content {
+    padding: 1.5rem;
+}
+
+.qr-instructions {
+    background: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    border-left: 4px solid #00b894;
+}
+
+.qr-instructions h4 {
+    color: #2d3436;
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.qr-instructions ol {
+    margin: 0;
+    padding-left: 1.5rem;
+    color: #636e72;
+}
+
+.qr-instructions li {
+    margin-bottom: 0.5rem;
+    line-height: 1.5;
+}
+
+#qr-code-container {
+    background: #ffffff;
+    border: 2px dashed #74b9ff;
+    border-radius: 12px;
+    padding: 2rem;
+    text-align: center;
+    margin: 1.5rem 0;
+    min-height: 300px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(116, 185, 255, 0.1);
+}
+
+#qr-code-container img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.qr-share-options {
+    margin-top: 1rem;
+}
+
+#share-url-display {
+    width: 100%;
+    padding: 0.8rem;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    font-family: monospace;
+    font-size: 0.85rem;
+    background: #f8f9fa;
+    resize: vertical;
+    min-height: 60px;
+}
+
+#share-url-display:focus {
+    outline: none;
+    border-color: #74b9ff;
+    box-shadow: 0 0 0 3px rgba(116, 185, 255, 0.1);
+}
+
+/* モバイル対応 */
+@media (max-width: 768px) {
+    .quick-sync-controls {
+        padding: 0.8rem;
+    }
+    
+    .quick-sync-btn {
+        padding: 0.6rem 1rem;
+        font-size: 0.85rem;
+        min-width: auto;
+        flex: 1;
+    }
+    
+    .controls-row {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+    
+    #qr-modal .modal-content {
+        width: 95%;
+        margin: 1rem;
+    }
+    
+    .qr-content {
+        padding: 1rem;
+    }
+    
+    .qr-instructions {
+        padding: 1rem;
+    }
+    
+    #qr-code-container {
+        padding: 1rem;
+        min-height: 250px;
+    }
+    
+    .sync-info {
+        font-size: 0.8rem;
+        margin-top: 0.5rem;
+        text-align: center;
+        width: 100%;
+    }
 } 

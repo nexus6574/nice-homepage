@@ -55,6 +55,12 @@
                     <button id="import-data-btn" class="control-btn sync-btn">データをインポート</button>
                     <span class="sync-info">💡 デバイス間でデータを共有する場合に使用</span>
                 </div>
+                <div class="controls-row quick-sync-controls">
+                    <button id="generate-qr-btn" class="control-btn quick-sync-btn">📱 QRコード生成</button>
+                    <button id="share-url-btn" class="control-btn quick-sync-btn">🔗 URL共有</button>
+                    <button id="scan-qr-btn" class="control-btn quick-sync-btn">📷 QRスキャン</button>
+                    <span class="sync-info">⚡ 簡単同期：モバイル↔パソコン間の高速データ共有</span>
+                </div>
             </div>
 
             <div id="stores-container" class="stores-grid">
@@ -267,6 +273,36 @@
             </div>
         </div>
     </div>
+
+    <!-- QRコードモーダル -->
+    <div id="qr-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>📱 QRコード同期</h3>
+                <button class="close-btn" onclick="hideQRModal()">&times;</button>
+            </div>
+            <div class="qr-content">
+                <div class="qr-instructions">
+                    <h4>🚀 使用方法</h4>
+                    <ol>
+                        <li>下のQRコードを他のデバイス（スマホ・タブレット・PC）でスキャン</li>
+                        <li>または、表示されたURLをコピーして他のデバイスのブラウザで開く</li>
+                        <li>自動的にデータが同期されます！</li>
+                    </ol>
+                </div>
+                <div id="qr-code-container" style="text-align: center; padding: 2rem; background: white; border-radius: 8px; border: 2px dashed #ddd;">
+                    QRコードを生成中...
+                </div>
+                <div class="qr-share-options">
+                    <textarea id="share-url-display" style="width: 100%; height: 60px; margin-top: 1rem; display: none;" readonly placeholder="共有URLがここに表示されます"></textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ファイル選択用の隠しinput -->
+    <input type="file" id="data-import-input" accept=".json" style="display: none;">
+    <input type="file" id="image-upload-input" accept="image/*" style="display: none;">
 
     <script src="admin.js"></script>
 </body>
