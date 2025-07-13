@@ -291,6 +291,17 @@ function setupEventListeners() {
     document.getElementById('copy-export-btn').addEventListener('click', copyExportToClipboard);
     document.getElementById('download-export-btn').addEventListener('click', downloadExportFile);
     document.getElementById('paste-import-btn').addEventListener('click', handlePasteImport);
+    
+    // 強制リフレッシュボタンを動的に追加
+    const syncControls = document.querySelector('.sync-controls');
+    if (syncControls) {
+        const forceRefreshBtn = document.createElement('button');
+        forceRefreshBtn.id = 'force-refresh-btn';
+        forceRefreshBtn.className = 'control-btn sync-btn';
+        forceRefreshBtn.textContent = '強制データ再読み込み';
+        forceRefreshBtn.addEventListener('click', handleForceRefresh);
+        syncControls.insertBefore(forceRefreshBtn, syncControls.lastElementChild);
+    }
     document.getElementById('file-import-btn').addEventListener('click', handleFileImport);
     
     // モーダル
@@ -738,7 +749,28 @@ function handleExportData() {
         console.log('バックアップデータ（非圧縮）:', backupData.substring(0, 100) + '...');
         console.log('バックアップデータ文字数:', backupData.length);
         
-        showMessage(`データをエクスポートしました（${finalData.length}文字、${compressionRatio}%圧縮）\n\n※万が一インポートに失敗する場合は、\nブラウザのコンソールから「バックアップデータ」をコピーしてください`, 'success');
+        // 緊急時用の簡単インポート機能を作成
+        window.NICE_EMERGENCY_IMPORT = function(data) {
+            try {
+                const importData = typeof data === 'string' ? JSON.parse(data) : data;
+                if (importData.stores && Array.isArray(importData.stores)) {
+                    currentStores = importData.stores;
+                    saveStores();
+                    renderStores();
+                    alert('緊急インポート成功！店舗データを更新しました。');
+                    window.location.reload();
+                } else {
+                    alert('無効なデータ形式です');
+                }
+            } catch (error) {
+                alert('緊急インポートエラー: ' + error.message);
+            }
+        };
+        
+        console.log('緊急インポート関数を作成しました。使用方法:');
+        console.log('NICE_EMERGENCY_IMPORT(バックアップデータ)');
+        
+        showMessage(`データをエクスポートしました（${finalData.length}文字、${compressionRatio}%圧縮）\n\n※万が一インポートに失敗する場合は、\nブラウザのコンソール（F12）で以下を実行：\nNICE_EMERGENCY_IMPORT(バックアップデータ)`, 'success');
         
     } catch (error) {
         console.error('Export error:', error);
@@ -905,7 +937,7 @@ ${storeCount}件の店舗データをインポートします。
             console.log('Stores re-rendered');
             
             hideImportModal();
-            showMessage(`${stores.length}件のデータをインポートしました\n\n3秒後にページを再読み込みします...`, 'success');
+            showMessage(`${stores.length}件のデータをインポートしました\n\n※変更が反映されない場合は「強制データ再読み込み」ボタンを押してください\n\n3秒後にページを再読み込みします...`, 'success');
             
             // 3秒後にページを再読み込み
             setTimeout(() => {
@@ -1106,6 +1138,55 @@ function showImportModal() {
 
 function hideImportModal() {
     document.getElementById('import-modal').style.display = 'none';
+}
+
+// 強制データ再読み込み機能
+function handleForceRefresh() {
+    try {
+        console.log('強制データ再読み込み開始...');
+        
+        // LocalStorageから直接データを読み込み
+        const savedStores = localStorage.getItem('cabaret_stores');
+        console.log('LocalStorageのデータ:', savedStores);
+        
+        if (savedStores) {
+            const parsedStores = JSON.parse(savedStores);
+            console.log('パースされたデータ:', parsedStores);
+            
+            // 現在のcurrentStoresと比較
+            console.log('現在のcurrentStores:', currentStores);
+            console.log('データが同じか？', JSON.stringify(currentStores) === JSON.stringify(parsedStores));
+            
+            // 強制的にデータを更新
+            currentStores = parsedStores;
+            console.log('更新後のcurrentStores:', currentStores);
+            
+            // 表示を強制更新
+            renderStores();
+            console.log('renderStores実行完了');
+            
+            // 成功メッセージ
+            showMessage(`データを強制再読み込みしました（${currentStores.length}件）\n\nページを再読み込みします...`, 'success');
+            
+            // 2秒後にページリロード
+            setTimeout(() => {
+                window.location.reload();
+            }, 2000);
+            
+        } else {
+            showMessage('LocalStorageにデータが見つかりません', 'warning');
+            
+            // デフォルトデータで復元
+            currentStores = [...DEFAULT_STORES];
+            saveStores();
+            renderStores();
+            showMessage('デフォルトデータで復元しました', 'warning');
+        }
+        
+    } catch (error) {
+        console.error('強制リフレッシュエラー:', error);
+        showMessage('強制リフレッシュに失敗しました: ' + error.message, 'error');
+    }
 }
 
 // ファイルアップロード機能
