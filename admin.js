@@ -616,6 +616,20 @@ function exportStoreData() {
 // エクスポート/インポート機能
 function handleExportData() {
     try {
+        // 画像URLを短縮する関数
+        function compressImageUrl(url) {
+            if (!url) return '';
+            // UnsplashのURLから不要な部分を削除
+            const match = url.match(/photo-([a-zA-Z0-9_-]+)\?/);
+            return match ? match[1] : url.substring(url.lastIndexOf('/') + 1);
+        }
+        
+        // 説明文を短縮する関数
+        function compressDescription(desc) {
+            if (!desc) return '';
+            return desc.length > 50 ? desc.substring(0, 50) + '…' : desc;
+        }
+        
         const exportData = {
             v: '1.0',
             t: Math.floor(Date.now() / 1000), // UNIXタイムスタンプで短縮
@@ -624,11 +638,11 @@ function handleExportData() {
             s: currentStores.map(store => ({
                 i: store.id,
                 n: store.name,
-                img: store.image,
-                imgs: store.images || [],
+                img: compressImageUrl(store.image),
+                imgs: (store.images || []).map(compressImageUrl),
                 p: store.price,
                 b: store.badge,
-                d: store.description,
+                d: compressDescription(store.description),
                 f: store.features || []
             }))
         };
@@ -667,16 +681,25 @@ function handlePasteImport() {
         let device = '';
         let storeCount = 0;
         
+        // 画像URLを復元する関数
+        function restoreImageUrl(compressed) {
+            if (!compressed) return '';
+            // 短縮されたIDかどうかチェック
+            if (compressed.includes('http')) return compressed; // 既に完全URL
+            // Unsplash URLを復元
+            return `https://images.unsplash.com/photo-${compressed}?w=800&h=600&fit=crop&crop=center`;
+        }
+        
         // 新形式（短縮版）の場合
         if (importData.s && Array.isArray(importData.s)) {
             stores = importData.s.map(store => ({
                 id: store.i,
                 name: store.n,
-                image: store.img,
-                images: store.imgs || [],
+                image: restoreImageUrl(store.img),
+                images: (store.imgs || []).map(restoreImageUrl),
                 price: store.p,
                 badge: store.b,
-                description: store.d,
+                description: store.d, // 短縮されていても問題なく使用
                 features: store.f || []
             }));
             timestamp = importData.t ? new Date(importData.t * 1000).toLocaleString('ja-JP') : '不明';
@@ -740,16 +763,25 @@ function handleImportFile(event) {
             let device = '';
             let storeCount = 0;
             
+            // 画像URLを復元する関数
+            function restoreImageUrl(compressed) {
+                if (!compressed) return '';
+                // 短縮されたIDかどうかチェック
+                if (compressed.includes('http')) return compressed; // 既に完全URL
+                // Unsplash URLを復元
+                return `https://images.unsplash.com/photo-${compressed}?w=800&h=600&fit=crop&crop=center`;
+            }
+            
             // 新形式（短縮版）の場合
             if (importData.s && Array.isArray(importData.s)) {
                 stores = importData.s.map(store => ({
                     id: store.i,
                     name: store.n,
-                    image: store.img,
-                    images: store.imgs || [],
+                    image: restoreImageUrl(store.img),
+                    images: (store.imgs || []).map(restoreImageUrl),
                     price: store.p,
                     badge: store.b,
-                    description: store.d,
+                    description: store.d, // 短縮されていても問題なく使用
                     features: store.f || []
                 }));
                 timestamp = importData.t ? new Date(importData.t * 1000).toLocaleString('ja-JP') : '不明';
