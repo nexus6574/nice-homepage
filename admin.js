@@ -617,20 +617,30 @@ function exportStoreData() {
 function handleExportData() {
     try {
         const exportData = {
-            version: '1.0.0',
-            timestamp: new Date().toISOString(),
-            device: navigator.userAgent.includes('Mobile') ? 'mobile' : 'desktop',
-            storeCount: currentStores.length,
-            stores: currentStores
+            v: '1.0',
+            t: Math.floor(Date.now() / 1000), // UNIXタイムスタンプで短縮
+            d: navigator.userAgent.includes('Mobile') ? 'M' : 'D', // MobileかDesktopを1文字で
+            c: currentStores.length,
+            s: currentStores.map(store => ({
+                i: store.id,
+                n: store.name,
+                img: store.image,
+                imgs: store.images || [],
+                p: store.price,
+                b: store.badge,
+                d: store.description,
+                f: store.features || []
+            }))
         };
         
-        const jsonString = JSON.stringify(exportData, null, 2);
+        // 最小形式のJSONString（インデントなし）
+        const jsonString = JSON.stringify(exportData);
         
         // エクスポートモーダルに表示
         document.getElementById('export-data-text').value = jsonString;
         showExportModal();
         
-        showMessage('データをエクスポートしました', 'success');
+        showMessage(`データをエクスポートしました（${jsonString.length}文字）`, 'success');
     } catch (error) {
         console.error('Export error:', error);
         showMessage('エクスポートに失敗しました: ' + error.message, 'error');
@@ -652,26 +662,52 @@ function handlePasteImport() {
     
     try {
         const importData = JSON.parse(jsonString);
+        let stores = [];
+        let timestamp = '';
+        let device = '';
+        let storeCount = 0;
         
-        // データ形式の検証
-        if (!importData.stores || !Array.isArray(importData.stores)) {
+        // 新形式（短縮版）の場合
+        if (importData.s && Array.isArray(importData.s)) {
+            stores = importData.s.map(store => ({
+                id: store.i,
+                name: store.n,
+                image: store.img,
+                images: store.imgs || [],
+                price: store.p,
+                badge: store.b,
+                description: store.d,
+                features: store.f || []
+            }));
+            timestamp = importData.t ? new Date(importData.t * 1000).toLocaleString('ja-JP') : '不明';
+            device = importData.d === 'M' ? '携帯' : importData.d === 'D' ? 'パソコン' : '不明';
+            storeCount = importData.c || stores.length;
+        }
+        // 旧形式の場合
+        else if (importData.stores && Array.isArray(importData.stores)) {
+            stores = importData.stores;
+            timestamp = importData.timestamp ? new Date(importData.timestamp).toLocaleString('ja-JP') : '不明';
+            device = importData.device === 'mobile' ? '携帯' : importData.device === 'desktop' ? 'パソコン' : '不明';
+            storeCount = importData.storeCount || stores.length;
+        }
+        else {
             throw new Error('無効なデータ形式です');
         }
         
         // 確認ダイアログ
         const confirmMessage = `
-${importData.storeCount || importData.stores.length}件の店舗データをインポートします。
-エクスポート日時: ${importData.timestamp ? new Date(importData.timestamp).toLocaleString('ja-JP') : '不明'}
-エクスポート元: ${importData.device || '不明'}
+${storeCount}件の店舗データをインポートします。
+エクスポート日時: ${timestamp}
+エクスポート元: ${device}
 
 現在のデータは上書きされます。続行しますか？`;
         
         if (confirm(confirmMessage)) {
-            currentStores = importData.stores;
+            currentStores = stores;
             saveStores();
             renderStores();
             hideImportModal();
-            showMessage(`${importData.stores.length}件のデータをインポートしました`, 'success');
+            showMessage(`${stores.length}件のデータをインポートしました`, 'success');
         }
     } catch (error) {
         console.error('Paste import error:', error);
@@ -699,26 +735,52 @@ function handleImportFile(event) {
         try {
             const jsonString = e.target.result;
             const importData = JSON.parse(jsonString);
+            let stores = [];
+            let timestamp = '';
+            let device = '';
+            let storeCount = 0;
             
-            // データ形式の検証
-            if (!importData.stores || !Array.isArray(importData.stores)) {
+            // 新形式（短縮版）の場合
+            if (importData.s && Array.isArray(importData.s)) {
+                stores = importData.s.map(store => ({
+                    id: store.i,
+                    name: store.n,
+                    image: store.img,
+                    images: store.imgs || [],
+                    price: store.p,
+                    badge: store.b,
+                    description: store.d,
+                    features: store.f || []
+                }));
+                timestamp = importData.t ? new Date(importData.t * 1000).toLocaleString('ja-JP') : '不明';
+                device = importData.d === 'M' ? '携帯' : importData.d === 'D' ? 'パソコン' : '不明';
+                storeCount = importData.c || stores.length;
+            }
+            // 旧形式の場合
+            else if (importData.stores && Array.isArray(importData.stores)) {
+                stores = importData.stores;
+                timestamp = importData.timestamp ? new Date(importData.timestamp).toLocaleString('ja-JP') : '不明';
+                device = importData.device === 'mobile' ? '携帯' : importData.device === 'desktop' ? 'パソコン' : '不明';
+                storeCount = importData.storeCount || stores.length;
+            }
+            else {
                 throw new Error('無効なデータ形式です');
             }
             
             // 確認ダイアログ
             const confirmMessage = `
-${importData.storeCount || importData.stores.length}件の店舗データをインポートします。
-エクスポート日時: ${importData.timestamp ? new Date(importData.timestamp).toLocaleString('ja-JP') : '不明'}
-エクスポート元: ${importData.device || '不明'}
+${storeCount}件の店舗データをインポートします。
+エクスポート日時: ${timestamp}
+エクスポート元: ${device}
 
 現在のデータは上書きされます。続行しますか？`;
             
             if (confirm(confirmMessage)) {
-                currentStores = importData.stores;
+                currentStores = stores;
                 saveStores();
                 renderStores();
                 hideImportModal();
-                showMessage(`${importData.stores.length}件のデータをインポートしました`, 'success');
+                showMessage(`${stores.length}件のデータをインポートしました`, 'success');
             }
         } catch (error) {
             console.error('Import error:', error);
