@@ -1020,8 +1020,58 @@ function handlePasteImport() {
             return restoredUrl;
         }
         
+        // V5U形式（超軽量版）の処理
+        if (inputData.startsWith('V5U:')) {
+            const compressedData = inputData.substring(4);
+            
+            // UTF-8対応のBase64デコード
+            const binaryString = atob(compressedData);
+            const utf8Bytes = new Uint8Array(binaryString.length);
+            for (let i = 0; i < binaryString.length; i++) {
+                utf8Bytes[i] = binaryString.charCodeAt(i);
+            }
+            const decodedData = new TextDecoder().decode(utf8Bytes);
+            
+            // 超軽量版の圧縮を復元
+            let restored = decodedData
+                .replace(/"i":/g, '"id":')
+                .replace(/"n":/g, '"name":')
+                .replace(/"p":/g, '"price":')
+                .replace(/"b":/g, '"badge":')
+                .replace(/A/g, '高級店')
+                .replace(/B/g, '上品')
+                .replace(/C/g, '人気')
+                .replace(/D/g, 'ラグジュアリー')
+                .replace(/E/g, '王室級')
+                .replace(/F/g, '新店')
+                .replace(/G/g, 'おすすめ');
+            
+            importData = JSON.parse(restored);
+            
+            console.log('V5U超軽量版形式データをデコード中...');
+            console.log('Raw importData:', importData);
+            
+            // 超軽量版は配列形式（id, name, price, badge）
+            stores = importData.s.map(storeArray => ({
+                id: storeArray[0],
+                name: storeArray[1],
+                image: '', // 画像なし
+                images: [], // 画像なし
+                price: storeArray[2],
+                badge: storeArray[3] || '',
+                description: '', // 詳細情報なし
+                features: [] // 特徴なし
+            }));
+            
+            timestamp = importData.t ? new Date(importData.t * 1000).toLocaleString('ja-JP') : '不明';
+            device = '不明';
+            storeCount = importData.c || stores.length;
+            
+            // 超軽量版の警告メッセージ
+            showMessage('🚀 超軽量版データをインポートしました。\n⚠️ 基本情報（店名・価格・バッジ）のみ含まれています。', 'warning');
+        }
         // V4L形式（軽量版）の処理
-        if (inputData.startsWith('V4L:')) {
+        else if (inputData.startsWith('V4L:')) {
             const compressedData = inputData.substring(4);
             
             // UTF-8対応のBase64デコード
@@ -1303,7 +1353,7 @@ function handleImportFile(event) {
                 }
                 
                 timestamp = importData.t ? new Date(importData.t * 1000).toLocaleString('ja-JP') : '不明';
-                device = importData.d === 'M' ? '携帯' : importData.d === 'D' ? 'パソコン' : importData.d === 1 ? '携帯' : 'パソコン';
+                device = importData.d === 'M' ? '携帯' : importData.d === 'D' ? 'パソコン' : '不明';
                 storeCount = importData.c || stores.length;
             }
             // 旧形式の場合
@@ -1568,38 +1618,47 @@ function generateShareURL() {
         console.log('現在のcurrentStores:', currentStores);
         console.log('データ生成開始...');
         
-        // まず軽量版データを生成
+        // 各種データ形式を生成
+        const ultraLightData = createUltraLightExportData();
         const lightData = createLightExportData();
         const fullData = createQuickExportData();
         
+        console.log('超軽量版データ:', ultraLightData.length, '文字');
         console.log('軽量版データ:', lightData.length, '文字');
         console.log('フル版データ:', fullData.length, '文字');
         
         const baseUrl = window.location.origin + window.location.pathname;
+        const ultraLightUrl = `${baseUrl}?import=${encodeURIComponent(ultraLightData)}`;
         const lightUrl = `${baseUrl}?import=${encodeURIComponent(lightData)}`;
         const fullUrl = `${baseUrl}?import=${encodeURIComponent(fullData)}`;
         
+        console.log('超軽量版URL:', ultraLightUrl.length, '文字');
         console.log('軽量版URL:', lightUrl.length, '文字');
         console.log('フル版URL:', fullUrl.length, '文字');
         
-        // URLの長さに基づいて使用するデータを決定
+        // URLの長さに基づいて使用するデータを決定（より厳しい制限）
         let selectedData, selectedUrl, mode;
         
-        if (lightUrl.length <= 2000) {
-            // 軽量版が2000文字以下なら軽量版を使用
+        if (ultraLightUrl.length <= 1200) {
+            // 超軽量版が1200文字以下なら超軽量版を使用
+            selectedData = ultraLightData;
+            selectedUrl = ultraLightUrl;
+            mode = '超軽量版（名前・価格のみ）';
+        } else if (lightUrl.length <= 1800) {
+            // 軽量版が1800文字以下なら軽量版を使用
             selectedData = lightData;
             selectedUrl = lightUrl;
             mode = '軽量版（画像なし）';
-        } else if (fullUrl.length <= 4000) {
-            // フル版が4000文字以下ならフル版を使用
+        } else if (fullUrl.length <= 3000) {
+            // フル版が3000文字以下ならフル版を使用
             selectedData = fullData;
             selectedUrl = fullUrl;
             mode = 'フル版';
         } else {
-            // どちらも長すぎる場合は軽量版を強制使用
-            selectedData = lightData;
-            selectedUrl = lightUrl;
-            mode = '軽量版（強制）';
+            // どちらも長すぎる場合は超軽量版を強制使用
+            selectedData = ultraLightData;
+            selectedUrl = ultraLightUrl;
+            mode = '超軽量版（強制）';
         }
         
         console.log(`選択されたモード: ${mode}, URL長: ${selectedUrl.length}文字`);
@@ -1615,7 +1674,9 @@ function generateShareURL() {
                 let message = `✅ ${mode}の共有URLをクリップボードにコピーしました！\n\n`;
                 message += `URL長: ${selectedUrl.length}文字\n\n`;
                 
-                if (mode.includes('軽量版')) {
+                if (mode.includes('超軽量版')) {
+                    message += '⚠️ 基本情報（店名・価格）のみ含まれています。\n詳細情報や画像も共有したい場合は「ファイルでエクスポート」をご利用ください。\n\n';
+                } else if (mode.includes('軽量版')) {
                     message += '⚠️ 画像データは含まれていません。\n画像も共有したい場合は「ファイルでエクスポート」をご利用ください。\n\n';
                 }
                 
@@ -1646,19 +1707,60 @@ function generateShareURL() {
         
         // 緊急時の最小限の共有URL生成
         try {
-            const emergencyData = currentStores.map(store => ({
-                id: store.id,
-                name: store.name,
-                price: store.price,
-                badge: store.badge
-            }));
-            const emergencyUrl = `${window.location.origin}${window.location.pathname}?emergency=${encodeURIComponent(JSON.stringify(emergencyData))}`;
-            console.log('緊急用最小URL:', emergencyUrl);
-            showMessage('⚠️ 緊急モードで最小限のURL生成しました（基本情報のみ）', 'warning');
+            const emergencyData = currentStores.map(store => [
+                store.id,
+                store.name,
+                store.price
+            ]);
+            const emergencyUrl = `${window.location.origin}${window.location.pathname}?mini=${encodeURIComponent(JSON.stringify(emergencyData))}`;
+            console.log('緊急用超短URL:', emergencyUrl);
+            showMessage('⚠️ 緊急モードで超短URL生成しました（名前・価格のみ）', 'warning');
         } catch (simpleError) {
             console.error('緊急URL生成も失敗:', simpleError);
         }
     }
+}
+
+// 超軽量版エクスポートデータ生成関数（基本情報のみ）
+function createUltraLightExportData() {
+    // 最小限のデータのみ（店名、価格、バッジ）
+    const ultraData = {
+        v: 5,  // 超軽量版フォーマット
+        t: Math.floor(Date.now() / 1000),
+        c: currentStores.length,
+        s: currentStores.map(store => [
+            store.id,
+            store.name,
+            store.price,
+            store.badge || ''
+        ])
+    };
+    
+    const jsonString = JSON.stringify(ultraData);
+    
+    // 最大圧縮
+    let compressed = jsonString
+        .replace(/","/g, '","')  // 無駄なスペース除去
+        .replace(/": "/g, '":"')  // 無駄なスペース除去
+        .replace(/"price":/g, '"p":')
+        .replace(/"badge":/g, '"b":')
+        .replace(/"name":/g, '"n":')
+        .replace(/"id":/g, '"i":');
+    
+    // さらなる圧縮（数値化）
+    compressed = compressed
+        .replace(/高級店/g, 'A')
+        .replace(/上品/g, 'B')
+        .replace(/人気/g, 'C')
+        .replace(/ラグジュアリー/g, 'D')
+        .replace(/王室級/g, 'E')
+        .replace(/新店/g, 'F')
+        .replace(/おすすめ/g, 'G');
+    
+    const utf8Bytes = new TextEncoder().encode(compressed);
+    const base64Compressed = btoa(String.fromCharCode(...utf8Bytes));
+    
+    return `V5U:${base64Compressed}`;  // V5U = Version 5 Ultra Light
 }
 
 // 軽量版エクスポートデータ生成関数（画像データを除外）
@@ -1748,7 +1850,49 @@ function checkForImportParameter() {
         }
     }
     
-    // 緊急時のシンプルインポート
+    // 緊急時の「mini」パラメータ処理
+    const miniData = urlParams.get('mini');
+    if (miniData) {
+        console.log('超短データを検出:', miniData);
+        
+        const confirmMini = confirm('⚡ 超短モードでデータを検出しました。\n\nインポートしますか？');
+        
+        if (confirmMini) {
+            try {
+                const parsedData = JSON.parse(decodeURIComponent(miniData));
+                if (Array.isArray(parsedData)) {
+                    // [id, name, price] 形式の配列を店舗オブジェクトに変換
+                    currentStores = parsedData.map(miniStore => ({
+                        id: miniStore[0],
+                        name: miniStore[1],
+                        price: miniStore[2],
+                        badge: '',
+                        image: '',
+                        images: [],
+                        description: '',
+                        features: []
+                    }));
+                    saveStores();
+                    renderStores();
+                    showMessage('✅ 超短モードでデータをインポートしました（基本情報のみ）', 'success');
+                }
+                
+                // URLをクリーンアップ
+                const newUrl = window.location.origin + window.location.pathname;
+                window.history.replaceState({}, document.title, newUrl);
+                
+            } catch (error) {
+                console.error('超短モードインポートエラー:', error);
+                showMessage('データのインポートに失敗しました: ' + error.message, 'error');
+            }
+        } else {
+            // URLをクリーンアップ
+            const newUrl = window.location.origin + window.location.pathname;
+            window.history.replaceState({}, document.title, newUrl);
+        }
+    }
+    
+    // 緊急時のシンプルインポート（旧emergency形式）
     if (emergencyData) {
         console.log('緊急データを検出:', emergencyData);
         
