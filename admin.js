@@ -693,21 +693,35 @@ function handleExportData() {
             return decompressed;
         }
         
+        // ローカル画像データを分離して格納
+        const localImages = {};
+        let localImageCounter = 0;
+        
+        function processImageForExport(img) {
+            if (!img) return '';
+            if (img.includes('unsplash')) {
+                return img.match(/photo-([a-zA-Z0-9_-]+)/)?.[1] || '';
+            }
+            if (img.startsWith('data:')) {
+                const localId = `LOCAL_${++localImageCounter}`;
+                localImages[localId] = img;
+                return localId;
+            }
+            return img || '';
+        }
+        
         // 超短縮データ形式
         const miniData = {
-            v: 1,
+            v: 2, // バージョンを2に更新（ローカル画像対応）
             t: Math.floor(Date.now() / 1000),
             d: navigator.userAgent.includes('Mobile') ? 1 : 0,
             c: currentStores.length,
+            l: localImages, // ローカル画像データを追加
             s: currentStores.map(store => [
                 store.id,
                 store.name,
-                store.image?.includes('unsplash') ? store.image.match(/photo-([a-zA-Z0-9_-]+)/)?.[1] || '' : 
-                store.image?.startsWith('data:') ? 'L' : store.image || '',
-                (store.images || []).map(img => 
-                    img?.includes('unsplash') ? img.match(/photo-([a-zA-Z0-9_-]+)/)?.[1] || '' : 
-                    img?.startsWith('data:') ? 'L' : img || ''
-                ),
+                processImageForExport(store.image),
+                (store.images || []).map(processImageForExport),
                 store.price,
                 store.badge,
                 store.description || '',
@@ -824,14 +838,38 @@ function handlePasteImport() {
             return decompressed;
         }
         
-        function restoreImageUrl(compressed) {
-            if (!compressed) return '';
-            if (compressed === 'L') return ''; // ローカル画像
-            if (compressed.includes('http')) return compressed;
-            return `https://images.unsplash.com/photo-${compressed}?w=800&h=600&fit=crop&crop=center`;
-        }
+        let importData, stores, timestamp, device, storeCount, localImages = {};
         
-        let importData, stores, timestamp, device, storeCount;
+        // 統一された画像復元関数
+        function restoreImageUrl(compressed) {
+            console.log('restoreImageUrl called with:', compressed);
+            
+            if (!compressed) return '';
+            
+            // ローカル画像IDの場合
+            if (typeof compressed === 'string' && compressed.startsWith('LOCAL_')) {
+                const localImage = localImages[compressed];
+                console.log(`ローカル画像復元: ${compressed} -> ${localImage ? 'データあり' : 'データなし'}`);
+                return localImage || '';
+            }
+            
+            // 旧形式のローカル画像識別子
+            if (compressed === 'L' || compressed === '[LOCAL]') {
+                console.log('旧形式ローカル画像識別子を検出（データなし）');
+                return '';
+            }
+            
+            // 既に完全URLの場合はそのまま
+            if (compressed.includes('http')) {
+                console.log('完全URL:', compressed);
+                return compressed;
+            }
+            
+            // Unsplash写真IDからURLを復元
+            const restoredUrl = `https://images.unsplash.com/photo-${compressed}?w=800&h=600&fit=crop&crop=center`;
+            console.log(`Unsplash ID復元: ${compressed} -> ${restoredUrl}`);
+            return restoredUrl;
+        }
         
         // 新しい圧縮形式かチェック（V3形式）
         if (inputData.startsWith('V3:')) {
@@ -847,10 +885,17 @@ function handlePasteImport() {
             const jsonString = simpleDecompress(decodedData);
             importData = JSON.parse(jsonString);
             
+            // ローカル画像データを復元（v2フォーマット対応）
+            if (importData.l) {
+                localImages = importData.l;
+                console.log('ローカル画像データを読み込み:', Object.keys(localImages).length, '件');
+            }
+            
             // デバッグ情報を出力
             console.log('V3形式データをデコード中...');
             console.log('Raw importData:', importData);
             console.log('Store array sample:', importData.s[0]);
+            console.log('ローカル画像データ:', localImages);
             
             // 配列形式から復元
             stores = importData.s.map((storeArray, index) => {
@@ -1011,35 +1056,58 @@ function handleImportFile(event) {
             let timestamp = '';
             let device = '';
             let storeCount = 0;
+            let localImages = {};
             
-            // 画像URLを復元する関数
-            function restoreImageUrl(compressed) {
-                if (!compressed) return '';
-                
-                // ローカル画像の場合は空にする（データが省略されているため）
-                if (compressed === '[LOCAL]') return '';
-                
-                // 既に完全URLの場合はそのまま
-                if (compressed.includes('http')) return compressed;
-                
-                // Unsplash写真IDからURLを復元
-                return `https://images.unsplash.com/photo-${compressed}?w=800&h=600&fit=crop&crop=center`;
+            // 統一された画像復元関数を使用（上で定義済み）
+            
+            // ローカル画像データを読み込み（v2フォーマット対応）
+            if (importData.l) {
+                localImages = importData.l;
+                console.log('ファイルインポート: ローカル画像データを読み込み:', Object.keys(localImages).length, '件');
             }
             
             // 新形式（短縮版）の場合
             if (importData.s && Array.isArray(importData.s)) {
-                stores = importData.s.map(store => ({
-                    id: store.i,
-                    name: store.n,
-                    image: restoreImageUrl(store.img),
-                    images: (store.imgs || []).map(restoreImageUrl),
-                    price: store.p,
-                    badge: store.b,
-                    description: store.d, // 短縮されていても問題なく使用
-                    features: store.f || []
-                }));
+                console.log('配列形式データを検出');
+                console.log('データバージョン:', importData.v);
+                console.log('サンプルストア:', importData.s[0]);
+                
+                // v2フォーマット（配列形式）とv1フォーマット（オブジェクト形式）を判別
+                const isArrayFormat = Array.isArray(importData.s[0]);
+                
+                if (isArrayFormat) {
+                    // 新しい配列形式（v2フォーマット）
+                    stores = importData.s.map((storeArray, index) => {
+                        console.log(`ファイル配列形式 Store ${index}:`, storeArray);
+                        const restored = {
+                            id: storeArray[0],
+                            name: storeArray[1],
+                            image: restoreImageUrl(storeArray[2]),
+                            images: (storeArray[3] || []).map(restoreImageUrl),
+                            price: storeArray[4],
+                            badge: storeArray[5],
+                            description: storeArray[6],
+                            features: storeArray[7] || []
+                        };
+                        console.log(`ファイル復元済み Store ${index}:`, restored);
+                        return restored;
+                    });
+                } else {
+                    // 旧形式（オブジェクト形式）
+                    stores = importData.s.map(store => ({
+                        id: store.i,
+                        name: store.n,
+                        image: restoreImageUrl(store.img),
+                        images: (store.imgs || []).map(restoreImageUrl),
+                        price: store.p,
+                        badge: store.b,
+                        description: store.d,
+                        features: store.f || []
+                    }));
+                }
+                
                 timestamp = importData.t ? new Date(importData.t * 1000).toLocaleString('ja-JP') : '不明';
-                device = importData.d === 'M' ? '携帯' : importData.d === 'D' ? 'パソコン' : '不明';
+                device = importData.d === 'M' ? '携帯' : importData.d === 'D' ? 'パソコン' : importData.d === 1 ? '携帯' : 'パソコン';
                 storeCount = importData.c || stores.length;
             }
             // 旧形式の場合
