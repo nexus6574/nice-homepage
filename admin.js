@@ -1020,8 +1020,55 @@ function handlePasteImport() {
             return restoredUrl;
         }
         
+        // V4L形式（軽量版）の処理
+        if (inputData.startsWith('V4L:')) {
+            const compressedData = inputData.substring(4);
+            
+            // UTF-8対応のBase64デコード
+            const binaryString = atob(compressedData);
+            const utf8Bytes = new Uint8Array(binaryString.length);
+            for (let i = 0; i < binaryString.length; i++) {
+                utf8Bytes[i] = binaryString.charCodeAt(i);
+            }
+            const decodedData = new TextDecoder().decode(utf8Bytes);
+            
+            // 軽量版の圧縮を復元
+            let restored = decodedData
+                .replace(/"i":/g, '"id":')
+                .replace(/"n":/g, '"name":')
+                .replace(/"p":/g, '"price":')
+                .replace(/"b":/g, '"badge":')
+                .replace(/"d":/g, '"description":')
+                .replace(/"f":/g, '"features":')
+                .replace(/"m":/g, '"image":')
+                .replace(/"g":/g, '"images":');
+            
+            importData = JSON.parse(restored);
+            
+            console.log('V4L軽量版形式データをデコード中...');
+            console.log('Raw importData:', importData);
+            
+            // 軽量版はオブジェクト形式なのでそのまま使用
+            stores = importData.s.map(store => ({
+                id: store.id,
+                name: store.name,
+                image: store.image ? restoreImageUrl(store.image) : '',
+                images: (store.images || []).map(restoreImageUrl),
+                price: store.price,
+                badge: store.badge,
+                description: store.description || '',
+                features: store.features || []
+            }));
+            
+            timestamp = importData.t ? new Date(importData.t * 1000).toLocaleString('ja-JP') : '不明';
+            device = importData.d === 1 ? '携帯' : 'パソコン';
+            storeCount = importData.c || stores.length;
+            
+            // 軽量版の警告メッセージ
+            showMessage('📱 軽量版データをインポートしました。\n⚠️ 画像データは含まれていません。', 'warning');
+        }
         // 新しい圧縮形式かチェック（V3形式）
-        if (inputData.startsWith('V3:')) {
+        else if (inputData.startsWith('V3:')) {
             const compressedData = inputData.substring(3);
             
             // UTF-8対応のBase64デコード
@@ -1521,35 +1568,72 @@ function generateShareURL() {
         console.log('現在のcurrentStores:', currentStores);
         console.log('データ生成開始...');
         
-        const data = createQuickExportData();
-        console.log('エクスポートデータ生成完了:', data.length, '文字');
+        // まず軽量版データを生成
+        const lightData = createLightExportData();
+        const fullData = createQuickExportData();
+        
+        console.log('軽量版データ:', lightData.length, '文字');
+        console.log('フル版データ:', fullData.length, '文字');
         
         const baseUrl = window.location.origin + window.location.pathname;
-        const shareUrl = `${baseUrl}?import=${encodeURIComponent(data)}`;
-        console.log('共有URL生成完了:', shareUrl.length, '文字');
+        const lightUrl = `${baseUrl}?import=${encodeURIComponent(lightData)}`;
+        const fullUrl = `${baseUrl}?import=${encodeURIComponent(fullData)}`;
+        
+        console.log('軽量版URL:', lightUrl.length, '文字');
+        console.log('フル版URL:', fullUrl.length, '文字');
+        
+        // URLの長さに基づいて使用するデータを決定
+        let selectedData, selectedUrl, mode;
+        
+        if (lightUrl.length <= 2000) {
+            // 軽量版が2000文字以下なら軽量版を使用
+            selectedData = lightData;
+            selectedUrl = lightUrl;
+            mode = '軽量版（画像なし）';
+        } else if (fullUrl.length <= 4000) {
+            // フル版が4000文字以下ならフル版を使用
+            selectedData = fullData;
+            selectedUrl = fullUrl;
+            mode = 'フル版';
+        } else {
+            // どちらも長すぎる場合は軽量版を強制使用
+            selectedData = lightData;
+            selectedUrl = lightUrl;
+            mode = '軽量版（強制）';
+        }
+        
+        console.log(`選択されたモード: ${mode}, URL長: ${selectedUrl.length}文字`);
         
         // 成功メッセージを最初に表示（クリップボード操作の前に）
-        showMessage('📋 URL共有機能を実行中...', 'info');
+        showMessage(`📋 ${mode}のURL共有機能を実行中...`, 'info');
         
         // クリップボードAPI対応チェック
         if (navigator.clipboard && navigator.clipboard.writeText) {
             console.log('モダンなクリップボードAPIを使用');
-            navigator.clipboard.writeText(shareUrl).then(() => {
+            navigator.clipboard.writeText(selectedUrl).then(() => {
                 console.log('クリップボードコピー成功');
-                showMessage('✅ 共有URLをクリップボードにコピーしました！\n\n他のデバイスのブラウザでペーストして開いてください', 'success');
+                let message = `✅ ${mode}の共有URLをクリップボードにコピーしました！\n\n`;
+                message += `URL長: ${selectedUrl.length}文字\n\n`;
+                
+                if (mode.includes('軽量版')) {
+                    message += '⚠️ 画像データは含まれていません。\n画像も共有したい場合は「ファイルでエクスポート」をご利用ください。\n\n';
+                }
+                
+                message += '他のデバイスのブラウザでペーストして開いてください';
+                showMessage(message, 'success');
             }).catch(error => {
                 console.error('モダンクリップボードAPI失敗:', error);
-                fallbackCopyToClipboard(shareUrl);
+                fallbackCopyToClipboard(selectedUrl);
             });
         } else {
             console.log('フォールバック方式を使用');
-            fallbackCopyToClipboard(shareUrl);
+            fallbackCopyToClipboard(selectedUrl);
         }
         
         // URLを画面にも表示
         const urlDisplay = document.getElementById('share-url-display');
         if (urlDisplay) {
-            urlDisplay.value = shareUrl;
+            urlDisplay.value = selectedUrl;
             urlDisplay.style.display = 'block';
             console.log('URL表示エリアに設定完了');
         } else {
@@ -1560,98 +1644,66 @@ function generateShareURL() {
         console.error('URL生成エラー:', error);
         showMessage('❌ URL生成に失敗しました: ' + error.message, 'error');
         
-        // 緊急時の簡単な共有URL生成
+        // 緊急時の最小限の共有URL生成
         try {
-            const simpleData = JSON.stringify(currentStores);
-            const simpleUrl = `${window.location.origin}${window.location.pathname}?simple=${encodeURIComponent(simpleData)}`;
-            console.log('緊急用シンプルURL:', simpleUrl);
-            showMessage('⚠️ 簡易モードでURL生成しました', 'warning');
+            const emergencyData = currentStores.map(store => ({
+                id: store.id,
+                name: store.name,
+                price: store.price,
+                badge: store.badge
+            }));
+            const emergencyUrl = `${window.location.origin}${window.location.pathname}?emergency=${encodeURIComponent(JSON.stringify(emergencyData))}`;
+            console.log('緊急用最小URL:', emergencyUrl);
+            showMessage('⚠️ 緊急モードで最小限のURL生成しました（基本情報のみ）', 'warning');
         } catch (simpleError) {
             console.error('緊急URL生成も失敗:', simpleError);
         }
     }
 }
 
-// フォールバック用のクリップボードコピー関数
-function fallbackCopyToClipboard(text) {
-    console.log('フォールバッククリップボード処理開始');
-    
-    try {
-        // テキストエリア方式
-        const textArea = document.createElement('textarea');
-        textArea.value = text;
-        textArea.style.cssText = 'position: fixed; top: -9999px; left: -9999px; opacity: 0;';
-        document.body.appendChild(textArea);
-        textArea.focus();
-        textArea.select();
-        
-        const success = document.execCommand('copy');
-        document.body.removeChild(textArea);
-        
-        if (success) {
-            console.log('フォールバッククリップボードコピー成功');
-            showMessage('✅ 共有URLをクリップボードにコピーしました！（フォールバック方式）', 'success');
-        } else {
-            throw new Error('execCommand failed');
-        }
-    } catch (error) {
-        console.error('フォールバッククリップボードも失敗:', error);
-        
-        // 最終手段: URLを表示して手動コピーを促す
-        const copyMessage = `📋 以下のURLを手動でコピーしてください：\n\n${text.substring(0, 100)}...`;
-        showMessage(copyMessage, 'warning');
-        
-        // モーダルに表示
-        const urlDisplay = document.getElementById('share-url-display');
-        if (urlDisplay) {
-            urlDisplay.value = text;
-            urlDisplay.style.display = 'block';
-            urlDisplay.select();
-        }
-    }
-}
-
-function createQuickExportData() {
-    // 軽量版のエクスポートデータを生成
-    const localImages = {};
-    let localImageCounter = 0;
-    
-    function processImageForQuickExport(img) {
-        if (!img) return '';
-        if (img.includes('unsplash')) {
-            return img.match(/photo-([a-zA-Z0-9_-]+)/)?.[1] || '';
-        }
-        if (img.startsWith('data:')) {
-            const localId = `LOCAL_${++localImageCounter}`;
-            localImages[localId] = img;
-            return localId;
-        }
-        return img || '';
-    }
-    
-    const quickData = {
-        v: 2,
+// 軽量版エクスポートデータ生成関数（画像データを除外）
+function createLightExportData() {
+    const lightData = {
+        v: 4,  // 軽量版フォーマット
         t: Math.floor(Date.now() / 1000),
         d: navigator.userAgent.includes('Mobile') ? 1 : 0,
         c: currentStores.length,
-        l: localImages,
-        s: currentStores.map(store => [
-            store.id,
-            store.name,
-            processImageForQuickExport(store.image),
-            (store.images || []).map(processImageForQuickExport),
-            store.price,
-            store.badge,
-            store.description || '',
-            store.features || []
-        ])
+        mode: 'light',
+        s: currentStores.map(store => ({
+            id: store.id,
+            name: store.name,
+            price: store.price,
+            badge: store.badge,
+            description: store.description || '',
+            features: store.features || [],
+            // 画像データは除外、Unsplash画像のみIDを保持
+            image: store.image && store.image.includes('unsplash') 
+                ? store.image.match(/photo-([a-zA-Z0-9_-]+)/)?.[1] || '' 
+                : '',
+            images: (store.images || [])
+                .filter(img => img && img.includes('unsplash'))
+                .map(img => img.match(/photo-([a-zA-Z0-9_-]+)/)?.[1] || '')
+                .filter(id => id)
+        }))
     };
     
-    const jsonString = JSON.stringify(quickData);
-    const utf8Bytes = new TextEncoder().encode(jsonString);
+    const jsonString = JSON.stringify(lightData);
+    
+    // 簡単な圧縮（繰り返し文字列の短縮）
+    let compressed = jsonString
+        .replace(/"id":/g, '"i":')
+        .replace(/"name":/g, '"n":')
+        .replace(/"price":/g, '"p":')
+        .replace(/"badge":/g, '"b":')
+        .replace(/"description":/g, '"d":')
+        .replace(/"features":/g, '"f":')
+        .replace(/"image":/g, '"m":')
+        .replace(/"images":/g, '"g":');
+    
+    const utf8Bytes = new TextEncoder().encode(compressed);
     const base64Compressed = btoa(String.fromCharCode(...utf8Bytes));
     
-    return `V3:${base64Compressed}`;
+    return `V4L:${base64Compressed}`;  // V4L = Version 4 Light
 }
 
 function scanQRCode() {
@@ -1754,3 +1806,85 @@ window.exportStoreData = exportStoreData;
 window.hideExportModal = hideExportModal; 
 window.hideImportModal = hideImportModal;
 window.hideQRModal = hideQRModal; 
+
+// フォールバック用のクリップボードコピー関数
+function fallbackCopyToClipboard(text) {
+    console.log('フォールバッククリップボード処理開始');
+    
+    try {
+        // テキストエリア方式
+        const textArea = document.createElement('textarea');
+        textArea.value = text;
+        textArea.style.cssText = 'position: fixed; top: -9999px; left: -9999px; opacity: 0;';
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        
+        const success = document.execCommand('copy');
+        document.body.removeChild(textArea);
+        
+        if (success) {
+            console.log('フォールバッククリップボードコピー成功');
+            showMessage('✅ 共有URLをクリップボードにコピーしました！（フォールバック方式）', 'success');
+        } else {
+            throw new Error('execCommand failed');
+        }
+    } catch (error) {
+        console.error('フォールバッククリップボードも失敗:', error);
+        
+        // 最終手段: URLを表示して手動コピーを促す
+        const copyMessage = `📋 以下のURLを手動でコピーしてください：\n\n${text.substring(0, 100)}...`;
+        showMessage(copyMessage, 'warning');
+        
+        // モーダルに表示
+        const urlDisplay = document.getElementById('share-url-display');
+        if (urlDisplay) {
+            urlDisplay.value = text;
+            urlDisplay.style.display = 'block';
+            urlDisplay.select();
+        }
+    }
+}
+
+function createQuickExportData() {
+    // フル版のエクスポートデータを生成（従来通り）
+    const localImages = {};
+    let localImageCounter = 0;
+    
+    function processImageForQuickExport(img) {
+        if (!img) return '';
+        if (img.includes('unsplash')) {
+            return img.match(/photo-([a-zA-Z0-9_-]+)/)?.[1] || '';
+        }
+        if (img.startsWith('data:')) {
+            const localId = `LOCAL_${++localImageCounter}`;
+            localImages[localId] = img;
+            return localId;
+        }
+        return img || '';
+    }
+    
+    const quickData = {
+        v: 2,
+        t: Math.floor(Date.now() / 1000),
+        d: navigator.userAgent.includes('Mobile') ? 1 : 0,
+        c: currentStores.length,
+        l: localImages,
+        s: currentStores.map(store => [
+            store.id,
+            store.name,
+            processImageForQuickExport(store.image),
+            (store.images || []).map(processImageForQuickExport),
+            store.price,
+            store.badge,
+            store.description || '',
+            store.features || []
+        ])
+    };
+    
+    const jsonString = JSON.stringify(quickData);
+    const utf8Bytes = new TextEncoder().encode(jsonString);
+    const base64Compressed = btoa(String.fromCharCode(...utf8Bytes));
+    
+    return `V3:${base64Compressed}`;
+}
