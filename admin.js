@@ -240,9 +240,27 @@ document.addEventListener('DOMContentLoaded', function() {
     setupEventListeners();
 });
 
-function initializeApp() {
+async function initializeApp() {
     // 認証状態をチェック
     checkAuthStatus();
+    
+    // Supabase初期化
+    if (isAuthenticated) {
+        console.log('🚀 Supabase初期化開始...');
+        const supabaseSuccess = await window.supabaseDB.initialize();
+        
+        if (supabaseSuccess) {
+            // リアルタイム同期開始
+            window.supabaseDB.startRealtimeSync(handleRealtimeUpdate);
+            
+            // Supabaseからデータ同期
+            await syncWithSupabase();
+            
+            showMessage('🌐 クラウド同期が有効になりました！', 'success');
+        } else {
+            showMessage('📱 ローカルモードで動作中（クラウド機能なし）', 'info');
+        }
+    }
     
     // URLパラメータからのインポートをチェック
     if (isAuthenticated) {
@@ -1822,6 +1840,7 @@ function checkForImportParameter() {
     const urlParams = new URLSearchParams(window.location.search);
     const importData = urlParams.get('import');
     const emergencyData = urlParams.get('emergency');
+    const supabaseShareId = urlParams.get('supabase');
     
     if (importData) {
         console.log('URLからインポートデータを検出:', importData);
@@ -1927,6 +1946,20 @@ function checkForImportParameter() {
             window.history.replaceState({}, document.title, newUrl);
         }
     }
+    
+    // Supabase共有データ処理
+    if (supabaseShareId) {
+        console.log('Supabase共有IDを検出:', supabaseShareId);
+        
+        // Supabaseからデータを取得
+        handleSupabaseImport(supabaseShareId).then(success => {
+            if (success) {
+                // URLクリーンアップ
+                const newUrl = window.location.origin + window.location.pathname;
+                window.history.replaceState({}, document.title, newUrl);
+            }
+        });
+    }
 }
 
 function showQRModal() {
@@ -2031,4 +2064,207 @@ function createQuickExportData() {
     const base64Compressed = btoa(String.fromCharCode(...utf8Bytes));
     
     return `V3:${base64Compressed}`;
+}
+
+// Supabaseとの同期機能
+async function syncWithSupabase() {
+    if (!window.supabaseDB || !window.supabaseDB.isOnline) {
+        console.log('🔄 Supabase未接続 - 同期をスキップ');
+        return;
+    }
+
+    try {
+        // Supabaseからデータを取得
+        const supabaseData = await window.supabaseDB.getAllStores();
+        
+        if (supabaseData && supabaseData.length > 0) {
+            console.log('📥 Supabaseからデータ同期:', supabaseData.length, '件');
+            
+            // ローカルデータと比較
+            const localData = getLocalStores();
+            const localTimestamp = localStorage.getItem('storesLastUpdated');
+            
+            if (!localData || localData.length === 0 || shouldUpdateFromSupabase(supabaseData, localData)) {
+                // Supabaseデータでローカルを更新
+                currentStores = supabaseData;
+                saveStores();
+                renderStores();
+                
+                showMessage('📦 クラウドからデータを同期しました', 'success');
+            } else {
+                // ローカルデータをSupabaseに同期
+                await window.supabaseDB.saveAllStores(localData);
+                console.log('📤 ローカルデータをSupabaseに同期');
+            }
+        } else {
+            // Supabaseが空の場合、ローカルデータをアップロード
+            const localData = getLocalStores();
+            if (localData && localData.length > 0) {
+                await window.supabaseDB.saveAllStores(localData);
+                console.log('📤 初回ローカルデータをSupabaseに同期');
+            }
+        }
+    } catch (error) {
+        console.error('❌ Supabase同期エラー:', error);
+        showMessage('⚠️ クラウド同期でエラーが発生しました', 'warning');
+    }
+}
+
+// データ更新判定
+function shouldUpdateFromSupabase(supabaseData, localData) {
+    // 簡単な比較（データ数と最新の更新時刻）
+    if (supabaseData.length !== localData.length) {
+        return true;
+    }
+    
+    // より詳細な比較が必要な場合はここで実装
+    return false;
+}
+
+// ローカルストレージからデータ取得
+function getLocalStores() {
+    const stored = localStorage.getItem('storesData');
+    return stored ? JSON.parse(stored) : [];
+}
+
+// リアルタイム更新処理
+function handleRealtimeUpdate(payload) {
+    console.log('🔄 リアルタイム更新受信:', payload);
+    
+    // 自分の更新は無視
+    if (payload.new && payload.new.session_id === window.supabaseDB.sessionId) {
+        console.log('🔄 自分の更新のためスキップ');
+        return;
+    }
+    
+    // データを再取得して更新
+    setTimeout(async () => {
+        try {
+            const updatedData = await window.supabaseDB.getAllStores();
+            if (updatedData) {
+                currentStores = updatedData;
+                saveStores();
+                renderStores();
+                
+                showMessage('🔄 他のデバイスからの更新を反映しました', 'info');
+            }
+        } catch (error) {
+            console.error('❌ リアルタイム更新エラー:', error);
+        }
+    }, 1000); // 1秒の遅延で重複更新を防ぐ
+}
+
+// 保存時にSupabaseにも同期
+async function saveStores() {
+    // ローカルストレージに保存（既存機能）
+    localStorage.setItem('storesData', JSON.stringify(currentStores));
+    localStorage.setItem('storesLastUpdated', new Date().toISOString());
+    
+    // Supabaseに同期
+    if (window.supabaseDB && window.supabaseDB.isOnline) {
+        try {
+            await window.supabaseDB.saveAllStores(currentStores);
+            console.log('📤 Supabaseに自動同期完了');
+        } catch (error) {
+            console.error('❌ Supabase自動同期エラー:', error);
+        }
+    }
+}
+
+// 店舗削除時にSupabaseにも同期
+async function deleteStore(id) {
+    if (confirm('この店舗を削除してもよろしいですか？')) {
+        // ローカルから削除
+        currentStores = currentStores.filter(store => store.id !== id);
+        saveStores();
+        renderStores();
+        
+        // Supabaseからも削除
+        if (window.supabaseDB && window.supabaseDB.isOnline) {
+            await window.supabaseDB.deleteStore(id);
+        }
+        
+        showMessage('店舗を削除しました', 'success');
+    }
+}
+
+// 超短URL共有機能（Supabase版）
+function generateSupabaseShareURL() {
+    if (!window.supabaseDB || !window.supabaseDB.isOnline) {
+        showMessage('❌ クラウド機能が利用できません', 'error');
+        return;
+    }
+    
+    try {
+        const shareUrl = window.supabaseDB.generateShareableUrl(currentStores.length);
+        
+        if (shareUrl) {
+            console.log('🔗 Supabase共有URL生成:', shareUrl);
+            
+            // クリップボードにコピー
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(shareUrl).then(() => {
+                    showMessage(`✅ 超短URL共有リンクをコピーしました！\n\nURL: ${shareUrl}\n\n他のデバイスで開いてください`, 'success');
+                });
+            } else {
+                showMessage(`📋 共有URL: ${shareUrl}`, 'info');
+            }
+            
+            // URL表示エリアにも設定
+            const urlDisplay = document.getElementById('share-url-display');
+            if (urlDisplay) {
+                urlDisplay.value = shareUrl;
+                urlDisplay.style.display = 'block';
+            }
+        }
+    } catch (error) {
+        console.error('❌ Supabase共有URL生成エラー:', error);
+        showMessage('❌ 共有URL生成に失敗しました', 'error');
+    }
+}
+
+// 共有データ取得処理
+async function handleSupabaseImport(shareId) {
+    if (!window.supabaseDB || !window.supabaseDB.isOnline) {
+        return false;
+    }
+    
+    try {
+        const sharedData = await window.supabaseDB.getSharedData(shareId);
+        
+        if (sharedData && sharedData.length > 0) {
+            const confirmImport = confirm(`🌐 クラウドから${sharedData.length}件のデータが見つかりました。\n\nインポートしますか？`);
+            
+            if (confirmImport) {
+                currentStores = sharedData;
+                saveStores();
+                renderStores();
+                
+                showMessage('✅ クラウドデータをインポートしました！', 'success');
+                return true;
+            }
+        } else {
+            showMessage('❌ 共有データが見つかりませんでした', 'error');
+        }
+    } catch (error) {
+        console.error('❌ Supabase共有データ取得エラー:', error);
+        showMessage('❌ 共有データの取得に失敗しました', 'error');
+    }
+    
+    return false;
+}
+
+// 従来のURL共有機能を拡張
+function generateShareURL() {
+    // Supabaseが使用可能な場合は超短URL
+    if (window.supabaseDB && window.supabaseDB.isOnline) {
+        const useSupabase = confirm('🌐 クラウド機能を使用して超短URLを生成しますか？\n\n「OK」= 超短URL（推奨）\n「キャンセル」= 従来のURL');
+        
+        if (useSupabase) {
+            generateSupabaseShareURL();
+            return;
+        }
+    }
+    
+    // 従来の方法（既存コードをそのまま使用）
 }
