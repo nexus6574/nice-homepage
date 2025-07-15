@@ -367,7 +367,10 @@ function showRLSFix() {
 
 5. 以下のSQLをコピー&ペーストして「Run」をクリック:
 
+   DROP POLICY IF EXISTS "Enable all operations for anon users" ON nice_stores;
    ALTER TABLE nice_stores DISABLE ROW LEVEL SECURITY;
+   GRANT ALL ON TABLE nice_stores TO anon;
+   GRANT ALL ON TABLE nice_stores TO authenticated;
 
 6. 「Success. No rows returned」が表示されれば完了
 
@@ -425,6 +428,93 @@ function showRLSFix() {
             modal.remove();
         }
     });
+}
+
+// 永続テストデータ挿入
+async function insertTestData() {
+    try {
+        if (!window.supabaseClient) {
+            throw new Error('Supabaseクライアントが初期化されていません');
+        }
+        
+        console.log('➕ 永続テストデータ挿入開始...');
+        
+        // 既存データを確認
+        const { data: existingData, error: checkError } = await window.supabaseClient
+            .from('nice_stores')
+            .select('*');
+            
+        console.log('📊 既存データ:', existingData?.length || 0, '件');
+        
+        if (checkError) {
+            throw checkError;
+        }
+        
+        // サンプル店舗データ
+        const sampleStores = [
+            {
+                id: 1,
+                name: 'Premium Club TOKYO',
+                price: '1,500円〜',
+                badge: '高級',
+                description: '高級感あふれる店内で最高のひと時を',
+                features: ['高級感', '完全個室', '最高級サービス'],
+                session_id: 'admin_permanent',
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString()
+            },
+            {
+                id: 2, 
+                name: 'Club Elegance',
+                price: '1,200円〜',
+                badge: '上品',
+                description: '上品で落ち着いた雰囲気のお店',
+                features: ['上品', '落ち着いた雰囲気', '大人の空間'],
+                session_id: 'admin_permanent',
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString()
+            },
+            {
+                id: 3,
+                name: 'Night Paradise', 
+                price: '1,000円〜',
+                badge: '人気',
+                description: '活気あふれる楽しい空間',
+                features: ['活気', '楽しい', 'アットホーム'],
+                session_id: 'admin_permanent',
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString()
+            }
+        ];
+        
+        console.log('📤 永続データをSupabaseに保存中...', sampleStores.length, '件');
+        
+        const { data, error } = await window.supabaseClient
+            .from('nice_stores')
+            .upsert(sampleStores)
+            .select();
+        
+        if (error) {
+            console.error('💥 Supabaseエラー詳細:', error);
+            
+            if (error.message.includes('permission denied') || error.code === '42501') {
+                throw new Error(`🚨 権限エラー: ${error.message}\n\n解決方法:\n1. Supabaseダッシュボード > SQL Editor\n2. 以下のSQLを実行:\n\nDROP POLICY IF EXISTS "Enable all operations for anon users" ON nice_stores;\nALTER TABLE nice_stores DISABLE ROW LEVEL SECURITY;\nGRANT ALL ON TABLE nice_stores TO anon;\nGRANT ALL ON TABLE nice_stores TO authenticated;`);
+            }
+            
+            throw error;
+        }
+        
+        console.log('✅ 永続データ保存成功！', data?.length || 0, '件');
+        alert(`✅ 永続テストデータ保存成功！\n${data?.length || 0}件の店舗データを保存しました。\n\nTable Editorで確認してください。`);
+        
+        // 店舗リストを更新
+        await loadStoresFromSupabase();
+        
+    } catch (error) {
+        console.error('❌ 永続データ保存エラー:', error);
+        alert('❌ 永続データ保存エラー:\n' + error.message);
+        throw error;
+    }
 }
 
 // クラウド同期状態をUIに更新
