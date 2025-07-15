@@ -260,7 +260,7 @@ async function testSupabaseConnection() {
 // Supabase直接データ保存テスト
 async function testSupabaseSave() {
     try {
-        if (!window.supabase) {
+        if (!window.supabaseClient) {
             throw new Error('Supabaseクライアントが初期化されていません');
         }
         
@@ -281,12 +281,26 @@ async function testSupabaseSave() {
         
         console.log('📤 テストデータをSupabaseに保存中...', testStore);
         
-        const { data, error } = await window.supabase
+        const { data, error } = await window.supabaseClient
             .from('nice_stores')
             .upsert(testStore)
             .select();
         
+        console.log('🔍 Supabase応答:', { data, error });
+        
         if (error) {
+            console.error('💥 Supabaseエラー詳細:', {
+                message: error.message,
+                details: error.details,
+                hint: error.hint,
+                code: error.code,
+                status: error.status
+            });
+            
+            if (error.message.includes('permission denied') || error.code === '42501') {
+                throw new Error(`🚨 権限エラー: ${error.message}\n\n解決方法:\n1. Supabaseダッシュボード > SQL Editor\n2. 以下のSQLを実行:\n   ALTER TABLE nice_stores DISABLE ROW LEVEL SECURITY;`);
+            }
+            
             throw error;
         }
         
@@ -296,7 +310,7 @@ async function testSupabaseSave() {
         // テストデータをすぐに削除
         setTimeout(async () => {
             try {
-                await window.supabase
+                await window.supabaseClient
                     .from('nice_stores')
                     .delete()
                     .eq('id', testStore.id);
@@ -311,6 +325,85 @@ async function testSupabaseSave() {
         alert('❌ Supabaseデータ保存エラー:\n' + error.message);
         throw error;
     }
+}
+
+// RLS権限修正手順を表示
+function showRLSFix() {
+    const fixInstructions = `
+🔧 Supabase RLS権限修正手順
+
+データ保存で権限エラーが出る場合、以下の手順で修正してください：
+
+📋 手順:
+1. Supabaseダッシュボードにアクセス
+   → https://supabase.com/dashboard
+
+2. プロジェクト「rkjclmiievzgqkfgkhfl」を選択
+
+3. 左メニューから「SQL Editor」をクリック
+
+4. 「New query」ボタンをクリック
+
+5. 以下のSQLをコピー&ペーストして「Run」をクリック:
+
+   ALTER TABLE nice_stores DISABLE ROW LEVEL SECURITY;
+
+6. 「Success. No rows returned」が表示されれば完了
+
+✅ 修正後、再度「💾 Supabase保存テスト」を実行してください
+
+❓ 困った時は:
+- コンソールログ(F12)でエラー詳細を確認
+- SQLエラーが出た場合はメッセージをコピーして報告
+    `;
+    
+    // モーダル形式で表示
+    const modal = document.createElement('div');
+    modal.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.8);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 10000;
+    `;
+    
+    const content = document.createElement('div');
+    content.style.cssText = `
+        background: white;
+        padding: 30px;
+        border-radius: 10px;
+        max-width: 600px;
+        max-height: 80%;
+        overflow-y: auto;
+        font-family: monospace;
+        line-height: 1.6;
+    `;
+    
+    content.innerHTML = `
+        <pre style="white-space: pre-wrap; margin: 0;">${fixInstructions}</pre>
+        <div style="text-align: center; margin-top: 20px;">
+            <button onclick="this.closest('.modal').remove()" 
+                    style="background: #007bff; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">
+                閉じる
+            </button>
+        </div>
+    `;
+    
+    modal.appendChild(content);
+    modal.className = 'modal';
+    document.body.appendChild(modal);
+    
+    // モーダル外をクリックで閉じる
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            modal.remove();
+        }
+    });
 }
 
 // クラウド同期状態をUIに更新
