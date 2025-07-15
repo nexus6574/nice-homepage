@@ -260,11 +260,32 @@ async function testSupabaseConnection() {
 // Supabase直接データ保存テスト
 async function testSupabaseSave() {
     try {
+        console.log('🧪 Supabaseデータ保存テスト開始...');
+        
+        // 詳細なSupabase状態をデバッグ
+        console.log('🔍 Supabase状態診断:');
+        console.log('- window.supabase:', typeof window.supabase, window.supabase);
+        console.log('- window.supabaseClient:', typeof window.supabaseClient, window.supabaseClient);
+        console.log('- SUPABASE_CONFIG:', typeof SUPABASE_CONFIG, SUPABASE_CONFIG);
+        
+        // supabaseClientが存在しない場合は初期化を試行
         if (!window.supabaseClient) {
-            throw new Error('Supabaseクライアントが初期化されていません');
+            console.log('⚠️ supabaseClientが未初期化。初期化を試行...');
+            
+            if (window.supabase && typeof window.supabase.createClient === 'function') {
+                window.supabaseClient = window.supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
+                console.log('✅ supabaseClient初期化完了');
+            } else {
+                throw new Error('❌ Supabase SDK（window.supabase）が利用できません');
+            }
         }
         
-        console.log('🧪 Supabaseデータ保存テスト開始...');
+        // クライアントが正しく初期化されているか確認
+        if (!window.supabaseClient || typeof window.supabaseClient.from !== 'function') {
+            throw new Error('❌ supabaseClientが正しく初期化されていません。fromメソッドが利用できません。');
+        }
+        
+        console.log('✅ supabaseClient確認完了');
         
         // テスト店舗データ
         const testStore = {

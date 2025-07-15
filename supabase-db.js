@@ -32,7 +32,11 @@ class SupabaseDB {
 
     // 接続テスト
     async testConnection() {
-        const { data, error } = await supabase
+        if (!window.supabaseClient) {
+            throw new Error('Supabaseクライアントが初期化されていません');
+        }
+        
+        const { data, error } = await window.supabaseClient
             .from(SUPABASE_CONFIG.tables.stores)
             .select('count')
             .limit(1);
@@ -61,7 +65,7 @@ class SupabaseDB {
         }
 
         try {
-            const { data, error } = await supabase
+            const { data, error } = await window.supabaseClient
                 .from(SUPABASE_CONFIG.tables.stores)
                 .select('*')
                 .order('id', { ascending: true });
@@ -87,7 +91,7 @@ class SupabaseDB {
 
         try {
             // 既存データを削除
-            const { error: deleteError } = await supabase
+            const { error: deleteError } = await window.supabaseClient
                 .from(SUPABASE_CONFIG.tables.stores)
                 .delete()
                 .neq('id', 0); // 全削除
@@ -110,7 +114,7 @@ class SupabaseDB {
                 updated_at: new Date().toISOString()
             }));
 
-            const { error: insertError } = await supabase
+            const { error: insertError } = await window.supabaseClient
                 .from(SUPABASE_CONFIG.tables.stores)
                 .insert(storesData);
 
@@ -134,7 +138,7 @@ class SupabaseDB {
         }
 
         try {
-            const { error } = await supabase
+            const { error } = await window.supabaseClient
                 .from(SUPABASE_CONFIG.tables.stores)
                 .upsert({
                     id: store.id,
@@ -168,7 +172,7 @@ class SupabaseDB {
         }
 
         try {
-            const { error } = await supabase
+            const { error } = await window.supabaseClient
                 .from(SUPABASE_CONFIG.tables.stores)
                 .delete()
                 .eq('id', storeId);
@@ -240,7 +244,7 @@ class SupabaseDB {
         }
 
         try {
-            const { data, error } = await supabase
+            const { data, error } = await window.supabaseClient
                 .from(SUPABASE_CONFIG.tables.stores)
                 .select('*')
                 .eq('session_id', shareId)
@@ -265,7 +269,7 @@ class SupabaseDB {
         }
 
         try {
-            const { data, error } = await supabase
+            const { data, error } = await window.supabaseClient
                 .from(SUPABASE_CONFIG.tables.stores)
                 .select('session_id, updated_at')
                 .order('updated_at', { ascending: false })
@@ -355,7 +359,7 @@ class SupabaseDB {
             console.log('☁️ Supabase Storageにアップロード中...');
             
             // Supabase Storageにアップロード
-            const { data, error } = await supabase.storage
+            const { data, error } = await window.supabaseClient.storage
                 .from(SUPABASE_CONFIG.storage.bucket)
                 .upload(fileName, optimizedFile, {
                     cacheControl: '3600',
@@ -392,7 +396,7 @@ class SupabaseDB {
         }
 
         try {
-            const { error } = await supabase.storage
+            const { error } = await window.supabaseClient.storage
                 .from(SUPABASE_CONFIG.storage.bucket)
                 .remove([fileName]);
 
@@ -422,7 +426,7 @@ class SupabaseDB {
 
         try {
             // ストレージ内の該当店舗の古い画像を検索
-            const { data: files, error } = await supabase.storage
+            const { data: files, error } = await window.supabaseClient.storage
                 .from(SUPABASE_CONFIG.storage.bucket)
                 .list('', {
                     search: `_${storeId}_`
@@ -438,7 +442,7 @@ class SupabaseDB {
             if (storeFiles.length > 1) {
                 // 最新以外を削除
                 const filesToDelete = storeFiles.slice(0, -1).map(file => file.name);
-                await supabase.storage
+                await window.supabaseClient.storage
                     .from(SUPABASE_CONFIG.storage.bucket)
                     .remove(filesToDelete);
                 
@@ -515,7 +519,7 @@ class SupabaseDB {
                 updated_at: new Date().toISOString()
             };
 
-            const { error } = await supabase
+            const { error } = await window.supabaseClient
                 .from(SUPABASE_CONFIG.tables.stores)
                 .upsert(supabaseData);
 
