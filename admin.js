@@ -517,6 +517,105 @@ async function insertTestData() {
     }
 }
 
+// Supabaseデータ確認
+async function checkSupabaseData() {
+    try {
+        if (!window.supabaseClient) {
+            throw new Error('Supabaseクライアントが初期化されていません');
+        }
+        
+        console.log('📊 Supabaseデータ確認開始...');
+        
+        const { data, error } = await window.supabaseClient
+            .from('nice_stores')
+            .select('*')
+            .order('updated_at', { ascending: false });
+        
+        if (error) {
+            throw error;
+        }
+        
+        console.log('📊 Supabaseデータ:', data);
+        
+        let message = `📊 Supabaseデータ確認結果\n\n`;
+        message += `🗄️ 総データ数: ${data?.length || 0}件\n\n`;
+        
+        if (data && data.length > 0) {
+            message += `📋 最新データ:\n`;
+            data.slice(0, 5).forEach((store, index) => {
+                message += `${index + 1}. ${store.name} (${store.price})\n`;
+            });
+            
+            if (data.length > 5) {
+                message += `... 他${data.length - 5}件\n`;
+            }
+        } else {
+            message += `❌ データが見つかりません\n\n`;
+            message += `💡 対処法:\n`;
+            message += `1. "➕ 永続テストデータ挿入"を実行\n`;
+            message += `2. 管理画面で店舗を追加\n`;
+            message += `3. "🔄 ローカル→Supabase同期"を実行`;
+        }
+        
+        alert(message);
+        
+    } catch (error) {
+        console.error('❌ Supabaseデータ確認エラー:', error);
+        alert('❌ Supabaseデータ確認エラー:\n' + error.message);
+    }
+}
+
+// ローカル→Supabase同期
+async function syncLocalToSupabase() {
+    try {
+        if (!window.supabaseClient) {
+            throw new Error('Supabaseクライアントが初期化されていません');
+        }
+        
+        console.log('🔄 ローカル→Supabase同期開始...');
+        
+        // ローカルストレージからデータを取得
+        const localStores = JSON.parse(localStorage.getItem('nice_stores') || '[]');
+        
+        if (localStores.length === 0) {
+            alert('❌ ローカルストレージにデータがありません');
+            return;
+        }
+        
+        console.log('📤 ローカルデータをSupabaseに同期中...', localStores.length, '件');
+        
+        let successCount = 0;
+        let errorCount = 0;
+        
+        for (const store of localStores) {
+            try {
+                const success = await saveStoreToSupabase(store);
+                if (success) {
+                    successCount++;
+                } else {
+                    errorCount++;
+                }
+            } catch (error) {
+                console.error(`店舗 ${store.name} の同期エラー:`, error);
+                errorCount++;
+            }
+        }
+        
+        const message = `🔄 ローカル→Supabase同期完了\n\n` +
+                       `✅ 成功: ${successCount}件\n` +
+                       `❌ 失敗: ${errorCount}件\n\n` +
+                       `📊 Supabaseデータ確認ボタンで結果を確認してください。`;
+        
+        alert(message);
+        
+        console.log('✅ 同期完了:', { successCount, errorCount });
+        
+    } catch (error) {
+        console.error('❌ 同期エラー:', error);
+        alert('❌ 同期エラー:\n' + error.message);
+    }
+}
+
 // クラウド同期状態をUIに更新
 function updateCloudSyncStatus(isOnline) {
     // 既存の状態表示を削除
@@ -587,12 +686,12 @@ async function loadStoresFromSupabase() {
     }
 }
 
-// Supabaseにデータを保存
+// Supabaseにデータを保存（直接クライアント使用）
 async function saveStoresToSupabase() {
     console.log('💾 saveStoresToSupabase実行中...');
     
-    if (!supabaseDB || !supabaseDB.isOnline) {
-        console.log('⚠️ SupabaseDB未初期化またはオフライン。ローカル保存を使用します。');
+    if (!window.supabaseClient) {
+        console.log('⚠️ Supabaseクライアント未初期化。ローカル保存を使用します。');
         return false;
     }
 
@@ -605,7 +704,7 @@ async function saveStoresToSupabase() {
         
         for (const store of currentStores) {
             try {
-                const success = await supabaseDB.saveStore(store);
+                const success = await saveStoreToSupabase(store);
                 if (success) {
                     successCount++;
                 } else {
@@ -615,7 +714,7 @@ async function saveStoresToSupabase() {
                 console.error(`店舗 ${store.name} の保存エラー:`, error);
                 errorCount++;
             }
-                 }
+        }
          
          // 結果の報告
          if (errorCount === 0) {
@@ -640,25 +739,45 @@ async function saveStoresToSupabase() {
     }
 }
 
-// 単一店舗をSupabaseに保存
+// 単一店舗をSupabaseに保存（直接クライアント使用）
 async function saveStoreToSupabase(store) {
     console.log('💾 saveStoreToSupabase実行中...', store);
     
-    if (!supabaseDB || !supabaseDB.isOnline) {
-        console.log('⚠️ SupabaseDB未初期化またはオフライン');
+    if (!window.supabaseClient) {
+        console.log('⚠️ Supabaseクライアント未初期化');
         return false;
     }
 
     try {
-        const success = await supabaseDB.saveStore(store);
+        console.log('📤 Supabaseに直接保存中...', store.name);
         
-        if (success) {
-            console.log('✅ Supabaseに店舗データを保存しました');
-            return true;
-        } else {
-            console.log('❌ Supabase保存に失敗');
+        // Supabaseに直接保存
+        const storeData = {
+            id: store.id,
+            name: store.name,
+            price: store.price,
+            badge: store.badge || '',
+            description: store.description || '',
+            features: store.features || [],
+            image: store.image || '',
+            images: store.images || [],
+            session_id: 'admin_session_' + Date.now(),
+            created_at: store.created_at || new Date().toISOString(),
+            updated_at: new Date().toISOString()
+        };
+        
+        const { data, error } = await window.supabaseClient
+            .from('nice_stores')
+            .upsert(storeData)
+            .select();
+        
+        if (error) {
+            console.error('❌ Supabase保存エラー:', error);
             return false;
         }
+        
+        console.log('✅ Supabaseに店舗データを保存しました:', data);
+        return true;
         
     } catch (error) {
         console.error('❌ Supabase保存エラー:', error);
