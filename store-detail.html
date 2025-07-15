@@ -93,11 +93,11 @@
                                 </div>
                                 <div class="info-item">
                                     <span class="info-label">営業時間</span>
-                                    <span class="info-value">20:00 - 26:00</span>
+                                    <span id="detail-hours" class="info-value"></span>
                                 </div>
                                 <div class="info-item">
                                     <span class="info-label">定休日</span>
-                                    <span class="info-value">日曜日</span>
+                                    <span id="detail-closed-days" class="info-value"></span>
                                 </div>
                                 <div class="info-item">
                                     <span class="info-label">所在地</span>
@@ -125,6 +125,48 @@
                 </div>
             </section>
 
+            <!-- 編集機能セクション -->
+            <section class="edit-section" id="edit-section" style="display: none;">
+                <div class="container">
+                    <h2>店舗情報を編集</h2>
+                    <div class="edit-form-container">
+                        <form id="store-edit-form">
+                            <input type="hidden" id="edit-store-id">
+                            
+                            <div class="edit-group">
+                                <label for="edit-store-name">店舗名</label>
+                                <input type="text" id="edit-store-name" required>
+                            </div>
+                            
+                            <div class="edit-group">
+                                <label for="edit-store-description">店舗説明</label>
+                                <textarea id="edit-store-description" rows="3" required></textarea>
+                            </div>
+                            
+                            <div class="edit-group">
+                                <label for="edit-store-price">初回料金</label>
+                                <input type="text" id="edit-store-price" placeholder="例: 1,500円〜" required>
+                            </div>
+                            
+                            <div class="edit-group">
+                                <label for="edit-store-badge">バッジ</label>
+                                <input type="text" id="edit-store-badge" placeholder="例: 人気No.1">
+                            </div>
+                            
+                            <div class="edit-group">
+                                <label for="edit-store-features">特徴・サービス</label>
+                                <input type="text" id="edit-store-features" placeholder="カンマ区切りで入力 例: VIP個室あり, 送迎サービス">
+                            </div>
+                            
+                            <div class="edit-buttons">
+                                <button type="submit" class="save-edit-btn">💾 保存</button>
+                                <button type="button" class="cancel-edit-btn" onclick="cancelEdit()">❌ キャンセル</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </section>
+
             <!-- お問い合わせセクション -->
             <section class="contact-section">
                 <div class="container">
@@ -145,6 +187,9 @@
             <section class="navigation-section">
                 <div class="container">
                     <div class="nav-buttons">
+                        <button class="edit-toggle-btn" onclick="toggleEditMode()">
+                            ✏️ 編集モード
+                        </button>
                         <a href="cabaret-list.html" class="back-btn">
                             ← 店舗一覧に戻る
                         </a>
@@ -172,6 +217,14 @@
         </div>
     </footer>
 
+    <!-- Supabase JavaScript SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
+    
+    <!-- Supabaseサポートファイル -->
+    <script src="supabase-config.js"></script>
+    <script src="supabase-db.js"></script>
+    
+    <!-- メインスクリプト -->
     <script src="script.js"></script>
     <script src="store-detail.js"></script>
 </body>

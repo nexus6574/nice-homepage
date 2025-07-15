@@ -9,14 +9,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }, 300);
 });
 
-// ページ完全読み込み時にも再初期化（画像読み込み完了後）
-window.addEventListener('load', function() {
-    setTimeout(() => {
-        console.log('ページ完全読み込み完了 - スライダーを再初期化します');
-        initializeSlider();
-    }, 500);
-});
-
 function initializeMobileMenu() {
     const mobileMenuToggle = document.querySelector('.mobile-menu-toggle');
     const navLinks = document.querySelector('.nav-links');
@@ -111,27 +103,92 @@ window.addEventListener('scroll', function() {
     }
 });
 
-// 店舗データ管理
-function loadStoreData() {
+// Supabase初期化状態
+let supabaseDB = null;
+let isSupabaseInitialized = false;
+
+// Supabase初期化
+async function initializeSupabaseFrontend() {
+    try {
+        console.log('🔧 フロントエンドSupabase初期化中...');
+        
+        // supabase-config.jsの初期化関数を使用
+        if (typeof window.initializeSupabase === 'function') {
+            const success = window.initializeSupabase();
+            if (!success) {
+                console.warn('⚠️ Supabase初期化失敗。ローカルモードで動作します。');
+                return false;
+            }
+        } else {
+            console.warn('⚠️ initializeSupabase関数が見つかりません');
+            return false;
+        }
+        
+        // SupabaseDBインスタンスを初期化
+        if (typeof window.SupabaseDB !== 'undefined') {
+            supabaseDB = new window.SupabaseDB();
+            const dbSuccess = await supabaseDB.initialize();
+            if (dbSuccess) {
+                console.log('✅ フロントエンドSupabaseDB初期化成功');
+                isSupabaseInitialized = true;
+                return true;
+            } else {
+                console.warn('⚠️ SupabaseDB初期化失敗。ローカルモードで動作します。');
+                return false;
+            }
+        } else {
+            console.warn('⚠️ SupabaseDBクラスが見つかりません。ローカルモードで動作します。');
+            return false;
+        }
+        
+    } catch (error) {
+        console.error('❌ フロントエンドSupabase初期化エラー:', error);
+        return false;
+    }
+}
+
+// 店舗データ管理（Supabase対応版）
+async function loadStoreData() {
     console.log('loadStoreData: データ読み込み開始');
     
-    const savedStores = localStorage.getItem('cabaret_stores');
+    // まずSupabaseからデータを読み込みを試みる
+    if (isSupabaseInitialized && supabaseDB) {
+        try {
+            console.log('📥 Supabaseからデータ読み込み中...');
+            const supabaseStores = await supabaseDB.loadStores();
+            
+            if (supabaseStores && supabaseStores.length > 0) {
+                console.log('✅ Supabaseからデータを読み込み成功');
+                console.log('店舗数:', supabaseStores.length);
+                console.log('店舗データサンプル:', supabaseStores[0]?.name || 'なし');
+                
+                // Supabaseのデータを最新として保存
+                localStorage.setItem('nice_stores', JSON.stringify(supabaseStores));
+                return supabaseStores;
+            }
+        } catch (error) {
+            console.error('❌ Supabaseデータ読み込みエラー:', error);
+        }
+    }
+    
+    // Supabaseが利用できない場合、LocalStorageからデータを読み込み
+    console.log('📂 LocalStorageからデータを読み込み中...');
+    const savedStores = localStorage.getItem('nice_stores');
     if (savedStores) {
         try {
             const parsedData = JSON.parse(savedStores);
-            console.log('loadStoreData: LocalStorageからデータを読み込み成功');
+            console.log('✅ LocalStorageからデータを読み込み成功');
             console.log('店舗数:', parsedData.length);
             console.log('店舗データサンプル:', parsedData[0]?.name || 'なし');
             return parsedData;
         } catch (error) {
-            console.error('loadStoreData: JSONパースエラー:', error);
+            console.error('❌ JSONパースエラー:', error);
             console.log('デフォルトデータにフォールバック');
             return getDefaultStoreData();
         }
     }
     
-    console.log('loadStoreData: LocalStorageにデータなし - デフォルトデータを使用');
-    // デフォルトの店舗データを返す
+    console.log('⚠️ LocalStorageにデータなし - デフォルトデータを使用');
     return getDefaultStoreData();
 }
 
@@ -144,7 +201,9 @@ function getDefaultStoreData() {
             price: "1,500円〜",
             description: "最高級のサービスと洗練された空間で特別な時間をお過ごしください。厳選されたキャストが心を込めておもてなしいたします。",
             features: ["VIP個室あり", "送迎サービス", "カラオケ完備", "高級シャンパン"],
-            badge: "人気No.1"
+            badge: "人気No.1",
+            businessHours: { start: "20:00", end: "02:00" },
+            closedDays: ["日曜日"]
         },
         {
             name: "Club Elegance",
@@ -152,7 +211,9 @@ function getDefaultStoreData() {
             price: "1,200円〜",
             description: "エレガントで落ち着いた雰囲気の中で、上品なキャストがお客様を優雅にお迎えいたします。",
             features: ["落ち着いた雰囲気", "上品なキャスト", "個室完備", "ワイン豊富"],
-            badge: "上品さNo.1"
+            badge: "上品さNo.1",
+            businessHours: { start: "19:30", end: "01:30" },
+            closedDays: ["月曜日"]
         },
         {
             name: "Night Paradise",
@@ -160,7 +221,9 @@ function getDefaultStoreData() {
             price: "1,000円〜",
             description: "夜の楽園をコンセプトにしたアットホームな空間で、楽しい時間をお過ごしください。",
             features: ["アットホーム", "リーズナブル", "イベント多数", "若いキャスト"],
-            badge: "コスパNo.1"
+            badge: "コスパNo.1",
+            businessHours: { start: "20:00", end: "03:00" },
+            closedDays: []
         },
         {
             name: "Luxury Lounge",
@@ -168,7 +231,9 @@ function getDefaultStoreData() {
             price: "2,000円〜",
             description: "ラグジュアリーな空間と最高級のサービスで、贅沢なひとときをお約束いたします。",
             features: ["最高級サービス", "豪華内装", "プレミアムドリンク", "VIPルーム"],
-            badge: "高級志向"
+            badge: "高級志向",
+            businessHours: { start: "19:00", end: "02:00" },
+            closedDays: ["日曜日", "月曜日"]
         },
         {
             name: "Royal Cabinet",
@@ -176,7 +241,9 @@ function getDefaultStoreData() {
             price: "1,750円〜",
             description: "王室のような気品あふれる空間で、最上級のホスピタリティをご体験ください。",
             features: ["格調高い", "知的なキャスト", "プライベート空間", "高級酒豊富"],
-            badge: "気品No.1"
+            badge: "気品No.1",
+            businessHours: { start: "19:30", end: "01:00" },
+            closedDays: ["火曜日"]
         },
         {
             name: "Diamond Club",
@@ -184,14 +251,16 @@ function getDefaultStoreData() {
             price: "1,400円〜",
             description: "ダイヤモンドのように輝く特別な時間をお約束いたします。美しいキャストがお迎えします。",
             features: ["煌びやか", "美しいキャスト", "特別サービス", "記念日対応"],
-            badge: "輝きNo.1"
+            badge: "輝きNo.1",
+            businessHours: { start: "20:30", end: "02:30" },
+            closedDays: ["水曜日"]
         }
     ];
 }
 
 // 店舗一覧ページのデータ更新
-function updateCabaretListPage() {
-    const storeData = loadStoreData();
+async function updateCabaretListPage() {
+    const storeData = await loadStoreData();
     if (!storeData || storeData.length === 0) return;
     
     const storeGrid = document.querySelector('.store-grid');
@@ -296,8 +365,8 @@ function generateStoreId(storeName) {
 }
 
 // メインページのスライダー更新
-function updateMainPageSlider() {
-    const storeData = loadStoreData();
+async function updateMainPageSlider() {
+    const storeData = await loadStoreData();
     if (!storeData || storeData.length === 0) return;
     
     const slider = document.querySelector('.slider');
@@ -531,27 +600,33 @@ function cleanupSlider() {
     sliderState.isInitialized = false;
 }
 
-// ページロード時にデータを更新
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOMContentLoaded: ページ初期化開始');
+// ページ読み込み時にスライダーを初期化
+window.addEventListener('load', async function() {
+    console.log('ページ読み込み完了 - 初期化開始');
     
-    // 現在のページに応じて更新
-    if (document.querySelector('.store-grid')) {
-        console.log('店舗一覧ページを検出 - データ更新中...');
-        updateCabaretListPage();
-    } else if (document.querySelector('.slider')) {
+    // Supabaseを初期化
+    await initializeSupabaseFrontend();
+    
+    // データを読み込み
+    const storeData = await loadStoreData();
+    console.log('✅ 店舗データ読み込み完了:', storeData.length, '件');
+    
+    // メインページの場合はスライダーを更新
+    if (window.location.pathname.includes('index.html') || window.location.pathname === '/' || window.location.pathname === '/NICE/') {
         console.log('メインページを検出 - スライダー更新中...');
-        updateMainPageSlider();
+        await updateMainPageSlider();
+    }
+    
+    // 店舗一覧ページの場合は店舗リストを更新
+    if (window.location.pathname.includes('cabaret-list.html')) {
+        console.log('店舗一覧ページを検出 - 店舗リスト更新中...');
+        await updateCabaretListPage();
     }
     
     // 管理画面リンクを追加（開発用）
     addAdminLink();
     
-    // データ同期監視を開始
-    startDataSyncMonitoring();
-    
-    // 強制リフレッシュボタンを追加
-    addForceRefreshButton();
+    console.log('🎉 フロントエンド初期化完了');
 });
 
 // 管理画面へのリンクを追加（デバッグ用）
@@ -592,205 +667,10 @@ function addAdminLink() {
     document.body.appendChild(adminLink);
 }
 
-// データ同期監視機能
-function startDataSyncMonitoring() {
-    console.log('データ同期監視を開始');
-    
-    // 初期データのハッシュを保存
-    let currentDataHash = getDataHash();
-    
-    // 定期的にlocalStorageをチェック（3秒ごと）
-    setInterval(function() {
-        const newDataHash = getDataHash();
-        if (newDataHash !== currentDataHash) {
-            console.log('データの変更を検出しました - 自動更新中...');
-            currentDataHash = newDataHash;
-            
-            // ページを自動更新
-            refreshPageData();
-            
-            // 通知を表示
-            showDataUpdateNotification();
-        }
-    }, 3000);
-    
-    // StorageEventでリアルタイム検出（同一オリジン内）
-    window.addEventListener('storage', function(e) {
-        if (e.key === 'cabaret_stores') {
-            console.log('Storage event: データ変更を検出');
-            refreshPageData();
-            showDataUpdateNotification();
-        }
-    });
-}
-
-// データのハッシュを生成（変更検出用）
-function getDataHash() {
-    const data = localStorage.getItem('cabaret_stores');
-    return data ? data.length + '_' + data.substring(0, 50) : 'empty';
-}
-
-// ページデータを強制リフレッシュ
-function refreshPageData() {
-    console.log('ページデータを強制リフレッシュ中...');
-    
-    try {
-        if (document.querySelector('.store-grid')) {
-            console.log('店舗一覧ページを更新中...');
-            updateCabaretListPage();
-        } else if (document.querySelector('.slider')) {
-            console.log('メインページスライダーを更新中...');
-            updateMainPageSlider();
-        }
-        console.log('ページデータのリフレッシュ完了');
-    } catch (error) {
-        console.error('データリフレッシュエラー:', error);
-    }
-}
-
-// データ更新通知を表示
-function showDataUpdateNotification() {
-    // 既存の通知を削除
-    const existingNotification = document.querySelector('.data-update-notification');
-    if (existingNotification) {
-        existingNotification.remove();
-    }
-    
-    const notification = document.createElement('div');
-    notification.className = 'data-update-notification';
-    notification.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        z-index: 10000;
-        background: linear-gradient(45deg, #27ae60, #2ecc71);
-        color: white;
-        padding: 15px 20px;
-        border-radius: 8px;
-        font-size: 14px;
-        font-weight: bold;
-        box-shadow: 0 5px 15px rgba(39, 174, 96, 0.4);
-        animation: slideInRight 0.5s ease;
-        max-width: 300px;
-    `;
-    
-    notification.innerHTML = `
-        <div style="display: flex; align-items: center; gap: 10px;">
-            <span>🔄</span>
-            <span>データが更新されました</span>
-        </div>
-    `;
-    
-    // アニメーションのCSSを追加
-    if (!document.getElementById('notification-styles')) {
-        const styles = document.createElement('style');
-        styles.id = 'notification-styles';
-        styles.textContent = `
-            @keyframes slideInRight {
-                from { transform: translateX(100%); opacity: 0; }
-                to { transform: translateX(0); opacity: 1; }
-            }
-            @keyframes slideOutRight {
-                from { transform: translateX(0); opacity: 1; }
-                to { transform: translateX(100%); opacity: 0; }
-            }
-        `;
-        document.head.appendChild(styles);
-    }
-    
-    document.body.appendChild(notification);
-    
-    // 3秒後に非表示
-    setTimeout(() => {
-        if (notification.parentNode) {
-            notification.style.animation = 'slideOutRight 0.5s ease';
-            setTimeout(() => {
-                if (notification.parentNode) {
-                    notification.remove();
-                }
-            }, 500);
-        }
-    }, 3000);
-}
-
-// 強制リフレッシュボタンを追加
-function addForceRefreshButton() {
-    const refreshButton = document.createElement('div');
-    refreshButton.style.cssText = `
-        position: fixed;
-        bottom: 20px;
-        left: 20px;
-        z-index: 1000;
-        background: linear-gradient(45deg, #3498db, #2980b9);
-        color: white;
-        padding: 12px 16px;
-        border-radius: 25px;
-        font-size: 12px;
-        font-weight: bold;
-        box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
-        cursor: pointer;
-        transition: all 0.3s ease;
-        text-decoration: none;
-        display: inline-block;
-        user-select: none;
-    `;
-    refreshButton.innerHTML = '🔄 データ更新';
-    
-    refreshButton.onclick = function() {
-        console.log('強制リフレッシュボタンがクリックされました');
-        
-        // ボタンを一時的に無効化
-        refreshButton.style.opacity = '0.6';
-        refreshButton.style.pointerEvents = 'none';
-        refreshButton.innerHTML = '🔄 更新中...';
-        
-        // データを強制リフレッシュ
-        refreshPageData();
-        
-        // 成功メッセージを表示
-        showDataUpdateNotification();
-        
-        // ボタンを元に戻す
-        setTimeout(() => {
-            refreshButton.style.opacity = '1';
-            refreshButton.style.pointerEvents = 'auto';
-            refreshButton.innerHTML = '🔄 データ更新';
-        }, 1000);
-    };
-    
-    refreshButton.addEventListener('mouseenter', function() {
-        this.style.transform = 'translateY(-3px)';
-        this.style.boxShadow = '0 8px 25px rgba(52, 152, 219, 0.6)';
-    });
-    
-    refreshButton.addEventListener('mouseleave', function() {
-        this.style.transform = 'translateY(0)';
-        this.style.boxShadow = '0 5px 15px rgba(52, 152, 219, 0.4)';
-    });
-    
-    document.body.appendChild(refreshButton);
-}
-
-// 緊急データ復旧機能（グローバル関数として公開）
-window.NICE_FORCE_REFRESH = function() {
-    console.log('緊急データリフレッシュ実行');
-    try {
-        refreshPageData();
-        showDataUpdateNotification();
-        console.log('緊急リフレッシュ完了');
-        return '成功: データを強制更新しました';
-    } catch (error) {
-        console.error('緊急リフレッシュエラー:', error);
-        return 'エラー: ' + error.message;
-    }
-};
-
 // ページ可視性変更時にデータをチェック（タブ切り替え時など）
 document.addEventListener('visibilitychange', function() {
     if (!document.hidden) {
-        console.log('ページが再表示されました - データをチェック中...');
-        // 少し遅延してからチェック
-        setTimeout(refreshPageData, 500);
+        console.log('ページが再表示されました');
     }
 });
 

@@ -1,14 +1,15 @@
 # NICE キャバクラ一覧 - Supabase セットアップガイド
 
-## 📋 **セットアップ手順**
+## 📋 **手順**
 
-### **1. Supabaseプロジェクト作成**
-1. [Supabase](https://supabase.com) でアカウント作成
-2. 新しいプロジェクトを作成
-3. データベースパスワードを設定
+### **1. Supabaseダッシュボードにアクセス**
+1. [Supabase Dashboard](https://supabase.com/dashboard) にログイン
+2. あなたのプロジェクト（`rkjclmiievzgqkfgkhfl`）を選択
 
-### **2. データベーステーブル作成**
-Supabaseダッシュボードの「SQL Editor」で以下のスクリプトを実行：
+### **2. SQL Editorで以下のスクリプトを実行**
+1. 左側メニューから「SQL Editor」をクリック
+2. 「New query」をクリック
+3. 以下のSQLスクリプトを貼り付けて実行：
 
 ```sql
 -- nice_stores テーブル作成
@@ -50,89 +51,41 @@ CREATE POLICY "Anyone can delete stores" ON nice_stores
 ALTER PUBLICATION supabase_realtime ADD TABLE nice_stores;
 ```
 
-### **3. API設定取得**
-1. プロジェクトSettings → API
-2. 以下の情報をコピー：
-   - `Project URL`
-   - `anon public key`
+### **3. Storage バケット作成（画像保存用）**
+Storage → New bucket で以下のバケットを作成：
 
-### **4. 設定ファイル更新**
-`supabase-config.js` ファイルを更新：
+```sql
+-- ストレージバケット作成（画像保存用）
+INSERT INTO storage.buckets (id, name, public) 
+VALUES ('nice-store-images', 'nice-store-images', true);
 
-```javascript
-const SUPABASE_CONFIG = {
-    url: 'https://your-project.supabase.co',  // ← Project URL
-    anonKey: 'your-anon-key',                // ← anon public key
-    
-    tables: {
-        stores: 'nice_stores',
-        sessions: 'nice_sessions'
-    }
-};
+-- Storage RLS ポリシー設定（全員がアップロード・読み取り可能）
+CREATE POLICY "Anyone can upload store images" ON storage.objects
+    FOR INSERT WITH CHECK (bucket_id = 'nice-store-images');
+
+CREATE POLICY "Anyone can read store images" ON storage.objects
+    FOR SELECT USING (bucket_id = 'nice-store-images');
+
+CREATE POLICY "Anyone can update store images" ON storage.objects
+    FOR UPDATE USING (bucket_id = 'nice-store-images');
+
+CREATE POLICY "Anyone can delete store images" ON storage.objects
+    FOR DELETE USING (bucket_id = 'nice-store-images');
 ```
 
-## 🚀 **利用開始**
+### **4. 実行方法**
+1. 上記SQLを全選択してコピー
+2. SQL Editorに貼り付け
+3. 「Run」ボタンをクリック
 
-設定完了後、管理画面にアクセスすると：
-- ✅ **"🌐 クラウド同期が有効になりました！"** → 成功
-- ⚠️ **"📱 ローカルモードで動作中"** → 設定未完了
+### **5. 成功確認**
+- 「Success. No rows returned」が表示されれば成功
+- 左側メニューの「Table Editor」で `nice_stores` テーブルが作成されていることを確認
 
-## 🎯 **新機能**
+## 🚀 **完了後**
 
-### **1. 超短URL共有**
-- 従来: `https://nice-shinjuku.com/admin.html?import=V5U:eyJ2Ijo1...` (1000文字以上)
-- 新しい: `https://nice-shinjuku.com/admin.html?supabase=session_12345&count=5` (約100文字)
+設定が完了すると、管理画面で：
+- ✅ **"🌐 クラウド同期が有効になりました！"** というメッセージが表示
+- **"☁️ Supabase 超短縮URL"** オプションが利用可能に
 
-### **2. リアルタイム同期**
-- 他のデバイスでの変更が自動で反映
-- 複数人での同時編集が可能
-
-### **3. 自動バックアップ**
-- データが自動でクラウドに保存
-- 端末故障時もデータが保護
-
-## 🔧 **トラブルシューティング**
-
-### **"テーブルが存在しません"エラー**
-→ SQLスクリプトが正しく実行されているか確認
-
-### **"クラウド同期でエラー"**
-→ API設定が正しく設定されているか確認
-
-### **リアルタイム同期が動作しない**
-→ `ALTER PUBLICATION` コマンドが実行されているか確認
-
-## 📊 **データベース構造**
-
-```
-nice_stores
-├── id (BIGINT) - 店舗ID
-├── name (VARCHAR) - 店名
-├── price (VARCHAR) - 価格
-├── badge (VARCHAR) - バッジ
-├── description (TEXT) - 説明
-├── features (JSONB) - 特徴リスト
-├── image (TEXT) - メイン画像URL
-├── images (JSONB) - 追加画像URLリスト
-├── session_id (VARCHAR) - セッション識別子
-├── created_at (TIMESTAMP) - 作成日時
-└── updated_at (TIMESTAMP) - 更新日時
-```
-
-## 💡 **使い分けガイド**
-
-| 機能 | 用途 | URL長さ |
-|-----|------|---------|
-| 🌐 Supabase共有 | 日常的な共有 | ~100文字 |
-| 📱 従来URL共有 | 一時的な共有 | 1000-3000文字 |
-| 📁 ファイル共有 | 完全バックアップ | ファイル |
-
-## 🛡️ **セキュリティ考慮事項**
-
-- 現在はパブリック読み書き権限
-- 必要に応じて認証機能を追加可能
-- Row Level Security (RLS) で細かい権限制御が可能
-
----
-
-**🎉 設定完了後は、管理画面で「🔗 URL共有」ボタンをクリックして超短URL機能をお試しください！** 
+何か問題があれば教えてください！ 

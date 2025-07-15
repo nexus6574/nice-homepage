@@ -50,266 +50,420 @@ const AVAILABLE_IMAGES = [
     },
     {
         id: 9,
-        url: 'https://images.unsplash.com/photo-1520637836862-4d197d17c15a?w=800&h=600&fit=crop&crop=center',
-        name: 'プライベート空間 1'
+        url: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800&h=600&fit=crop&crop=center',
+        name: 'シャンデリア 1'
     },
     {
         id: 10,
-        url: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&h=600&fit=crop&crop=center',
-        name: 'ナイトクラブ 1'
+        url: 'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=800&h=600&fit=crop&crop=center',
+        name: 'レストランバー 1'
     },
     {
         id: 11,
-        url: 'https://images.unsplash.com/photo-1566737236500-c8ac43014a8e?w=800&h=600&fit=crop&crop=center',
-        name: 'ラウンジエリア 1'
+        url: 'https://images.unsplash.com/photo-1579952363873-27d3bfad9c0d?w=800&h=600&fit=crop&crop=center',
+        name: 'エレガントな空間 2'
     },
     {
         id: 12,
-        url: 'https://images.unsplash.com/photo-1592861956120-e524fc739696?w=800&h=600&fit=crop&crop=center',
-        name: 'バーカウンター 1'
+        url: 'https://images.unsplash.com/photo-1566417713940-fe7c737a9ef2?w=800&h=600&fit=crop&crop=center',
+        name: 'モダンなバー 2'
     },
     {
         id: 13,
-        url: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800&h=600&fit=crop&crop=center',
-        name: 'クラブ照明 1'
+        url: 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=800&h=600&fit=crop&crop=center',
+        name: 'ラグジュアリーラウンジ 2'
     },
     {
         id: 14,
-        url: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=800&h=600&fit=crop&crop=center',
-        name: '店内全景 1'
+        url: 'https://images.unsplash.com/photo-1586985289906-406988974504?w=800&h=600&fit=crop&crop=center',
+        name: 'VIPルーム 2'
     },
     {
         id: 15,
-        url: 'https://images.unsplash.com/photo-1485846234645-a62644f84728?w=800&h=600&fit=crop&crop=center',
-        name: 'イベントホール 1'
+        url: 'https://images.unsplash.com/photo-1502791451862-7bd8c1df43a7?w=800&h=600&fit=crop&crop=center',
+        name: 'カウンターバー 2'
     },
     {
         id: 16,
-        url: 'https://images.unsplash.com/photo-1527069398084-e64eec5dd6ab?w=800&h=600&fit=crop&crop=center',
-        name: 'ダンスフロア 1'
+        url: 'https://images.unsplash.com/photo-1556742502-ec7c0e9f34b1?w=800&h=600&fit=crop&crop=center',
+        name: 'レストランバー 2'
     },
     {
         id: 17,
-        url: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop&crop=center',
-        name: 'テーブル席 1'
+        url: 'https://images.unsplash.com/photo-1530841344095-c5a1dd5c0dd5?w=800&h=600&fit=crop&crop=center',
+        name: 'モダンクラブ 2'
     },
     {
         id: 18,
-        url: 'https://images.unsplash.com/photo-1597655601841-214a4cfe8b9c?w=800&h=600&fit=crop&crop=center',
-        name: 'VIPボックス 1'
+        url: 'https://images.unsplash.com/photo-1584464491033-06628f3a6b7b?w=800&h=600&fit=crop&crop=center',
+        name: 'シャンデリア 2'
     },
     {
         id: 19,
-        url: 'https://images.unsplash.com/photo-1559339352-11d035aa65de?w=800&h=600&fit=crop&crop=center',
-        name: 'プレミアム空間 1'
+        url: 'https://images.unsplash.com/photo-1609142025341-dd87b1b38d0d?w=800&h=600&fit=crop&crop=center',
+        name: '高級クラブ内装 2'
     },
     {
         id: 20,
-        url: 'https://images.unsplash.com/photo-1514933651103-005eec06c04b?w=800&h=600&fit=crop&crop=center',
-        name: 'エントランス 1'
-    }
-];
-
-// デフォルト店舗データ（写真ギャラリー付き）
-const DEFAULT_STORES = [
-    {
-        id: 1,
-        name: 'Premium Club TOKYO',
-        image: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=800&h=600&fit=crop&crop=center',
-        images: [
-            'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=800&h=600&fit=crop&crop=center',
-            'https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=800&h=600&fit=crop&crop=center',
-            'https://images.unsplash.com/photo-1549490349-8643362247b5?w=800&h=600&fit=crop&crop=center',
-            'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=800&h=600&fit=crop&crop=center',
-            'https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=800&h=600&fit=crop&crop=center'
-        ],
-        price: '3,000円〜',
-        badge: '高級店',
-        description: '高級感あふれる店内で最高のひと時を。経験豊富なキャストが心を込めてお客様をおもてなしいたします。完全個室も完備。',
-        features: ['完全個室', '経験豊富', '高級内装']
-    },
-    {
-        id: 2,
-        name: 'Club Elegance',
-        image: 'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=800&h=600&fit=crop&crop=center',
-        images: [
-            'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=800&h=600&fit=crop&crop=center',
-            'https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=800&h=600&fit=crop&crop=center',
-            'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=800&h=600&fit=crop&crop=center',
-            'https://images.unsplash.com/photo-1549490349-8643362247b5?w=800&h=600&fit=crop&crop=center',
-            'https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=800&h=600&fit=crop&crop=center'
-        ],
-        price: '2,500円〜',
-        badge: '上品',
-        description: '上品で落ち着いた雰囲気のお店。大人の時間を楽しみたい方におすすめ。質の高いサービスと心地よい空間を提供します。',
-        features: ['落ち着いた雰囲気', '大人向け', '質の高いサービス']
-    },
-    {
-        id: 3,
-        name: 'Night Paradise',
-        image: 'https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=800&h=600&fit=crop&crop=center',
-        images: [
-            'https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=800&h=600&fit=crop&crop=center',
-            'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=800&h=600&fit=crop&crop=center',
-            'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=800&h=600&fit=crop&crop=center',
-            'https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=800&h=600&fit=crop&crop=center',
-            'https://images.unsplash.com/photo-1549490349-8643362247b5?w=800&h=600&fit=crop&crop=center'
-        ],
-        price: '2,000円〜',
-        badge: '人気',
-        description: '活気あふれる楽しい空間。初心者の方でも気軽にお楽しみいただけます。明るいキャストと楽しい時間をお過ごしください。',
-        features: ['初心者歓迎', '活気ある', 'リーズナブル']
-    },
-    {
-        id: 4,
-        name: 'Luxury Lounge',
-        image: 'https://images.unsplash.com/photo-1549490349-8643362247b5?w=800&h=600&fit=crop&crop=center',
-        images: [
-            'https://images.unsplash.com/photo-1549490349-8643362247b5?w=800&h=600&fit=crop&crop=center',
-            'https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=800&h=600&fit=crop&crop=center',
-            'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=800&h=600&fit=crop&crop=center',
-            'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=800&h=600&fit=crop&crop=center',
-            'https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=800&h=600&fit=crop&crop=center'
-        ],
-        price: '4,000円〜',
-        badge: 'ラグジュアリー',
-        description: '極上のサービスと居心地の良さを追求した特別な空間。VIP待遇で最高級のおもてなしをお約束いたします。',
-        features: ['VIP待遇', '最高級', '特別空間']
-    },
-    {
-        id: 5,
-        name: 'Royal Cabinet',
-        image: 'https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=800&h=600&fit=crop&crop=center',
-        images: [
-            'https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=800&h=600&fit=crop&crop=center',
-            'https://images.unsplash.com/photo-1549490349-8643362247b5?w=800&h=600&fit=crop&crop=center',
-            'https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=800&h=600&fit=crop&crop=center',
-            'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=800&h=600&fit=crop&crop=center',
-            'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=800&h=600&fit=crop&crop=center'
-        ],
-        price: '3,500円〜',
-        badge: '王室級',
-        description: '王室のような豪華な内装と最上級のサービス。特別な日や接待にも最適な格式高いお店です。完全予約制。',
-        features: ['完全予約制', '豪華内装', '接待向け']
-    },
-    {
-        id: 6,
-        name: 'Diamond Club',
-        image: 'https://images.unsplash.com/photo-1516997121675-4c2d1684aa3e?w=800&h=600&fit=crop&crop=center',
-        images: [
-            'https://images.unsplash.com/photo-1516997121675-4c2d1684aa3e?w=800&h=600&fit=crop&crop=center',
-            'https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=800&h=600&fit=crop&crop=center',
-            'https://images.unsplash.com/photo-1549490349-8643362247b5?w=800&h=600&fit=crop&crop=center',
-            'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=800&h=600&fit=crop&crop=center',
-            'https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=800&h=600&fit=crop&crop=center'
-        ],
-        price: '2,800円〜',
-        badge: '新店',
-        description: '新しくオープンした話題のお店。モダンな内装と若いキャストが魅力。オープン記念として特別料金でご案内中。',
-        features: ['新店オープン', 'モダン内装', '特別料金']
+        url: 'https://images.unsplash.com/photo-1586473219010-2ffc57b0d282?w=800&h=600&fit=crop&crop=center',
+        name: '豪華な内装 2'
     }
 ];
 
 // グローバル変数
 let currentStores = [];
-let editingStoreId = null;
 let isAuthenticated = false;
-// 画像ギャラリー管理変数
-let currentImageType = 'main'; // 'main' または 'gallery'
+let editingStoreId = null;
+let currentImageType = '';
 let currentGalleryIndex = 0;
-let currentStoreImages = [null, null, null, null, null]; // ギャラリー画像（5枚）
+let currentStoreImages = [];
 
 // DOM要素
-const loginScreen = document.getElementById('login-screen');
-const adminScreen = document.getElementById('admin-screen');
-const loginForm = document.getElementById('login-form');
-const loginError = document.getElementById('login-error');
-const logoutBtn = document.getElementById('logout-btn');
-const storesContainer = document.getElementById('stores-container');
-const addStoreBtn = document.getElementById('add-store-btn');
-const saveAllBtn = document.getElementById('save-all-btn');
-const resetDataBtn = document.getElementById('reset-data-btn');
-const editModal = document.getElementById('edit-modal');
-const storeForm = document.getElementById('store-form');
-const modalTitle = document.getElementById('modal-title');
-const imageGalleryModal = document.getElementById('image-gallery-modal');
+let loginScreen, adminScreen, loginForm, loginError, logoutBtn, addStoreBtn, 
+    saveAllBtn, resetDataBtn, storesList, editModal, storeForm, imageGallery;
 
-// 初期化
-document.addEventListener('DOMContentLoaded', function() {
-    initializeApp();
-    setupEventListeners();
-});
+// Supabaseクライアント
+let supabaseClient = null;
+let supabaseDB = null;
 
-async function initializeApp() {
-    // 認証状態をチェック
-    checkAuthStatus();
-    
-    // Supabase初期化
-    if (isAuthenticated) {
-        console.log('🚀 Supabase初期化開始...');
-        const supabaseSuccess = await window.supabaseDB.initialize();
+// Supabase設定のインポート
+async function initializeSupabaseAdmin() {
+    try {
+        console.log('🔧 Supabase管理画面初期化中...');
         
-        if (supabaseSuccess) {
-            // リアルタイム同期開始
-            window.supabaseDB.startRealtimeSync(handleRealtimeUpdate);
-            
-            // Supabaseからデータ同期
-            await syncWithSupabase();
-            
-            showMessage('🌐 クラウド同期が有効になりました！', 'success');
+        // supabase-config.jsの初期化関数を使用
+        if (typeof window.initializeSupabase === 'function') {
+            const success = window.initializeSupabase();
+            if (!success) {
+                console.warn('⚠️ Supabase初期化失敗。ローカルモードで動作します。');
+                return false;
+            }
         } else {
-            showMessage('📱 ローカルモードで動作中（クラウド機能なし）', 'info');
+            console.error('❌ initializeSupabase関数が見つかりません');
+            return false;
         }
-    }
-    
-    // URLパラメータからのインポートをチェック
-    if (isAuthenticated) {
-        checkForImportParameter();
         
-        // 5秒後にURL共有機能のテスト実行
-        setTimeout(() => {
-            console.log('📱 モバイル対応チェック実行中...');
-            console.log('User Agent:', navigator.userAgent);
-            console.log('Touch support:', 'ontouchstart' in window);
-            console.log('Clipboard API:', !!navigator.clipboard);
-            
-            // 緊急時のURL共有機能を グローバル関数として追加
-            window.NICE_EMERGENCY_SHARE = function() {
-                console.log('🆘 緊急URL共有機能実行');
-                try {
-                    const data = JSON.stringify(currentStores);
-                    const url = `${window.location.origin}${window.location.pathname}?emergency=${encodeURIComponent(data)}`;
-                    
-                    if (navigator.share) {
-                        navigator.share({
-                            title: 'NICE店舗データ',
-                            url: url
-                        });
-                    } else {
-                        console.log('緊急共有URL:', url);
-                        alert('以下のURLをコピーしてください:\n\n' + url);
-                    }
-                } catch (error) {
-                    console.error('緊急共有機能エラー:', error);
-                }
-            };
-            
-            console.log('緊急時機能: NICE_EMERGENCY_SHARE() がコンソールで利用可能です');
-        }, 5000);
-    }
-    
-    // 店舗データを初期化
-    initializeStoreData();
-    
-    // 店舗一覧を表示
-    if (isAuthenticated) {
-        renderStores();
+        // SupabaseDBインスタンスを初期化
+        console.log('🔍 利用可能なグローバルオブジェクト:', {
+            SupabaseDB: typeof window.SupabaseDB,
+            createSupabaseDB: typeof window.createSupabaseDB,
+            SUPABASE_CONFIG: typeof window.SUPABASE_CONFIG
+        });
+        
+        if (typeof window.SupabaseDB !== 'undefined') {
+            supabaseDB = new window.SupabaseDB();
+            const dbSuccess = await supabaseDB.initialize();
+            if (!dbSuccess) {
+                console.warn('⚠️ SupabaseDB初期化失敗。ローカルモードで動作します。');
+                // ローカルモードでも成功扱いにして続行
+                return true;
+            }
+            console.log('✅ SupabaseDBインスタンス初期化成功');
+        } else if (typeof window.createSupabaseDB !== 'undefined') {
+            supabaseDB = window.createSupabaseDB();
+            const dbSuccess = await supabaseDB.initialize();
+            if (!dbSuccess) {
+                console.warn('⚠️ SupabaseDB初期化失敗。ローカルモードで動作します。');
+                return true;
+            }
+            console.log('✅ SupabaseDBインスタンス初期化成功（createSupabaseDB経由）');
+        } else {
+            console.warn('⚠️ SupabaseDBクラスが見つかりません。ローカルモードで動作します。');
+            // SupabaseDBが見つからなくても続行（ローカルモード）
+            return true;
+        }
+        
+        console.log('✅ Supabase管理画面初期化成功');
+        
+        // Supabase接続をテスト
+        await testSupabaseConnection();
+        
+        // クラウド同期状態をUIに反映
+        updateCloudSyncStatus(true);
+        
+        return true;
+    } catch (error) {
+        console.warn('⚠️ Supabase設定の読み込みに失敗（ローカルモードで動作）:', error);
+        updateCloudSyncStatus(false);
+        return false;
     }
 }
 
+// Supabase接続テスト
+async function testSupabaseConnection() {
+    try {
+        if (!window.supabase) {
+            throw new Error('Supabaseクライアントが初期化されていません');
+        }
+        
+        const { data, error } = await window.supabase
+            .from('nice_stores')
+            .select('count')
+            .limit(1);
+        
+        if (error && error.code === 'PGRST116') {
+            throw new Error('テーブルが存在しません。SUPABASE_SETUP.mdの手順でテーブルを作成してください。');
+        }
+        
+        if (error) {
+            throw error;
+        }
+        
+        console.log('✅ Supabase接続テスト成功');
+    } catch (error) {
+        console.error('❌ Supabase接続テストエラー:', error.message);
+        throw error;
+    }
+}
+
+// クラウド同期状態をUIに更新
+function updateCloudSyncStatus(isOnline) {
+    // 既存の状態表示を削除
+    const existingStatus = document.querySelector('.cloud-sync-status');
+    if (existingStatus) {
+        existingStatus.remove();
+    }
+    
+    // 新しい状態表示を作成
+    const statusElement = document.createElement('div');
+    statusElement.className = 'cloud-sync-status';
+    statusElement.style.cssText = `
+        position: fixed;
+        top: 10px;
+        right: 10px;
+        padding: 8px 15px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: bold;
+        z-index: 1000;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+    `;
+    
+    if (isOnline) {
+        statusElement.innerHTML = '🌐 クラウド同期が有効になりました！';
+        statusElement.style.background = 'linear-gradient(45deg, #27ae60, #2ecc71)';
+        statusElement.style.color = 'white';
+    } else {
+        statusElement.innerHTML = '💾 ローカルモード（オフライン）';
+        statusElement.style.background = 'linear-gradient(45deg, #f39c12, #e67e22)';
+        statusElement.style.color = 'white';
+    }
+    
+    document.body.appendChild(statusElement);
+    
+    // 5秒後に薄く表示
+    setTimeout(() => {
+        statusElement.style.opacity = '0.7';
+        statusElement.style.transform = 'scale(0.9)';
+    }, 5000);
+}
+
+// Supabaseからデータを読み込み
+async function loadStoresFromSupabase() {
+    console.log('📥 loadStoresFromSupabase実行中...');
+    
+    if (!supabaseDB || !supabaseDB.isOnline) {
+        console.log('⚠️ SupabaseDB未初期化またはオフライン。ローカルデータを使用します。');
+        return false;
+    }
+
+    try {
+        const stores = await supabaseDB.loadStores();
+        
+        if (stores && stores.length > 0) {
+            currentStores = stores;
+            console.log(`✅ Supabaseから${currentStores.length}件の店舗データを読み込みました`);
+            return true;
+        } else {
+            console.log('📥 Supabaseにデータが見つかりません');
+            return false;
+        }
+        
+    } catch (error) {
+        console.error('❌ Supabaseデータ読み込みエラー:', error);
+        return false;
+    }
+}
+
+// Supabaseにデータを保存
+async function saveStoresToSupabase() {
+    console.log('💾 saveStoresToSupabase実行中...');
+    
+    if (!supabaseDB || !supabaseDB.isOnline) {
+        console.log('⚠️ SupabaseDB未初期化またはオフライン。ローカル保存を使用します。');
+        return false;
+    }
+
+    try {
+        showMessage('クラウドに保存中...', 'info');
+        
+        // 各店舗を個別に保存
+        let successCount = 0;
+        let errorCount = 0;
+        
+        for (const store of currentStores) {
+            try {
+                const success = await supabaseDB.saveStore(store);
+                if (success) {
+                    successCount++;
+                } else {
+                    errorCount++;
+                }
+            } catch (error) {
+                console.error(`店舗 ${store.name} の保存エラー:`, error);
+                errorCount++;
+            }
+                 }
+         
+         // 結果の報告
+         if (errorCount === 0) {
+             console.log(`✅ ${successCount}件の店舗をSupabaseに保存しました`);
+             showMessage(`✅ ${successCount}件の店舗をクラウドに保存しました！`, 'success');
+             notifyMobileDevices();
+             return true;
+         } else if (successCount > 0) {
+             console.log(`⚠️ ${successCount}件成功、${errorCount}件失敗`);
+             showMessage(`⚠️ ${successCount}件成功、${errorCount}件失敗`, 'warning');
+             return true;
+         } else {
+             console.log(`❌ 全ての店舗の保存に失敗しました`);
+             showMessage('❌ クラウド保存に失敗しました', 'error');
+             return false;
+         }
+         
+    } catch (error) {
+        console.error('❌ Supabase保存エラー:', error);
+        showMessage('クラウド保存エラー: ' + error.message, 'error');
+        return false;
+    }
+}
+
+// 単一店舗をSupabaseに保存
+async function saveStoreToSupabase(store) {
+    console.log('💾 saveStoreToSupabase実行中...', store);
+    
+    if (!supabaseDB || !supabaseDB.isOnline) {
+        console.log('⚠️ SupabaseDB未初期化またはオフライン');
+        return false;
+    }
+
+    try {
+        const success = await supabaseDB.saveStore(store);
+        
+        if (success) {
+            console.log('✅ Supabaseに店舗データを保存しました');
+            return true;
+        } else {
+            console.log('❌ Supabase保存に失敗');
+            return false;
+        }
+        
+    } catch (error) {
+        console.error('❌ Supabase保存エラー:', error);
+        return false;
+    }
+}
+
+// デフォルトデータ
+const DEFAULT_STORES = [
+    {
+        id: 1,
+        name: "Club Elegance",
+        description: "銀座の中心に位置する高級キャバクラ。洗練された大人の女性が、上質なひとときをお約束いたします。",
+        features: ["高級店", "銀座", "上品"],
+        price: "30,000円〜",
+        badge: "人気",
+        image: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=800&h=600&fit=crop&crop=center",
+        gallery: [
+            "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=800&h=600&fit=crop&crop=center",
+            "https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=800&h=600&fit=crop&crop=center",
+            "https://images.unsplash.com/photo-1549490349-8643362247b5?w=800&h=600&fit=crop&crop=center"
+        ]
+    },
+    {
+        id: 2,
+        name: "Royal Lounge",
+        description: "六本木の夜を彩る最高級ラウンジ。VIPルームも完備し、特別な夜をお過ごしいただけます。",
+        features: ["ラグジュアリー", "六本木", "VIP"],
+        price: "50,000円〜",
+        badge: "王室級",
+        image: "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=800&h=600&fit=crop&crop=center",
+        gallery: [
+            "https://images.unsplash.com/photo-1516997121675-4c2d1684aa3e?w=800&h=600&fit=crop&crop=center",
+            "https://images.unsplash.com/photo-1574391884720-bfafb0d70327?w=800&h=600&fit=crop&crop=center"
+        ]
+    },
+    {
+        id: 3,
+        name: "Modern Bar TOKYO",
+        description: "新宿の新スポット。モダンなデザインと最新の音響設備で、新感覚のエンターテイメントを提供。",
+        features: ["新店", "新宿", "モダン"],
+        price: "20,000円〜",
+        badge: "新店",
+        image: "https://images.unsplash.com/photo-1543007630-9710e4a00a20?w=800&h=600&fit=crop&crop=center",
+        gallery: [
+            "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800&h=600&fit=crop&crop=center",
+            "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=800&h=600&fit=crop&crop=center",
+            "https://images.unsplash.com/photo-1579952363873-27d3bfad9c0d?w=800&h=600&fit=crop&crop=center",
+            "https://images.unsplash.com/photo-1566417713940-fe7c737a9ef2?w=800&h=600&fit=crop&crop=center"
+        ]
+    }
+];
+
+// 初期化
+async function initializeApp() {
+    console.log('🚀 管理画面初期化開始...');
+    
+    try {
+        // DOM要素を取得
+        console.log('📋 DOM要素を取得中...');
+        loginScreen = document.getElementById('login-screen');
+        adminScreen = document.getElementById('admin-screen');
+        loginForm = document.getElementById('login-form');
+        loginError = document.getElementById('login-error');
+        logoutBtn = document.getElementById('logout-btn');
+        addStoreBtn = document.getElementById('add-store-btn');
+        saveAllBtn = document.getElementById('save-all-btn');
+        resetDataBtn = document.getElementById('reset-data-btn');
+        storesList = document.getElementById('stores-list');
+        editModal = document.getElementById('edit-modal');
+        storeForm = document.getElementById('store-form');
+        imageGallery = document.getElementById('image-gallery');
+
+        console.log('📋 重要なDOM要素の確認:');
+        console.log('- storeForm:', !!storeForm);
+        console.log('- editModal:', !!editModal);
+        console.log('- addStoreBtn:', !!addStoreBtn);
+
+        // Supabaseを初期化
+        console.log('☁️ Supabase初期化中...');
+        await initializeSupabaseAdmin();
+        
+        // 認証状態をチェック
+        console.log('🔐 認証状態をチェック中...');
+        checkAuthStatus();
+        
+        // データを初期化
+        console.log('📊 データ初期化中...');
+        await initializeStoreData();
+        
+        // イベントリスナーを設定
+        console.log('⚡ イベントリスナー設定中...');
+        setupEventListeners();
+        
+        console.log('✅ 管理画面初期化完了');
+        
+    } catch (error) {
+        console.error('❌ 管理画面初期化エラー:', error);
+        showMessage('初期化エラー: ' + error.message, 'error');
+    }
+}
+
+// 認証状態チェック
 function checkAuthStatus() {
-    const authToken = localStorage.getItem('admin_auth');
-    if (authToken === 'authenticated') {
+    const savedAuth = localStorage.getItem('admin_auth');
+    if (savedAuth === 'authenticated') {
         isAuthenticated = true;
         showAdminScreen();
     } else {
@@ -317,171 +471,218 @@ function checkAuthStatus() {
     }
 }
 
-function initializeStoreData() {
-    const savedStores = localStorage.getItem('cabaret_stores');
-    if (savedStores) {
-        currentStores = JSON.parse(savedStores);
-    } else {
-        currentStores = [...DEFAULT_STORES];
-        saveStores();
+// データ初期化
+async function initializeStoreData() {
+    // まずSupabaseからデータを試行
+    const supabaseLoaded = await loadStoresFromSupabase();
+    
+    if (!supabaseLoaded) {
+        // Supabaseから読み込めない場合、ローカルストレージを確認
+        const savedData = localStorage.getItem('nice_stores');
+        if (savedData) {
+            try {
+                currentStores = JSON.parse(savedData);
+                console.log('ローカルストレージからデータを読み込みました');
+            } catch (error) {
+                console.error('ローカルデータの解析エラー:', error);
+                currentStores = [...DEFAULT_STORES];
+            }
+        } else {
+            currentStores = [...DEFAULT_STORES];
+            console.log('デフォルトデータを使用します');
+        }
+    }
+    
+    if (isAuthenticated) {
+        renderStores();
     }
 }
 
+// イベントリスナー設定
 function setupEventListeners() {
-    // ログイン
-    loginForm.addEventListener('submit', handleLogin);
+    console.log('📋 イベントリスナー設定開始...');
     
-    // ログアウト
-    logoutBtn.addEventListener('click', handleLogout);
-    
-    // 店舗管理
-    addStoreBtn.addEventListener('click', showAddStoreModal);
-    saveAllBtn.addEventListener('click', handleSaveAll);
-    resetDataBtn.addEventListener('click', handleResetData);
-    
-    // エクスポート/インポート
-    document.getElementById('export-data-btn').addEventListener('click', handleExportData);
-    document.getElementById('import-data-btn').addEventListener('click', handleImportData);
-    document.getElementById('copy-export-btn').addEventListener('click', copyExportToClipboard);
-    document.getElementById('download-export-btn').addEventListener('click', downloadExportFile);
-    document.getElementById('paste-import-btn').addEventListener('click', handlePasteImport);
-    
-    // 簡単同期機能
-    const generateQRBtn = document.getElementById('generate-qr-btn');
-    const shareUrlBtn = document.getElementById('share-url-btn');
-    const scanQRBtn = document.getElementById('scan-qr-btn');
-    
-    console.log('同期ボタンの初期化チェック:');
-    console.log('generateQRBtn:', generateQRBtn);
-    console.log('shareUrlBtn:', shareUrlBtn);
-    console.log('scanQRBtn:', scanQRBtn);
-    
-    if (generateQRBtn) {
-        generateQRBtn.addEventListener('click', generateQRCode);
-        console.log('QRコード生成ボタンのイベント設定完了');
-    } else {
-        console.error('QRコード生成ボタンが見つかりません');
-    }
-    
-    if (shareUrlBtn) {
-        // クリックイベント
-        shareUrlBtn.addEventListener('click', function(e) {
-            console.log('URL共有ボタンがクリックされました (click event)');
-            e.preventDefault();
-            e.stopPropagation();
-            
-            // 視覚的フィードバック
-            shareUrlBtn.style.transform = 'scale(0.95)';
-            shareUrlBtn.style.background = 'linear-gradient(45deg, #00a085, #00b894)';
-            
-            setTimeout(() => {
-                shareUrlBtn.style.transform = '';
-                shareUrlBtn.style.background = '';
-            }, 150);
-            
-            generateShareURL();
-        });
-        
-        // モバイル用タッチイベント
-        shareUrlBtn.addEventListener('touchend', function(e) {
-            console.log('URL共有ボタンがタッチされました (touchend event)');
-            e.preventDefault();
-            e.stopPropagation();
-            
-            // 視覚的フィードバック
-            shareUrlBtn.style.transform = 'scale(0.95)';
-            shareUrlBtn.style.background = 'linear-gradient(45deg, #00a085, #00b894)';
-            
-            setTimeout(() => {
-                shareUrlBtn.style.transform = '';
-                shareUrlBtn.style.background = '';
-                generateShareURL();
-            }, 100);
-        });
-        
-        // タッチ開始時の視覚効果
-        shareUrlBtn.addEventListener('touchstart', function(e) {
-            console.log('URL共有ボタンタッチ開始 (touchstart event)');
-            shareUrlBtn.style.transform = 'scale(0.95)';
-            shareUrlBtn.style.background = 'linear-gradient(45deg, #ff7675, #fd79a8)';
-        });
-        
-        // ボタンの状態詳細チェック
-        console.log('URL共有ボタンのイベント設定完了');
-        console.log('ボタンの詳細情報:');
-        console.log('- 位置:', shareUrlBtn.getBoundingClientRect());
-        console.log('- スタイル display:', getComputedStyle(shareUrlBtn).display);
-        console.log('- スタイル visibility:', getComputedStyle(shareUrlBtn).visibility);
-        console.log('- スタイル pointer-events:', getComputedStyle(shareUrlBtn).pointerEvents);
-        console.log('- スタイル z-index:', getComputedStyle(shareUrlBtn).zIndex);
-        console.log('- 親要素:', shareUrlBtn.parentElement);
-        
-        // 強制診断ボタンを一時的に追加
-        const debugBtn = document.createElement('button');
-        debugBtn.textContent = '🔧 URL共有デバッグ';
-        debugBtn.style.cssText = `
-            position: fixed;
-            top: 100px;
-            right: 20px;
-            z-index: 99999;
-            background: red;
-            color: white;
-            padding: 10px;
-            border: none;
-            border-radius: 5px;
-            font-size: 12px;
-        `;
-        debugBtn.onclick = function() {
-            console.log('デバッグボタンから直接呼び出し');
-            generateShareURL();
-        };
-        document.body.appendChild(debugBtn);
-        
-        // 5秒後にデバッグボタンを削除
-        setTimeout(() => {
-            if (debugBtn.parentNode) {
-                debugBtn.remove();
-            }
-        }, 10000);
-        
-    } else {
-        console.error('URL共有ボタンが見つかりません');
-        console.log('DOM内の全要素をチェック:');
-        console.log('quick-sync-controls:', document.querySelector('.quick-sync-controls'));
-        console.log('control-btn要素数:', document.querySelectorAll('.control-btn').length);
-        console.log('quick-sync-btn要素数:', document.querySelectorAll('.quick-sync-btn').length);
-    }
-    
-    if (scanQRBtn) {
-        scanQRBtn.addEventListener('click', scanQRCode);
-        console.log('QRスキャンボタンのイベント設定完了');
-    } else {
-        console.error('QRスキャンボタンが見つかりません');
-    }
-    
-    // 強制リフレッシュボタンを動的に追加
-    const syncControls = document.querySelector('.sync-controls');
-    if (syncControls) {
-        const forceRefreshBtn = document.createElement('button');
-        forceRefreshBtn.id = 'force-refresh-btn';
-        forceRefreshBtn.className = 'control-btn sync-btn';
-        forceRefreshBtn.textContent = '強制データ再読み込み';
-        forceRefreshBtn.addEventListener('click', handleForceRefresh);
-        syncControls.insertBefore(forceRefreshBtn, syncControls.lastElementChild);
-    }
-    document.getElementById('file-import-btn').addEventListener('click', handleFileImport);
-    
-    // モーダル
-    document.querySelector('.close-btn').addEventListener('click', hideModal);
-    document.querySelector('.cancel-btn').addEventListener('click', hideModal);
-    storeForm.addEventListener('submit', handleStoreSubmit);
-    
-    // モーダル外クリックで閉じる
-    editModal.addEventListener('click', function(e) {
-        if (e.target === editModal) {
-            hideModal();
+    try {
+        // ログイン
+        if (loginForm) {
+            loginForm.addEventListener('submit', handleLogin);
+            console.log('✅ ログインフォームイベント設定完了');
         }
+        
+        // ログアウト
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', handleLogout);
+            console.log('✅ ログアウトボタンイベント設定完了');
+        }
+        
+        // 店舗管理
+        if (addStoreBtn) {
+            addStoreBtn.addEventListener('click', showAddStoreModal);
+            console.log('✅ 新規店舗追加ボタンイベント設定完了');
+        }
+        
+        if (saveAllBtn) {
+            saveAllBtn.addEventListener('click', handleSaveAll);
+            console.log('✅ 全保存ボタンイベント設定完了');
+        }
+        
+        if (resetDataBtn) {
+            resetDataBtn.addEventListener('click', handleResetData);
+            console.log('✅ リセットボタンイベント設定完了');
+        }
+        
+        // フォーカス管理
+        setupFocusManagement();
+        
+        console.log('✅ 基本イベントリスナー設定完了');
+        
+        // デバッグ用テストボタンを追加
+        addDebugTestButtons();
+        
+    } catch (error) {
+        console.error('❌ イベントリスナー設定エラー:', error);
+    }
+}
+
+// デバッグ用テストボタンを追加
+function addDebugTestButtons() {
+    // テスト保存ボタン
+    const testSaveBtn = document.createElement('button');
+    testSaveBtn.textContent = '🧪 テスト保存';
+    testSaveBtn.style.cssText = `
+        position: fixed;
+        top: 10px;
+        right: 10px;
+        z-index: 10000;
+        padding: 10px 15px;
+        background: #e74c3c;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        font-size: 12px;
+        cursor: pointer;
+    `;
+    testSaveBtn.addEventListener('click', function() {
+        console.log('🧪 テスト保存実行...');
+        const testStore = {
+            id: Date.now(),
+            name: 'テスト店舗 ' + new Date().toLocaleTimeString(),
+            description: 'これはテスト店舗です',
+            price: '1,000円〜',
+            badge: 'テスト',
+            features: ['テスト機能'],
+            image: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=800&h=600&fit=crop&crop=center',
+            gallery: [],
+            businessHours: { start: '20:00', end: '02:00' },
+            closedDays: []
+        };
+        
+        saveStore(testStore).then(success => {
+            if (success) {
+                console.log('✅ テスト保存成功');
+                renderStores();
+            } else {
+                console.log('❌ テスト保存失敗');
+            }
+        });
     });
+    document.body.appendChild(testSaveBtn);
+    
+    // ログ確認ボタン
+    const logBtn = document.createElement('button');
+    logBtn.textContent = '📋 ログ確認';
+    logBtn.style.cssText = `
+        position: fixed;
+        top: 50px;
+        right: 10px;
+        z-index: 10000;
+        padding: 10px 15px;
+        background: #3498db;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        font-size: 12px;
+        cursor: pointer;
+    `;
+    logBtn.addEventListener('click', function() {
+        console.log('📋 現在の状態:');
+        console.log('- 認証状態:', isAuthenticated);
+        console.log('- 現在の店舗数:', currentStores.length);
+        console.log('- Supabaseクライアント:', !!supabaseClient);
+        console.log('- DOM要素の存在:');
+        console.log('  - storeForm:', !!storeForm);
+        console.log('  - addStoreBtn:', !!addStoreBtn);
+        console.log('  - editModal:', !!editModal);
+        console.log('- ローカルストレージ:', !!localStorage.getItem('nice_stores'));
+    });
+    document.body.appendChild(logBtn);
+    
+    console.log('🧪 デバッグテストボタンを追加しました');
+}
+
+// フォーカス管理
+function setupFocusManagement() {
+    console.log('🎯 フォーカス管理設定開始...');
+    
+    try {
+        // モーダルボタン
+        const closeBtn = document.querySelector('.close-btn');
+        const cancelBtn = document.querySelector('.cancel-btn');
+        
+        if (closeBtn) {
+            closeBtn.addEventListener('click', hideModal);
+            console.log('✅ 閉じるボタンイベント設定完了');
+        }
+        
+        if (cancelBtn) {
+            cancelBtn.addEventListener('click', hideModal);
+            console.log('✅ キャンセルボタンイベント設定完了');
+        }
+        
+        // 🔥 重要: 店舗フォーム送信イベント
+        if (storeForm) {
+            storeForm.addEventListener('submit', handleStoreSubmit);
+            console.log('✅ 店舗フォーム送信イベント設定完了');
+        } else {
+            console.error('❌ 店舗フォーム要素が見つかりません');
+        }
+        
+        // モーダル外クリックで閉じる
+        if (editModal) {
+            editModal.addEventListener('click', function(e) {
+                if (e.target === editModal) {
+                    hideModal();
+                }
+            });
+            console.log('✅ モーダル外クリックイベント設定完了');
+        }
+        
+        console.log('✅ フォーカス管理設定完了');
+        
+    } catch (error) {
+        console.error('❌ フォーカス管理設定エラー:', error);
+    }
+}
+
+// 全体診断機能
+function NICE_GALLERY_TEST() {
+    console.log('🧪 簡単ギャラリーテスト開始');
+    
+    // 店舗編集モードでない場合は最初の店舗を編集
+    if (!editingStoreId && currentStores.length > 0) {
+        console.log('📝 テスト用に最初の店舗を編集モードに');
+        editStore(currentStores[0].id);
+        setTimeout(() => {
+            console.log('⏰ 3秒後にギャラリー1番目のアップロードテスト');
+            uploadImage('gallery', 0);
+        }, 3000);
+    } else if (editingStoreId) {
+        console.log('📝 既に編集モード、ギャラリー1番目のアップロードテスト');
+        uploadImage('gallery', 0);
+    } else {
+        console.log('❌ テスト不可：店舗データがありません');
+        alert('テスト不可：店舗データがありません');
+    }
 }
 
 // 認証処理
@@ -531,1740 +732,888 @@ function showError(message) {
 
 // 店舗管理
 function renderStores() {
-    storesContainer.innerHTML = '';
+    console.log('🔄 renderStores実行中...');
+    console.log('現在の店舗数:', currentStores.length);
+    console.log('currentStores内容:', currentStores);
     
-    currentStores.forEach(store => {
-        const storeCard = createStoreCard(store);
-        storesContainer.appendChild(storeCard);
-    });
+    if (!storesList) {
+        console.error('❌ storesListエレメントが見つかりません');
+        return;
+    }
+    
+    try {
+        storesList.innerHTML = '';
+        
+        if (currentStores.length === 0) {
+            console.log('⚠️ 店舗データが空です');
+            storesList.innerHTML = '<p style="text-align: center; color: #666; padding: 20px;">店舗データがありません</p>';
+            return;
+        }
+        
+        currentStores.forEach((store, index) => {
+            try {
+                console.log(`🏪 店舗${index + 1}を描画中:`, store.name);
+                const storeCard = createStoreCard(store);
+                storesList.appendChild(storeCard);
+            } catch (error) {
+                console.error(`❌ 店舗${index + 1}の描画エラー:`, error, store);
+            }
+        });
+        
+        console.log('✅ 店舗一覧の描画完了');
+        
+    } catch (error) {
+        console.error('❌ renderStoresエラー:', error);
+        storesList.innerHTML = '<p style="text-align: center; color: #e74c3c; padding: 20px;">店舗一覧の表示でエラーが発生しました</p>';
+    }
 }
 
 function createStoreCard(store) {
-    const card = document.createElement('div');
-    card.className = 'admin-store-card';
-    card.innerHTML = `
-        <div class="admin-store-image">
-            <img src="${store.image}" alt="${store.name}" loading="lazy">
-        </div>
-        <div class="admin-store-info">
-            <div class="admin-store-name">${store.name}</div>
-            <div class="admin-store-price">${store.price}</div>
-            <div class="admin-store-actions">
-                <button class="edit-btn" onclick="editStore(${store.id})">編集</button>
-                <button class="delete-btn" onclick="deleteStore(${store.id})">削除</button>
+    try {
+        console.log('🏗️ 店舗カード作成中:', store.name);
+        
+        const card = document.createElement('div');
+        card.className = 'store-card';
+        
+        // データの安全性チェック
+        const safeName = store.name || '名前未設定';
+        const safeDescription = store.description || '説明なし';
+        const safePrice = store.price || '価格未設定';
+        const safeImage = store.image || 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=800&h=600&fit=crop&crop=center';
+        const safeBadge = store.badge || '';
+        const safeFeatures = Array.isArray(store.features) ? store.features : [];
+        
+        card.innerHTML = `
+            <img src="${safeImage}" alt="${safeName}" class="store-image" onerror="this.src='https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=800&h=600&fit=crop&crop=center'">
+            <div class="store-info">
+                <div class="store-header">
+                    <h3>${safeName}</h3>
+                    ${safeBadge ? `<span class="badge">${safeBadge}</span>` : ''}
+                </div>
+                <p class="store-description">${safeDescription}</p>
+                <div class="store-features">
+                    ${safeFeatures.map(feature => `<span class="feature-tag">${feature}</span>`).join('')}
+                </div>
+                <div class="store-price">${safePrice}</div>
+                <div class="store-actions">
+                    <button onclick="editStore(${store.id})" class="edit-btn">編集</button>
+                    <button onclick="deleteStore(${store.id})" class="delete-btn">削除</button>
+                </div>
             </div>
-        </div>
-    `;
-    return card;
+        `;
+        
+        console.log('✅ 店舗カード作成完了:', safeName);
+        return card;
+        
+    } catch (error) {
+        console.error('❌ 店舗カード作成エラー:', error, store);
+        
+        // エラー時のフォールバック
+        const errorCard = document.createElement('div');
+        errorCard.className = 'store-card error-card';
+        errorCard.innerHTML = `
+            <div class="store-info">
+                <h3>エラー: 店舗データの表示に失敗</h3>
+                <p>店舗ID: ${store.id || '不明'}</p>
+                <button onclick="deleteStore(${store.id || 0})" class="delete-btn">削除</button>
+            </div>
+        `;
+        return errorCard;
+    }
 }
 
 function editStore(id) {
+    console.log('🖊️ editStore実行開始、店舗ID:', id);
+    
     const store = currentStores.find(s => s.id === id);
-    if (!store) return;
-    
+    if (!store) {
+        console.error('❌ 店舗が見つかりません:', id);
+        showMessage('店舗が見つかりません', 'error');
+        return;
+    }
+
+    console.log('🏪 編集対象店舗:', store);
     editingStoreId = id;
-    modalTitle.textContent = '店舗情報編集';
     
-    // 基本情報を設定
+    // 現在の画像配列を初期化（5スロット）
+    currentStoreImages = store.gallery ? [...store.gallery] : [];
+    
+    // 配列が5要素未満の場合は空文字で埋める
+    while (currentStoreImages.length < 5) {
+        currentStoreImages.push('');
+    }
+    
+    console.log('📷 初期ギャラリー配列:', currentStoreImages);
+
+    // フォームに値を設定
+    document.getElementById('store-id').value = store.id;
     document.getElementById('store-name').value = store.name;
-    document.getElementById('store-price').value = store.price;
-    document.getElementById('store-badge').value = store.badge;
     document.getElementById('store-description').value = store.description;
     document.getElementById('store-features').value = store.features.join(', ');
+    document.getElementById('store-price').value = store.price;
+    document.getElementById('store-badge').value = store.badge;
+    document.getElementById('main-image-url').value = store.image;
     
-    // メイン画像を設定
-    setMainImage(store.image);
+    // 営業時間の設定（デフォルト値: 20:00-02:00）
+    document.getElementById('store-hours-start').value = store.businessHours?.start || '20:00';
+    document.getElementById('store-hours-end').value = store.businessHours?.end || '02:00';
     
-    // ギャラリー画像を設定
-    currentStoreImages = store.images ? [...store.images] : [null, null, null, null, null];
+    // 定休日の設定
+    const allDays = ['日曜日', '月曜日', '火曜日', '水曜日', '木曜日', '金曜日', '土曜日'];
+    const closedDaysIds = ['closed-sunday', 'closed-monday', 'closed-tuesday', 'closed-wednesday', 'closed-thursday', 'closed-friday', 'closed-saturday'];
+    
+    // まず全ての曜日チェックボックスをクリア
+    closedDaysIds.forEach(id => {
+        document.getElementById(id).checked = false;
+    });
+    
+    // 店舗の定休日をチェック
+    if (store.closedDays && Array.isArray(store.closedDays)) {
+        allDays.forEach((day, index) => {
+            if (store.closedDays.includes(day)) {
+                document.getElementById(closedDaysIds[index]).checked = true;
+            }
+        });
+    }
+
     updateGalleryPreview();
-    
     showModal();
-}
-
-// メイン画像を設定
-function setMainImage(imageUrl) {
-    const preview = document.getElementById('selected-main-image');
-    const noImageText = document.querySelector('.no-image-text');
     
-    if (imageUrl) {
-        preview.src = imageUrl;
-        preview.style.display = 'block';
-        noImageText.style.display = 'none';
-    } else {
-        preview.style.display = 'none';
-        noImageText.style.display = 'block';
-    }
+    console.log('✅ editStore完了');
 }
 
-// ギャラリー画像プレビューを更新
+function setMainImage(imageUrl) {
+    document.getElementById('main-image-url').value = imageUrl;
+    hideImageGallery();
+}
+
 function updateGalleryPreview() {
-    for (let i = 0; i < 5; i++) {
-        const slot = document.querySelector(`[data-index="${i}"]`);
-        const preview = slot.querySelector('.gallery-preview');
-        const selectBtn = slot.querySelector('.select-gallery-btn');
-        const removeBtn = slot.querySelector('.remove-gallery-btn');
-        
-        if (currentStoreImages[i]) {
-            preview.src = currentStoreImages[i];
-            preview.style.display = 'block';
-            selectBtn.textContent = '変更';
-            removeBtn.style.display = 'block';
-            slot.classList.add('has-image');
-        } else {
-            preview.style.display = 'none';
-            selectBtn.textContent = '選択';
-            removeBtn.style.display = 'none';
-            slot.classList.remove('has-image');
-        }
+    console.log('🖼️ updateGalleryPreview実行開始');
+    console.log('現在のcurrentStoreImages:', currentStoreImages);
+    
+    // currentStoreImagesが存在しない場合は初期化
+    if (!currentStoreImages || !Array.isArray(currentStoreImages)) {
+        console.log('⚠️ currentStoreImagesが無効なため初期化');
+        currentStoreImages = ['', '', '', '', ''];
     }
+    
+    // 5スロット分の配列を確保
+    while (currentStoreImages.length < 5) {
+        currentStoreImages.push('');
+    }
+    
+    const galleryPreview = document.getElementById('gallery-preview');
+    if (!galleryPreview) {
+        console.error('❌ gallery-previewエレメントが見つかりません');
+        return;
+    }
+    
+    galleryPreview.innerHTML = '';
+    
+    for (let i = 0; i < 5; i++) {
+        const slot = document.createElement('div');
+        slot.className = 'gallery-slot';
+        slot.setAttribute('data-index', i);
+        
+        const imageUrl = currentStoreImages[i];
+        console.log(`スロット${i}: "${imageUrl}"`);
+        
+        if (imageUrl && imageUrl.trim() !== '') {
+            slot.innerHTML = `
+                <img src="${imageUrl}" alt="ギャラリー画像 ${i + 1}" class="gallery-image">
+                <button type="button" class="remove-gallery-btn" onclick="removeGalleryImage(${i})">×</button>
+                <button type="button" class="upload-gallery-btn" onclick="uploadImage('gallery', ${i})">📷</button>
+            `;
+        } else {
+            slot.innerHTML = `
+                <div class="empty-slot">
+                    <span>画像 ${i + 1}</span>
+                    <button type="button" class="upload-gallery-btn" onclick="uploadImage('gallery', ${i})">📷 選択</button>
+                </div>
+            `;
+        }
+        
+        galleryPreview.appendChild(slot);
+    }
+    
+    console.log('✅ updateGalleryPreview完了');
 }
 
-// 画像ギャラリーを表示
 function showImageGallery(type, index = 0) {
+    console.log('🎭 showImageGallery実行:', { type, index });
+    
     currentImageType = type;
     currentGalleryIndex = index;
     
-    const galleryGrid = document.querySelector('.image-gallery-grid');
-    galleryGrid.innerHTML = '';
+    const galleryContent = document.getElementById('gallery-content');
+    galleryContent.innerHTML = '';
     
     AVAILABLE_IMAGES.forEach(image => {
-        const imageOption = document.createElement('div');
-        imageOption.className = 'gallery-image-option';
-        imageOption.onclick = () => selectImage(image.url);
-        
-        imageOption.innerHTML = `
-            <img src="${image.url}" alt="${image.name}" loading="lazy">
-            <div class="gallery-image-label">${image.name}</div>
+        const imageItem = document.createElement('div');
+        imageItem.className = 'gallery-item';
+        imageItem.innerHTML = `
+            <img src="${image.url}" alt="${image.name}" onclick="selectImage('${image.url}')">
+            <p>${image.name}</p>
         `;
-        
-        galleryGrid.appendChild(imageOption);
+        galleryContent.appendChild(imageItem);
     });
     
-    imageGalleryModal.style.display = 'flex';
+    imageGallery.style.display = 'flex';
+    console.log('✅ 画像ギャラリーを表示しました');
 }
 
-// 画像を選択
 function selectImage(imageUrl) {
+    console.log('🖱️ selectImage実行:', { 
+        imageUrl, 
+        currentImageType, 
+        currentGalleryIndex, 
+        editingStoreId 
+    });
+    
     if (currentImageType === 'main') {
         setMainImage(imageUrl);
     } else if (currentImageType === 'gallery') {
+        if (!currentStoreImages || !Array.isArray(currentStoreImages)) {
+            console.log('⚠️ currentStoreImagesを初期化');
+            currentStoreImages = ['', '', '', '', ''];
+        }
+        
+        // 指定されたインデックスに画像URLを設定
         currentStoreImages[currentGalleryIndex] = imageUrl;
+        console.log(`📷 ギャラリー${currentGalleryIndex}に画像設定:`, imageUrl);
+        console.log('現在のcurrentStoreImages:', currentStoreImages);
+        
+        // プレビューを更新
         updateGalleryPreview();
+        
+        showMessage(`ギャラリー${currentGalleryIndex + 1}に画像を設定しました`, 'success');
     }
     
     hideImageGallery();
 }
 
-// ギャラリー画像を削除
 function removeGalleryImage(index) {
-    currentStoreImages[index] = null;
-    updateGalleryPreview();
+    console.log('🗑️ removeGalleryImage実行:', index);
+    
+    if (!currentStoreImages || !Array.isArray(currentStoreImages)) {
+        console.log('⚠️ currentStoreImagesを初期化');
+        currentStoreImages = ['', '', '', '', ''];
+    }
+    
+    if (index >= 0 && index < currentStoreImages.length) {
+        const removedImage = currentStoreImages[index];
+        currentStoreImages[index] = '';
+        console.log(`🗑️ スロット${index}から画像削除:`, removedImage);
+        console.log('更新後のcurrentStoreImages:', currentStoreImages);
+        
+        updateGalleryPreview();
+        showMessage(`ギャラリー${index + 1}の画像を削除しました`, 'success');
+    } else {
+        console.error('❌ 無効なインデックス:', index);
+    }
 }
 
-// 画像ギャラリーを非表示
 function hideImageGallery() {
-    imageGalleryModal.style.display = 'none';
+    imageGallery.style.display = 'none';
 }
 
 function deleteStore(id) {
-    const store = currentStores.find(s => s.id === id);
-    if (!store) return;
-    
-    if (confirm(`「${store.name}」を削除しますか？`)) {
-        currentStores = currentStores.filter(s => s.id !== id);
-        saveStores();
+    if (confirm('この店舗を削除しますか？')) {
+        currentStores = currentStores.filter(store => store.id !== id);
         renderStores();
+        saveStores();
         showMessage('店舗を削除しました', 'success');
     }
 }
 
 function showAddStoreModal() {
     editingStoreId = null;
-    modalTitle.textContent = '新規店舗追加';
+    currentStoreImages = ['', '', '', '', ''];
+    
+    // フォームをリセット
     storeForm.reset();
+    document.getElementById('store-id').value = '';
     
-    // 画像をリセット
-    setMainImage('');
-    currentStoreImages = [null, null, null, null, null];
     updateGalleryPreview();
-    
     showModal();
 }
 
-function handleStoreSubmit(e) {
+async function handleStoreSubmit(e) {
     e.preventDefault();
     
-    const formData = {
-        name: document.getElementById('store-name').value,
-        image: document.getElementById('selected-main-image').src || '',
-        images: currentStoreImages.filter(img => img !== null), // nullを除外
-        price: document.getElementById('store-price').value,
-        badge: document.getElementById('store-badge').value,
-        description: document.getElementById('store-description').value,
-        features: document.getElementById('store-features').value.split(',').map(f => f.trim()).filter(f => f)
-    };
+    console.log('💾 handleStoreSubmit実行開始');
+    console.log('編集中店舗ID:', editingStoreId);
+    console.log('フォーム要素:', e.target);
     
-    if (!formData.image) {
-        showMessage('メイン画像を選択してください', 'error');
-        return;
-    }
-    
-    if (editingStoreId) {
-        // 編集
-        const storeIndex = currentStores.findIndex(s => s.id === editingStoreId);
-        if (storeIndex !== -1) {
-            currentStores[storeIndex] = { ...currentStores[storeIndex], ...formData };
-            showMessage('店舗情報を更新しました', 'success');
+    try {
+        // フォームデータを手動で収集（FormDataの代わり）
+        const storeName = document.getElementById('store-name')?.value || '';
+        const storeDescription = document.getElementById('store-description')?.value || '';
+        const storePrice = document.getElementById('store-price')?.value || '';
+        const storeBadge = document.getElementById('store-badge')?.value || '';
+        const storeFeatures = document.getElementById('store-features')?.value || '';
+        const storeImage = document.getElementById('main-image-url')?.value || '';
+        
+        console.log('📝 収集したフォームデータ:', {
+            name: storeName,
+            description: storeDescription,
+            price: storePrice,
+            badge: storeBadge,
+            features: storeFeatures,
+            image: storeImage
+        });
+        
+        // 特徴を配列に変換
+        const features = storeFeatures ? storeFeatures.split(',').map(f => f.trim()).filter(f => f) : [];
+        
+        // currentStoreImagesが正しく初期化されているか確認
+        if (!currentStoreImages || !Array.isArray(currentStoreImages)) {
+            console.log('⚠️ currentStoreImagesを初期化');
+            currentStoreImages = ['', '', '', '', ''];
         }
-    } else {
-        // 新規追加
-        const newId = Math.max(...currentStores.map(s => s.id), 0) + 1;
-        const newStore = { id: newId, ...formData };
-        currentStores.push(newStore);
-        showMessage('新しい店舗を追加しました', 'success');
+        
+        // 空の要素を除去してギャラリー配列を作成
+        const gallery = currentStoreImages.filter(img => img && img.trim() !== '');
+        
+        // 営業時間の取得
+        const businessHours = {
+            start: document.getElementById('store-hours-start')?.value || '20:00',
+            end: document.getElementById('store-hours-end')?.value || '02:00'
+        };
+        
+        // 定休日の取得
+        const closedDaysCheckboxes = document.querySelectorAll('input[name="closedDays"]:checked');
+        const closedDays = Array.from(closedDaysCheckboxes).map(checkbox => checkbox.value);
+        
+        const storeData = {
+            name: storeName,
+            description: storeDescription,
+            features: features,
+            price: storePrice,
+            badge: storeBadge,
+            image: storeImage,
+            gallery: gallery,
+            businessHours: businessHours,
+            closedDays: closedDays
+        };
+        
+        console.log('📝 完成した店舗データ:', storeData);
+        
+        // 必須フィールドの検証
+        if (!storeData.name || !storeData.description || !storeData.price) {
+            showMessage('店舗名、説明、価格は必須項目です', 'error');
+            return;
+        }
+
+        let savedStore = null;
+
+        if (editingStoreId) {
+            // 既存店舗の更新
+            const index = currentStores.findIndex(store => store.id === editingStoreId);
+            if (index !== -1) {
+                savedStore = { ...currentStores[index], ...storeData };
+                currentStores[index] = savedStore;
+                console.log('✅ 既存店舗を更新しました:', savedStore.name);
+            } else {
+                console.error('❌ 編集対象の店舗が見つかりません');
+                showMessage('編集対象の店舗が見つかりません', 'error');
+                return;
+            }
+        } else {
+            // 新規店舗の追加
+            const newId = Math.max(...currentStores.map(s => s.id), 0) + 1;
+            savedStore = { id: newId, ...storeData };
+            currentStores.push(savedStore);
+            console.log('✅ 新規店舗を追加しました:', savedStore.name);
+        }
+
+        if (savedStore) {
+            // 自動保存を実行
+            console.log('💾 保存処理開始...');
+            const saveSuccess = await saveStore(savedStore);
+            
+            if (saveSuccess) {
+                console.log('✅ 保存成功、画面を更新');
+                renderStores();
+                hideModal();
+            } else {
+                console.error('❌ 保存に失敗しました');
+                showMessage('保存に失敗しました', 'error');
+            }
+        }
+        
+    } catch (error) {
+        console.error('❌ handleStoreSubmitエラー:', error);
+        showMessage('フォーム送信エラー: ' + error.message, 'error');
     }
     
-    saveStores();
-    renderStores();
-    hideModal();
+    console.log('💾 handleStoreSubmit完了');
 }
 
 function handleSaveAll() {
     saveStores();
-    showMessage('全ての変更を保存しました', 'success');
+    showMessage('すべてのデータを保存しました', 'success');
 }
 
 function handleResetData() {
-    if (confirm('全ての店舗データを初期状態にリセットしますか？この操作は取り消せません。')) {
+    if (confirm('すべてのデータをリセットしますか？この操作は取り消せません。')) {
         currentStores = [...DEFAULT_STORES];
-        saveStores();
         renderStores();
-        showMessage('データをリセットしました', 'warning');
+        saveStores();
+        showMessage('データをリセットしました', 'success');
     }
 }
 
 function saveStores() {
-    localStorage.setItem('cabaret_stores', JSON.stringify(currentStores));
+    try {
+        localStorage.setItem('nice_stores', JSON.stringify(currentStores));
+        console.log('ローカルストレージに保存しました');
+        
+        // モバイル向け通知を送信
+        notifyMobileDevices();
+        
+        // Supabaseにも保存を試行（自動）
+        saveStoresToSupabase().then(success => {
+            if (success) {
+                console.log('✅ クラウド同期完了');
+            } else {
+                console.log('⚠️ クラウド同期失敗、ローカル保存は完了');
+            }
+        });
+    } catch (error) {
+        console.error('保存エラー:', error);
+        showMessage('保存に失敗しました', 'error');
+    }
 }
 
-// モーダル制御
+// 単一店舗の保存（編集時の自動保存用）
+async function saveStore(store) {
+    console.log('💾 saveStore開始:', store.name);
+    
+    try {
+        // 入力データの検証
+        if (!store || !store.name) {
+            throw new Error('無効な店舗データです');
+        }
+        
+        // ローカルに保存
+        console.log('💾 ローカルストレージに保存中...');
+        
+        const index = currentStores.findIndex(s => s.id === store.id);
+        if (index !== -1) {
+            currentStores[index] = store;
+            console.log('✅ 既存店舗をローカル配列で更新');
+        } else {
+            currentStores.push(store);
+            console.log('✅ 新規店舗をローカル配列に追加');
+        }
+        
+        localStorage.setItem('nice_stores', JSON.stringify(currentStores));
+        console.log('✅ ローカルストレージに保存完了');
+        
+        // Supabaseに自動保存
+        console.log('☁️ Supabaseに保存を試行...');
+        const cloudSaved = await saveStoreToSupabase(store);
+        
+        if (cloudSaved) {
+            console.log('✅ クラウド保存成功');
+            showMessage(`✅ ${store.name} をクラウドに保存しました`, 'success');
+        } else {
+            console.log('⚠️ クラウド保存失敗、ローカル保存のみ');
+            showMessage(`💾 ${store.name} をローカルに保存しました（クラウド接続なし）`, 'info');
+        }
+        
+        // モバイル向け通知
+        console.log('📱 モバイルデバイスに通知送信...');
+        notifyMobileDevices();
+        
+        console.log('✅ saveStore完了');
+        return true;
+        
+    } catch (error) {
+        console.error('❌ 店舗保存エラー:', error);
+        showMessage('保存に失敗しました: ' + error.message, 'error');
+        return false;
+    }
+}
+
+// モバイルデバイスへの通知
+function notifyMobileDevices() {
+    // StorageEventを発火してモバイルに通知
+    window.dispatchEvent(new StorageEvent('storage', {
+        key: 'nice_stores',
+        oldValue: null,
+        newValue: JSON.stringify(currentStores),
+        url: window.location.href,
+        storageArea: localStorage
+    }));
+    
+    // モバイル向けの視覚的フィードバック
+    const mobileNotification = document.createElement('div');
+    mobileNotification.style.cssText = `
+        position: fixed;
+        top: 10px;
+        right: 10px;
+        background: linear-gradient(45deg, #27ae60, #2ecc71);
+        color: white;
+        padding: 10px 15px;
+        border-radius: 20px;
+        font-size: 14px;
+        font-weight: bold;
+        z-index: 10001;
+        box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3);
+        animation: slideInRight 0.3s ease-out;
+    `;
+    mobileNotification.innerHTML = '📱 モバイル版に変更を通知しました';
+    
+    document.body.appendChild(mobileNotification);
+    
+    setTimeout(() => {
+        mobileNotification.style.animation = 'slideOutRight 0.3s ease-in';
+        setTimeout(() => {
+            mobileNotification.remove();
+        }, 300);
+    }, 2500);
+    
+    console.log('📱 モバイルデバイスに変更通知を送信しました');
+}
+
+// モバイル向けCSS アニメーションを追加
+function addMobileAnimationStyles() {
+    if (document.getElementById('mobile-animations')) return;
+    
+    const style = document.createElement('style');
+    style.id = 'mobile-animations';
+    style.textContent = `
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        @keyframes slideOutRight {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+        }
+        
+        @keyframes slideDown {
+            from {
+                transform: translateY(-100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+    `;
+    
+    document.head.appendChild(style);
+}
+
+// 初期化時にモバイル向けスタイルを追加
+document.addEventListener('DOMContentLoaded', function() {
+    addMobileAnimationStyles();
+});
+
 function showModal() {
-    editModal.classList.add('show');
-    document.body.style.overflow = 'hidden';
+    editModal.style.display = 'flex';
 }
 
 function hideModal() {
-    editModal.classList.remove('show');
-    document.body.style.overflow = '';
-    storeForm.reset();
+    editModal.style.display = 'none';
     editingStoreId = null;
+    currentStoreImages = [];
 }
 
-// メッセージ表示
 function showMessage(message, type = 'success') {
     // 既存のメッセージを削除
     const existingMessage = document.querySelector('.message');
     if (existingMessage) {
         existingMessage.remove();
     }
-    
+
     const messageDiv = document.createElement('div');
     messageDiv.className = `message ${type}`;
     messageDiv.textContent = message;
     
-    const adminControls = document.querySelector('.admin-controls');
-    adminControls.appendChild(messageDiv);
+    // メッセージのスタイル
+    messageDiv.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 12px 20px;
+        border-radius: 4px;
+        color: white;
+        font-weight: bold;
+        z-index: 10000;
+        max-width: 300px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        opacity: 0;
+        transform: translateX(100%);
+        transition: all 0.3s ease;
+    `;
     
-    // 3秒後に自動削除
+    if (type === 'success') {
+        messageDiv.style.backgroundColor = '#4CAF50';
+    } else if (type === 'error') {
+        messageDiv.style.backgroundColor = '#f44336';
+    } else if (type === 'warning') {
+        messageDiv.style.backgroundColor = '#ff9800';
+    } else {
+        messageDiv.style.backgroundColor = '#2196F3';
+    }
+    
+    document.body.appendChild(messageDiv);
+    
+    // アニメーション
     setTimeout(() => {
-        if (messageDiv.parentNode) {
-            messageDiv.remove();
-        }
+        messageDiv.style.opacity = '1';
+        messageDiv.style.transform = 'translateX(0)';
+    }, 10);
+    
+    // 自動削除
+    setTimeout(() => {
+        messageDiv.style.opacity = '0';
+        messageDiv.style.transform = 'translateX(100%)';
+        setTimeout(() => {
+            if (messageDiv.parentNode) {
+                messageDiv.remove();
+            }
+        }, 300);
     }, 3000);
 }
 
-// データエクスポート用の関数（デバッグ用）
-function exportStoreData() {
-    const data = JSON.stringify(currentStores, null, 2);
-    console.log('Store Data:', data);
-    return data;
-}
-
-// エクスポート/インポート機能
-function handleExportData() {
-    try {
-        // 簡易圧縮（問題のあるLZ圧縮を避ける）
-        function simpleCompress(jsonData) {
-            // 重複文字列を置換する簡単な圧縮
-            let compressed = jsonData;
-            
-            // よく使われる文字列を短い記号に置換
-            const replacements = {
-                '"https://images.unsplash.com/photo-': '"U:',
-                '?w=800&h=600&fit=crop&crop=center"': '"',
-                '"price"': '"p"',
-                '"badge"': '"b"',
-                '"name"': '"n"',
-                '"description"': '"d"',
-                '"features"': '"f"',
-                '"image"': '"i"',
-                '"images"': '"g"',
-                '"id"': '"x"',
-                '高級店': 'H1',
-                '上品': 'H2', 
-                '人気': 'H3',
-                'ラグジュアリー': 'H4',
-                '王室級': 'H5',
-                '新店': 'H6',
-                'おすすめ': 'H7'
-            };
-            
-            for (const [original, replacement] of Object.entries(replacements)) {
-                compressed = compressed.split(original).join(replacement);
-            }
-            
-            return compressed;
-        }
-        
-        // 簡易解凍
-        function simpleDecompress(compressed) {
-            // 圧縮時の置換を逆に戻す
-            const replacements = {
-                '"U:': '"https://images.unsplash.com/photo-',
-                'H1': '高級店',
-                'H2': '上品',
-                'H3': '人気', 
-                'H4': 'ラグジュアリー',
-                'H5': '王室級',
-                'H6': '新店',
-                'H7': 'おすすめ',
-                '"p"': '"price"',
-                '"b"': '"badge"',
-                '"n"': '"name"',
-                '"d"': '"description"',
-                '"f"': '"features"',
-                '"i"': '"image"',
-                '"g"': '"images"',
-                '"x"': '"id"'
-            };
-            
-            let decompressed = compressed;
-            for (const [replacement, original] of Object.entries(replacements)) {
-                decompressed = decompressed.split(replacement).join(original);
-            }
-            
-            // UnsplashのURL修復
-            decompressed = decompressed.replace(/"U:([a-zA-Z0-9_-]+)"/g, '"https://images.unsplash.com/photo-$1?w=800&h=600&fit=crop&crop=center"');
-            
-            return decompressed;
-        }
-        
-        // ローカル画像データを分離して格納
-        const localImages = {};
-        let localImageCounter = 0;
-        
-        function processImageForExport(img) {
-            if (!img) return '';
-            if (img.includes('unsplash')) {
-                return img.match(/photo-([a-zA-Z0-9_-]+)/)?.[1] || '';
-            }
-            if (img.startsWith('data:')) {
-                const localId = `LOCAL_${++localImageCounter}`;
-                localImages[localId] = img;
-                return localId;
-            }
-            return img || '';
-        }
-        
-        // 超短縮データ形式
-        const miniData = {
-            v: 2, // バージョンを2に更新（ローカル画像対応）
-            t: Math.floor(Date.now() / 1000),
-            d: navigator.userAgent.includes('Mobile') ? 1 : 0,
-            c: currentStores.length,
-            l: localImages, // ローカル画像データを追加
-            s: currentStores.map(store => [
-                store.id,
-                store.name,
-                processImageForExport(store.image),
-                (store.images || []).map(processImageForExport),
-                store.price,
-                store.badge,
-                store.description || '',
-                store.features || []
-            ])
-        };
-        
-        console.log('エクスポート中のデータ:');
-        console.log('Original currentStores:', currentStores);
-        console.log('Mini data format:', miniData);
-        console.log('Sample store array:', miniData.s[0]);
-        
-        // JSON化して簡易圧縮
-        const jsonString = JSON.stringify(miniData);
-        const compressed = simpleCompress(jsonString);
-        
-        // UTF-8対応のBase64エンコード
-        const utf8Bytes = new TextEncoder().encode(compressed);
-        const base64Compressed = btoa(String.fromCharCode(...utf8Bytes));
-        
-        // 最終エンコード（さらに短縮）
-        const finalData = `V3:${base64Compressed}`;
-        
-        // エクスポートモーダルに表示
-        document.getElementById('export-data-text').value = finalData;
-        showExportModal();
-        
-        const compressionRatio = Math.round((1 - finalData.length / jsonString.length) * 100);
-        
-        // 緊急時用の非圧縮バックアップも生成
-        const backupData = JSON.stringify({
-            version: "backup",
-            timestamp: new Date().toISOString(),
-            device: navigator.userAgent.includes('Mobile') ? 'mobile' : 'desktop',
-            storeCount: currentStores.length,
-            stores: currentStores
-        });
-        
-        console.log('バックアップデータ（非圧縮）:', backupData.substring(0, 100) + '...');
-        console.log('バックアップデータ文字数:', backupData.length);
-        
-        // 緊急時用の簡単インポート機能を作成
-        window.NICE_EMERGENCY_IMPORT = function(data) {
-            try {
-                const importData = typeof data === 'string' ? JSON.parse(data) : data;
-                if (importData.stores && Array.isArray(importData.stores)) {
-                    currentStores = importData.stores;
-                    saveStores();
-                    renderStores();
-                    alert('緊急インポート成功！店舗データを更新しました。');
-                    window.location.reload();
-                } else {
-                    alert('無効なデータ形式です');
-                }
-            } catch (error) {
-                alert('緊急インポートエラー: ' + error.message);
-            }
-        };
-        
-        console.log('緊急インポート関数を作成しました。使用方法:');
-        console.log('NICE_EMERGENCY_IMPORT(バックアップデータ)');
-        
-        showMessage(`データをエクスポートしました（${finalData.length}文字、${compressionRatio}%圧縮）\n\n※万が一インポートに失敗する場合は、\nブラウザのコンソール（F12）で以下を実行：\nNICE_EMERGENCY_IMPORT(バックアップデータ)`, 'success');
-        
-    } catch (error) {
-        console.error('Export error:', error);
-        showMessage('エクスポートに失敗しました: ' + error.message, 'error');
-    }
-}
-
-function handleImportData() {
-    showImportModal();
-}
-
-function handlePasteImport() {
-    const textArea = document.getElementById('import-data-text');
-    const inputData = textArea.value.trim();
-    
-    if (!inputData) {
-        showMessage('インポートするデータを入力してください', 'error');
-        return;
-    }
-    
-    try {
-        // 簡易解凍関数
-        function simpleDecompress(compressed) {
-            const replacements = {
-                '"U:': '"https://images.unsplash.com/photo-',
-                'H1': '高級店',
-                'H2': '上品',
-                'H3': '人気', 
-                'H4': 'ラグジュアリー',
-                'H5': '王室級',
-                'H6': '新店',
-                'H7': 'おすすめ',
-                '"p"': '"price"',
-                '"b"': '"badge"',
-                '"n"': '"name"',
-                '"d"': '"description"',
-                '"f"': '"features"',
-                '"i"': '"image"',
-                '"g"': '"images"',
-                '"x"': '"id"'
-            };
-            
-            let decompressed = compressed;
-            for (const [replacement, original] of Object.entries(replacements)) {
-                decompressed = decompressed.split(replacement).join(original);
-            }
-            
-            // UnsplashのURL修復
-            decompressed = decompressed.replace(/"U:([a-zA-Z0-9_-]+)"/g, '"https://images.unsplash.com/photo-$1?w=800&h=600&fit=crop&crop=center"');
-            
-            return decompressed;
-        }
-        
-        let importData, stores, timestamp, device, storeCount, localImages = {};
-        
-        // 統一された画像復元関数
-        function restoreImageUrl(compressed) {
-            console.log('restoreImageUrl called with:', compressed);
-            
-            if (!compressed) return '';
-            
-            // ローカル画像IDの場合
-            if (typeof compressed === 'string' && compressed.startsWith('LOCAL_')) {
-                const localImage = localImages[compressed];
-                console.log(`ローカル画像復元: ${compressed} -> ${localImage ? 'データあり' : 'データなし'}`);
-                return localImage || '';
-            }
-            
-            // 旧形式のローカル画像識別子
-            if (compressed === 'L' || compressed === '[LOCAL]') {
-                console.log('旧形式ローカル画像識別子を検出（データなし）');
-                return '';
-            }
-            
-            // 既に完全URLの場合はそのまま
-            if (compressed.includes('http')) {
-                console.log('完全URL:', compressed);
-                return compressed;
-            }
-            
-            // Unsplash写真IDからURLを復元
-            const restoredUrl = `https://images.unsplash.com/photo-${compressed}?w=800&h=600&fit=crop&crop=center`;
-            console.log(`Unsplash ID復元: ${compressed} -> ${restoredUrl}`);
-            return restoredUrl;
-        }
-        
-        // V5U形式（超軽量版）の処理
-        if (inputData.startsWith('V5U:')) {
-            const compressedData = inputData.substring(4);
-            
-            // UTF-8対応のBase64デコード
-            const binaryString = atob(compressedData);
-            const utf8Bytes = new Uint8Array(binaryString.length);
-            for (let i = 0; i < binaryString.length; i++) {
-                utf8Bytes[i] = binaryString.charCodeAt(i);
-            }
-            const decodedData = new TextDecoder().decode(utf8Bytes);
-            
-            // 超軽量版の圧縮を復元
-            let restored = decodedData
-                .replace(/"i":/g, '"id":')
-                .replace(/"n":/g, '"name":')
-                .replace(/"p":/g, '"price":')
-                .replace(/"b":/g, '"badge":')
-                .replace(/A/g, '高級店')
-                .replace(/B/g, '上品')
-                .replace(/C/g, '人気')
-                .replace(/D/g, 'ラグジュアリー')
-                .replace(/E/g, '王室級')
-                .replace(/F/g, '新店')
-                .replace(/G/g, 'おすすめ');
-            
-            importData = JSON.parse(restored);
-            
-            console.log('V5U超軽量版形式データをデコード中...');
-            console.log('Raw importData:', importData);
-            
-            // 超軽量版は配列形式（id, name, price, badge）
-            stores = importData.s.map(storeArray => ({
-                id: storeArray[0],
-                name: storeArray[1],
-                image: '', // 画像なし
-                images: [], // 画像なし
-                price: storeArray[2],
-                badge: storeArray[3] || '',
-                description: '', // 詳細情報なし
-                features: [] // 特徴なし
-            }));
-            
-            timestamp = importData.t ? new Date(importData.t * 1000).toLocaleString('ja-JP') : '不明';
-            device = '不明';
-            storeCount = importData.c || stores.length;
-            
-            // 超軽量版の警告メッセージ
-            showMessage('🚀 超軽量版データをインポートしました。\n⚠️ 基本情報（店名・価格・バッジ）のみ含まれています。', 'warning');
-        }
-        // V4L形式（軽量版）の処理
-        else if (inputData.startsWith('V4L:')) {
-            const compressedData = inputData.substring(4);
-            
-            // UTF-8対応のBase64デコード
-            const binaryString = atob(compressedData);
-            const utf8Bytes = new Uint8Array(binaryString.length);
-            for (let i = 0; i < binaryString.length; i++) {
-                utf8Bytes[i] = binaryString.charCodeAt(i);
-            }
-            const decodedData = new TextDecoder().decode(utf8Bytes);
-            
-            // 軽量版の圧縮を復元
-            let restored = decodedData
-                .replace(/"i":/g, '"id":')
-                .replace(/"n":/g, '"name":')
-                .replace(/"p":/g, '"price":')
-                .replace(/"b":/g, '"badge":')
-                .replace(/"d":/g, '"description":')
-                .replace(/"f":/g, '"features":')
-                .replace(/"m":/g, '"image":')
-                .replace(/"g":/g, '"images":');
-            
-            importData = JSON.parse(restored);
-            
-            console.log('V4L軽量版形式データをデコード中...');
-            console.log('Raw importData:', importData);
-            
-            // 軽量版はオブジェクト形式なのでそのまま使用
-            stores = importData.s.map(store => ({
-                id: store.id,
-                name: store.name,
-                image: store.image ? restoreImageUrl(store.image) : '',
-                images: (store.images || []).map(restoreImageUrl),
-                price: store.price,
-                badge: store.badge,
-                description: store.description || '',
-                features: store.features || []
-            }));
-            
-            timestamp = importData.t ? new Date(importData.t * 1000).toLocaleString('ja-JP') : '不明';
-            device = importData.d === 1 ? '携帯' : 'パソコン';
-            storeCount = importData.c || stores.length;
-            
-            // 軽量版の警告メッセージ
-            showMessage('📱 軽量版データをインポートしました。\n⚠️ 画像データは含まれていません。', 'warning');
-        }
-        // 新しい圧縮形式かチェック（V3形式）
-        else if (inputData.startsWith('V3:')) {
-            const compressedData = inputData.substring(3);
-            
-            // UTF-8対応のBase64デコード
-            const binaryString = atob(compressedData);
-            const utf8Bytes = new Uint8Array(binaryString.length);
-            for (let i = 0; i < binaryString.length; i++) {
-                utf8Bytes[i] = binaryString.charCodeAt(i);
-            }
-            const decodedData = new TextDecoder().decode(utf8Bytes);
-            const jsonString = simpleDecompress(decodedData);
-            importData = JSON.parse(jsonString);
-            
-            // ローカル画像データを復元（v2フォーマット対応）
-            if (importData.l) {
-                localImages = importData.l;
-                console.log('ローカル画像データを読み込み:', Object.keys(localImages).length, '件');
-            }
-            
-            // デバッグ情報を出力
-            console.log('V3形式データをデコード中...');
-            console.log('Raw importData:', importData);
-            console.log('Store array sample:', importData.s[0]);
-            console.log('ローカル画像データ:', localImages);
-            
-            // 配列形式から復元
-            stores = importData.s.map((storeArray, index) => {
-                console.log(`Store ${index}:`, storeArray);
-                const restored = {
-                    id: storeArray[0],
-                    name: storeArray[1],
-                    image: restoreImageUrl(storeArray[2]),
-                    images: (storeArray[3] || []).map(restoreImageUrl),
-                    price: storeArray[4],
-                    badge: storeArray[5],
-                    description: storeArray[6],
-                    features: storeArray[7] || []
-                };
-                console.log(`Restored store ${index}:`, restored);
-                return restored;
-            });
-            
-            console.log('Final restored stores:', stores);
-            timestamp = importData.t ? new Date(importData.t * 1000).toLocaleString('ja-JP') : '不明';
-            device = importData.d === 1 ? '携帯' : 'パソコン';
-            storeCount = importData.c || stores.length;
-        }
-        // V2形式（旧バージョン）
-        else if (inputData.startsWith('V2:')) {
-            throw new Error('V2形式は非対応です。新しいエクスポートを使用してください。');
-        }
-        // 旧V1形式（エラーが出やすいのでスキップするか簡単な処理）
-        else if (inputData.startsWith('V1:')) {
-            throw new Error('V1形式は非対応です。新しいエクスポートを使用してください。');
-        }
-        else {
-            // 旧形式のJSONを試す
-            importData = JSON.parse(inputData);
-            
-            // 中間圧縮形式の場合
-            if (importData.s && Array.isArray(importData.s)) {
-                stores = importData.s.map(store => ({
-                    id: store.i,
-                    name: store.n,
-                    image: restoreImageUrl(store.img),
-                    images: (store.imgs || []).map(restoreImageUrl),
-                    price: store.p,
-                    badge: store.b,
-                    description: store.d,
-                    features: store.f || []
-                }));
-                timestamp = importData.t ? new Date(importData.t * 1000).toLocaleString('ja-JP') : '不明';
-                device = importData.d === 'M' ? '携帯' : importData.d === 'D' ? 'パソコン' : '不明';
-                storeCount = importData.c || stores.length;
-            }
-            // 元の形式の場合
-            else if (importData.stores && Array.isArray(importData.stores)) {
-                stores = importData.stores;
-                timestamp = importData.timestamp ? new Date(importData.timestamp).toLocaleString('ja-JP') : '不明';
-                device = importData.device === 'mobile' ? '携帯' : importData.device === 'desktop' ? 'パソコン' : '不明';
-                storeCount = importData.storeCount || stores.length;
-            }
-            else {
-                throw new Error('無効なデータ形式です');
-            }
-        }
-        
-        // 確認ダイアログ
-        const confirmMessage = `
-${storeCount}件の店舗データをインポートします。
-エクスポート日時: ${timestamp}
-エクスポート元: ${device}
-
-現在のデータは上書きされます。続行しますか？`;
-        
-        if (confirm(confirmMessage)) {
-            console.log('インポート実行中...');
-            console.log('Old currentStores:', currentStores);
-            console.log('New stores to import:', stores);
-            
-            currentStores = stores;
-            console.log('Updated currentStores:', currentStores);
-            
-            saveStores();
-            console.log('Data saved to localStorage');
-            
-            renderStores();
-            console.log('Stores re-rendered');
-            
-            hideImportModal();
-            showMessage(`${stores.length}件のデータをインポートしました\n\n※変更が反映されない場合は「強制データ再読み込み」ボタンを押してください\n\n3秒後にページを再読み込みします...`, 'success');
-            
-            // 3秒後にページを再読み込み
-            setTimeout(() => {
-                window.location.reload();
-            }, 3000);
-        }
-    } catch (error) {
-        console.error('Paste import error:', error);
-        console.error('Input data preview:', inputData.substring(0, 100) + '...');
-        
-        // フォールバック：圧縮なしの直接JSONとして試す
-        if (inputData.startsWith('{') && inputData.includes('"stores"')) {
-            try {
-                const fallbackData = JSON.parse(inputData);
-                if (fallbackData.stores && Array.isArray(fallbackData.stores)) {
-                    console.log('フォールバック：直接JSONとして処理');
-                    currentStores = fallbackData.stores;
-                    saveStores();
-                    renderStores();
-                    hideImportModal();
-                    showMessage(`フォールバック処理で${fallbackData.stores.length}件のデータをインポートしました\n\n3秒後にページを再読み込みします...`, 'warning');
-                    
-                    // 3秒後にページを再読み込み
-                    setTimeout(() => {
-                        window.location.reload();
-                    }, 3000);
-                    return;
-                }
-            } catch (fallbackError) {
-                console.error('フォールバックも失敗:', fallbackError);
-            }
-        }
-        
-        showMessage('インポートに失敗しました: ' + error.message + '\n\nデバッグ情報: ' + inputData.substring(0, 50) + '...', 'error');
-    }
-}
-
-function handleFileImport() {
-    const fileInput = document.getElementById('data-import-input');
-    fileInput.onchange = handleImportFile;
-    fileInput.click();
-}
-
-function handleImportFile(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-    
-    if (file.type !== 'application/json' && !file.name.endsWith('.json')) {
-        showMessage('JSONファイルを選択してください', 'error');
-        return;
-    }
-    
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        try {
-            const inputData = e.target.result;
-            
-            // V3形式かどうかチェック
-            if (inputData.startsWith('V3:') || inputData.startsWith('V2:') || inputData.startsWith('V1:')) {
-                // ペーストインポートと同じ処理を呼び出す
-                document.getElementById('import-data-text').value = inputData;
-                hideImportModal();
-                setTimeout(() => {
-                    handlePasteImport();
-                }, 100);
-                return;
-            }
-            
-            const importData = JSON.parse(inputData);
-            let stores = [];
-            let timestamp = '';
-            let device = '';
-            let storeCount = 0;
-            let localImages = {};
-            
-            // 統一された画像復元関数を使用（上で定義済み）
-            
-            // ローカル画像データを読み込み（v2フォーマット対応）
-            if (importData.l) {
-                localImages = importData.l;
-                console.log('ファイルインポート: ローカル画像データを読み込み:', Object.keys(localImages).length, '件');
-            }
-            
-            // 新形式（短縮版）の場合
-            if (importData.s && Array.isArray(importData.s)) {
-                console.log('配列形式データを検出');
-                console.log('データバージョン:', importData.v);
-                console.log('サンプルストア:', importData.s[0]);
-                
-                // v2フォーマット（配列形式）とv1フォーマット（オブジェクト形式）を判別
-                const isArrayFormat = Array.isArray(importData.s[0]);
-                
-                if (isArrayFormat) {
-                    // 新しい配列形式（v2フォーマット）
-                    stores = importData.s.map((storeArray, index) => {
-                        console.log(`ファイル配列形式 Store ${index}:`, storeArray);
-                        const restored = {
-                            id: storeArray[0],
-                            name: storeArray[1],
-                            image: restoreImageUrl(storeArray[2]),
-                            images: (storeArray[3] || []).map(restoreImageUrl),
-                            price: storeArray[4],
-                            badge: storeArray[5],
-                            description: storeArray[6],
-                            features: storeArray[7] || []
-                        };
-                        console.log(`ファイル復元済み Store ${index}:`, restored);
-                        return restored;
-                    });
-                } else {
-                    // 旧形式（オブジェクト形式）
-                    stores = importData.s.map(store => ({
-                        id: store.i,
-                        name: store.n,
-                        image: restoreImageUrl(store.img),
-                        images: (store.imgs || []).map(restoreImageUrl),
-                        price: store.p,
-                        badge: store.b,
-                        description: store.d,
-                        features: store.f || []
-                    }));
-                }
-                
-                timestamp = importData.t ? new Date(importData.t * 1000).toLocaleString('ja-JP') : '不明';
-                device = importData.d === 'M' ? '携帯' : importData.d === 'D' ? 'パソコン' : '不明';
-                storeCount = importData.c || stores.length;
-            }
-            // 旧形式の場合
-            else if (importData.stores && Array.isArray(importData.stores)) {
-                stores = importData.stores;
-                timestamp = importData.timestamp ? new Date(importData.timestamp).toLocaleString('ja-JP') : '不明';
-                device = importData.device === 'mobile' ? '携帯' : importData.device === 'desktop' ? 'パソコン' : '不明';
-                storeCount = importData.storeCount || stores.length;
-            }
-            else {
-                throw new Error('無効なデータ形式です');
-            }
-            
-            // 確認ダイアログ
-            const confirmMessage = `
-${storeCount}件の店舗データをインポートします。
-エクスポート日時: ${timestamp}
-エクスポート元: ${device}
-
-現在のデータは上書きされます。続行しますか？`;
-            
-            if (confirm(confirmMessage)) {
-                currentStores = stores;
-                saveStores();
-                renderStores();
-                hideImportModal();
-                showMessage(`${stores.length}件のデータをインポートしました`, 'success');
-            }
-        } catch (error) {
-            console.error('Import error:', error);
-            showMessage('インポートに失敗しました: ' + error.message, 'error');
-        }
-    };
-    
-    reader.onerror = function() {
-        showMessage('ファイルの読み込みに失敗しました', 'error');
-    };
-    
-    reader.readAsText(file);
-    
-    // ファイル入力をリセット
-    event.target.value = '';
-}
-
-function copyExportToClipboard() {
-    const textArea = document.getElementById('export-data-text');
-    textArea.select();
-    textArea.setSelectionRange(0, 99999); // モバイル対応
-    
-    try {
-        document.execCommand('copy');
-        showMessage('クリップボードにコピーしました', 'success');
-    } catch (error) {
-        console.error('Copy error:', error);
-        showMessage('コピーに失敗しました', 'error');
-    }
-}
-
-function downloadExportFile() {
-    try {
-        const textArea = document.getElementById('export-data-text');
-        const data = textArea.value;
-        const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-        const filename = `nice-stores-data-${timestamp}.json`;
-        
-        const blob = new Blob([data], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = filename;
-        a.style.display = 'none';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-        
-        showMessage('ファイルをダウンロードしました', 'success');
-    } catch (error) {
-        console.error('Download error:', error);
-        showMessage('ダウンロードに失敗しました: ' + error.message, 'error');
-    }
-}
-
-function showExportModal() {
-    document.getElementById('export-modal').style.display = 'flex';
-}
-
-function hideExportModal() {
-    document.getElementById('export-modal').style.display = 'none';
-}
-
-function showImportModal() {
-    document.getElementById('import-modal').style.display = 'flex';
-}
-
-function hideImportModal() {
-    document.getElementById('import-modal').style.display = 'none';
-}
-
-// 強制データ再読み込み機能
-function handleForceRefresh() {
-    try {
-        console.log('強制データ再読み込み開始...');
-        
-        // LocalStorageから直接データを読み込み
-        const savedStores = localStorage.getItem('cabaret_stores');
-        console.log('LocalStorageのデータ:', savedStores);
-        
-        if (savedStores) {
-            const parsedStores = JSON.parse(savedStores);
-            console.log('パースされたデータ:', parsedStores);
-            
-            // 現在のcurrentStoresと比較
-            console.log('現在のcurrentStores:', currentStores);
-            console.log('データが同じか？', JSON.stringify(currentStores) === JSON.stringify(parsedStores));
-            
-            // 強制的にデータを更新
-            currentStores = parsedStores;
-            console.log('更新後のcurrentStores:', currentStores);
-            
-            // 表示を強制更新
-            renderStores();
-            console.log('renderStores実行完了');
-            
-            // 成功メッセージ
-            showMessage(`データを強制再読み込みしました（${currentStores.length}件）\n\nページを再読み込みします...`, 'success');
-            
-            // 2秒後にページリロード
-            setTimeout(() => {
-                window.location.reload();
-            }, 2000);
-            
-        } else {
-            showMessage('LocalStorageにデータが見つかりません', 'warning');
-            
-            // デフォルトデータで復元
-            currentStores = [...DEFAULT_STORES];
-            saveStores();
-            renderStores();
-            showMessage('デフォルトデータで復元しました', 'warning');
-        }
-        
-    } catch (error) {
-        console.error('強制リフレッシュエラー:', error);
-        showMessage('強制リフレッシュに失敗しました: ' + error.message, 'error');
-    }
-}
-
-// ファイルアップロード機能
 function uploadImage(type, index = 0) {
+    console.log('📤 uploadImage実行開始:', { type, index, editingStoreId });
+    
+    // 編集中でない場合のチェック
+    if (!editingStoreId) {
+        console.error('❌ 店舗が編集モードではありません');
+        showMessage('先に店舗を編集モードにしてください', 'error');
+        return;
+    }
+    
+    // currentStoreImagesの初期化チェック
+    if (!currentStoreImages || !Array.isArray(currentStoreImages)) {
+        console.log('⚠️ currentStoreImagesを初期化');
+        currentStoreImages = ['', '', '', '', ''];
+    }
+    
+    console.log('現在のcurrentStoreImages:', currentStoreImages);
+    
+    // ファイル入力要素が既に存在する場合は削除
+    const existingInput = document.getElementById('image-upload-input');
+    if (existingInput) {
+        existingInput.remove();
+    }
+    
+    // ファイル入力要素を作成
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.id = 'image-upload-input';
+    fileInput.accept = 'image/*';
+    fileInput.style.display = 'none';
+    
+    console.log('📁 ファイル入力要素を作成しました');
+    
+    // アップロード処理のイベントハンドラー
+    const handleUpload = async (event) => {
+        console.log('📁 ファイル選択イベント発生');
+        const file = event.target.files[0];
+        
+        if (!file) {
+            console.log('❌ ファイルが選択されませんでした');
+            return;
+        }
+        
+        console.log('📁 選択されたファイル:', file.name, file.size, 'bytes');
+        
+        try {
+            await handleFileUpload(event);
+        } catch (error) {
+            console.error('❌ アップロードエラー:', error);
+            showMessage('画像のアップロードに失敗しました: ' + error.message, 'error');
+        }
+    };
+    
+    fileInput.addEventListener('change', handleUpload);
+    document.body.appendChild(fileInput);
+    
+    // currentImageTypeとcurrentGalleryIndexを設定
     currentImageType = type;
     currentGalleryIndex = index;
     
-    const fileInput = document.getElementById('image-upload-input');
-    fileInput.onchange = handleFileUpload;
+    console.log('🎯 設定完了:', { currentImageType, currentGalleryIndex });
+    
+    // ファイル選択ダイアログを開く
     fileInput.click();
+    
+    console.log('📤 uploadImage実行完了');
 }
 
-function handleFileUpload(event) {
+async function handleFileUpload(event) {
+    console.log('📤 handleFileUpload実行開始');
+    
     const file = event.target.files[0];
-    if (!file) return;
-    
-    // ファイルタイプチェック
-    if (!file.type.startsWith('image/')) {
-        alert('画像ファイルを選択してください。');
+    if (!file) {
+        console.error('❌ ファイルが選択されていません');
         return;
     }
     
-    // ファイルサイズチェック（10MB以下）
+    console.log('📁 アップロード対象ファイル:', {
+        name: file.name,
+        size: file.size,
+        type: file.type
+    });
+    
+    // ファイルサイズチェック（10MB制限）
     if (file.size > 10 * 1024 * 1024) {
-        alert('ファイルサイズは10MB以下にしてください。');
+        showMessage('ファイルサイズは10MB以下にしてください', 'error');
         return;
     }
     
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        const imageUrl = e.target.result; // base64データ
-        
-        // プレビュー表示と選択処理
-        if (currentImageType === 'main') {
-            setMainImage(imageUrl);
-        } else if (currentImageType === 'gallery') {
-            currentStoreImages[currentGalleryIndex] = imageUrl;
-            updateGalleryPreview();
-        }
-        
-        // 成功メッセージ
-        showMessage('画像をアップロードしました', 'success');
-    };
-    
-    reader.onerror = function() {
-        showMessage('画像の読み込みに失敗しました', 'error');
-    };
-    
-    reader.readAsDataURL(file);
-    
-    // ファイル入力をリセット
-    event.target.value = '';
-}
-
-// 簡単同期機能の実装
-function generateQRCode() {
-    try {
-        // データをエクスポート
-        const data = createQuickExportData();
-        
-        // QRコード用のURLを生成
-        const baseUrl = window.location.origin + window.location.pathname;
-        const qrUrl = `${baseUrl}?import=${encodeURIComponent(data)}`;
-        
-        // QRコード生成（qrcode.jsライブラリを使用）
-        const qrContainer = document.getElementById('qr-code-container');
-        qrContainer.innerHTML = ''; // 既存のQRコードをクリア
-        
-        // QRコードライブラリが読み込まれていない場合はフォールバック
-        if (typeof QRCode === 'undefined') {
-            // QRコードAPIを使用
-            const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(qrUrl)}`;
-            const img = document.createElement('img');
-            img.src = qrApiUrl;
-            img.alt = 'QRコード';
-            img.style.cssText = 'max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);';
-            qrContainer.appendChild(img);
-        } else {
-            // qrcode.jsライブラリを使用
-            new QRCode(qrContainer, {
-                text: qrUrl,
-                width: 250,
-                height: 250,
-                colorDark: "#000000",
-                colorLight: "#ffffff",
-                correctLevel: QRCode.CorrectLevel.M
-            });
-        }
-        
-        // URL情報も表示
-        const urlInfo = document.createElement('div');
-        urlInfo.style.cssText = 'margin-top: 1rem; padding: 1rem; background: #f8f9fa; border-radius: 8px; font-size: 12px; word-break: break-all;';
-        urlInfo.innerHTML = `
-            <strong>🔗 共有URL:</strong><br>
-            <span style="color: #666;">${qrUrl}</span><br><br>
-            <strong>📱 使用方法:</strong><br>
-            1. QRコードを他のデバイスでスキャン<br>
-            2. 自動的にデータがインポートされます
-        `;
-        qrContainer.appendChild(urlInfo);
-        
-        showQRModal();
-        showMessage('QRコードを生成しました！他のデバイスでスキャンしてください', 'success');
-        
-    } catch (error) {
-        console.error('QRコード生成エラー:', error);
-        showMessage('QRコード生成に失敗しました: ' + error.message, 'error');
+    // ファイル形式チェック
+    if (!file.type.startsWith('image/')) {
+        showMessage('画像ファイルを選択してください', 'error');
+        return;
     }
-}
-
-function generateShareURL() {
-    console.log('🔗 generateShareURL関数が呼び出されました');
+    
+    console.log('✅ ファイル検証通過');
+    
+    let imageUrl = null;
     
     try {
-        console.log('現在のcurrentStores:', currentStores);
-        console.log('データ生成開始...');
-        
-        // 各種データ形式を生成
-        const ultraLightData = createUltraLightExportData();
-        const lightData = createLightExportData();
-        const fullData = createQuickExportData();
-        
-        console.log('超軽量版データ:', ultraLightData.length, '文字');
-        console.log('軽量版データ:', lightData.length, '文字');
-        console.log('フル版データ:', fullData.length, '文字');
-        
-        const baseUrl = window.location.origin + window.location.pathname;
-        const ultraLightUrl = `${baseUrl}?import=${encodeURIComponent(ultraLightData)}`;
-        const lightUrl = `${baseUrl}?import=${encodeURIComponent(lightData)}`;
-        const fullUrl = `${baseUrl}?import=${encodeURIComponent(fullData)}`;
-        
-        console.log('超軽量版URL:', ultraLightUrl.length, '文字');
-        console.log('軽量版URL:', lightUrl.length, '文字');
-        console.log('フル版URL:', fullUrl.length, '文字');
-        
-        // URLの長さに基づいて使用するデータを決定（より厳しい制限）
-        let selectedData, selectedUrl, mode;
-        
-        if (ultraLightUrl.length <= 1200) {
-            // 超軽量版が1200文字以下なら超軽量版を使用
-            selectedData = ultraLightData;
-            selectedUrl = ultraLightUrl;
-            mode = '超軽量版（名前・価格のみ）';
-        } else if (lightUrl.length <= 1800) {
-            // 軽量版が1800文字以下なら軽量版を使用
-            selectedData = lightData;
-            selectedUrl = lightUrl;
-            mode = '軽量版（画像なし）';
-        } else if (fullUrl.length <= 3000) {
-            // フル版が3000文字以下ならフル版を使用
-            selectedData = fullData;
-            selectedUrl = fullUrl;
-            mode = 'フル版';
-        } else {
-            // どちらも長すぎる場合は超軽量版を強制使用
-            selectedData = ultraLightData;
-            selectedUrl = ultraLightUrl;
-            mode = '超軽量版（強制）';
+        // Supabaseアップロードを試行
+        if (supabaseClient) {
+            console.log('☁️ Supabaseアップロードを試行...');
+            imageUrl = await handleSupabaseUpload(file);
         }
         
-        console.log(`選択されたモード: ${mode}, URL長: ${selectedUrl.length}文字`);
+        // Supabaseアップロードに失敗した場合はローカル処理
+        if (!imageUrl) {
+            console.log('💾 ローカルアップロードにフォールバック');
+            imageUrl = await handleLocalUpload(file);
+        }
         
-        // 成功メッセージを最初に表示（クリップボード操作の前に）
-        showMessage(`📋 ${mode}のURL共有機能を実行中...`, 'info');
-        
-        // クリップボードAPI対応チェック
-        if (navigator.clipboard && navigator.clipboard.writeText) {
-            console.log('モダンなクリップボードAPIを使用');
-            navigator.clipboard.writeText(selectedUrl).then(() => {
-                console.log('クリップボードコピー成功');
-                let message = `✅ ${mode}の共有URLをクリップボードにコピーしました！\n\n`;
-                message += `URL長: ${selectedUrl.length}文字\n\n`;
-                
-                if (mode.includes('超軽量版')) {
-                    message += '⚠️ 基本情報（店名・価格）のみ含まれています。\n詳細情報や画像も共有したい場合は「ファイルでエクスポート」をご利用ください。\n\n';
-                } else if (mode.includes('軽量版')) {
-                    message += '⚠️ 画像データは含まれていません。\n画像も共有したい場合は「ファイルでエクスポート」をご利用ください。\n\n';
+        if (imageUrl) {
+            console.log('✅ アップロード成功:', imageUrl);
+            
+            if (currentImageType === 'main') {
+                setMainImage(imageUrl);
+                showMessage('メイン画像を設定しました', 'success');
+            } else if (currentImageType === 'gallery') {
+                // currentStoreImagesが正しく初期化されているか確認
+                if (!currentStoreImages || !Array.isArray(currentStoreImages)) {
+                    console.log('⚠️ currentStoreImagesを初期化');
+                    currentStoreImages = ['', '', '', '', ''];
                 }
                 
-                message += '他のデバイスのブラウザでペーストして開いてください';
-                showMessage(message, 'success');
-            }).catch(error => {
-                console.error('モダンクリップボードAPI失敗:', error);
-                fallbackCopyToClipboard(selectedUrl);
-            });
+                currentStoreImages[currentGalleryIndex] = imageUrl;
+                console.log(`📷 ギャラリー${currentGalleryIndex}に画像設定:`, imageUrl);
+                console.log('更新後のcurrentStoreImages:', currentStoreImages);
+                
+                updateGalleryPreview();
+                showMessage(`ギャラリー${currentGalleryIndex + 1}に画像をアップロードしました`, 'success');
+            }
         } else {
-            console.log('フォールバック方式を使用');
-            fallbackCopyToClipboard(selectedUrl);
-        }
-        
-        // URLを画面にも表示
-        const urlDisplay = document.getElementById('share-url-display');
-        if (urlDisplay) {
-            urlDisplay.value = selectedUrl;
-            urlDisplay.style.display = 'block';
-            console.log('URL表示エリアに設定完了');
-        } else {
-            console.log('URL表示エリアが見つかりません');
+            throw new Error('画像URLの取得に失敗しました');
         }
         
     } catch (error) {
-        console.error('URL生成エラー:', error);
-        showMessage('❌ URL生成に失敗しました: ' + error.message, 'error');
+        console.error('❌ アップロードエラー:', error);
+        showMessage('画像のアップロードに失敗しました: ' + error.message, 'error');
+    }
+    
+    // ファイル入力要素を削除
+    if (event.target) {
+        event.target.remove();
+    }
+    
+    console.log('📤 handleFileUpload実行完了');
+}
+
+async function handleSupabaseUpload(file) {
+    try {
+        console.log('☁️ Supabaseアップロード開始:', file.name);
         
-        // 緊急時の最小限の共有URL生成
-        try {
-            const emergencyData = currentStores.map(store => [
-                store.id,
-                store.name,
-                store.price
-            ]);
-            const emergencyUrl = `${window.location.origin}${window.location.pathname}?mini=${encodeURIComponent(JSON.stringify(emergencyData))}`;
-            console.log('緊急用超短URL:', emergencyUrl);
-            showMessage('⚠️ 緊急モードで超短URL生成しました（名前・価格のみ）', 'warning');
-        } catch (simpleError) {
-            console.error('緊急URL生成も失敗:', simpleError);
+        // ファイル名にタイムスタンプを追加してユニークにする
+        const timestamp = Date.now();
+        const fileExtension = file.name.split('.').pop();
+        const fileName = `store-image-${timestamp}.${fileExtension}`;
+        
+        console.log('📁 Supabaseファイル名:', fileName);
+        
+        // Supabase Storageにアップロード
+        const { data, error } = await supabaseClient.storage
+            .from('nice-store-images')
+            .upload(fileName, file, {
+                cacheControl: '3600',
+                upsert: false
+            });
+        
+        if (error) {
+            console.error('☁️ Supabaseアップロードエラー:', error);
+            throw error;
         }
-    }
-}
-
-// 超軽量版エクスポートデータ生成関数（基本情報のみ）
-function createUltraLightExportData() {
-    // 最小限のデータのみ（店名、価格、バッジ）
-    const ultraData = {
-        v: 5,  // 超軽量版フォーマット
-        t: Math.floor(Date.now() / 1000),
-        c: currentStores.length,
-        s: currentStores.map(store => [
-            store.id,
-            store.name,
-            store.price,
-            store.badge || ''
-        ])
-    };
-    
-    const jsonString = JSON.stringify(ultraData);
-    
-    // 最大圧縮
-    let compressed = jsonString
-        .replace(/","/g, '","')  // 無駄なスペース除去
-        .replace(/": "/g, '":"')  // 無駄なスペース除去
-        .replace(/"price":/g, '"p":')
-        .replace(/"badge":/g, '"b":')
-        .replace(/"name":/g, '"n":')
-        .replace(/"id":/g, '"i":');
-    
-    // さらなる圧縮（数値化）
-    compressed = compressed
-        .replace(/高級店/g, 'A')
-        .replace(/上品/g, 'B')
-        .replace(/人気/g, 'C')
-        .replace(/ラグジュアリー/g, 'D')
-        .replace(/王室級/g, 'E')
-        .replace(/新店/g, 'F')
-        .replace(/おすすめ/g, 'G');
-    
-    const utf8Bytes = new TextEncoder().encode(compressed);
-    const base64Compressed = btoa(String.fromCharCode(...utf8Bytes));
-    
-    return `V5U:${base64Compressed}`;  // V5U = Version 5 Ultra Light
-}
-
-// 軽量版エクスポートデータ生成関数（画像データを除外）
-function createLightExportData() {
-    const lightData = {
-        v: 4,  // 軽量版フォーマット
-        t: Math.floor(Date.now() / 1000),
-        d: navigator.userAgent.includes('Mobile') ? 1 : 0,
-        c: currentStores.length,
-        mode: 'light',
-        s: currentStores.map(store => ({
-            id: store.id,
-            name: store.name,
-            price: store.price,
-            badge: store.badge,
-            description: store.description || '',
-            features: store.features || [],
-            // 画像データは除外、Unsplash画像のみIDを保持
-            image: store.image && store.image.includes('unsplash') 
-                ? store.image.match(/photo-([a-zA-Z0-9_-]+)/)?.[1] || '' 
-                : '',
-            images: (store.images || [])
-                .filter(img => img && img.includes('unsplash'))
-                .map(img => img.match(/photo-([a-zA-Z0-9_-]+)/)?.[1] || '')
-                .filter(id => id)
-        }))
-    };
-    
-    const jsonString = JSON.stringify(lightData);
-    
-    // 簡単な圧縮（繰り返し文字列の短縮）
-    let compressed = jsonString
-        .replace(/"id":/g, '"i":')
-        .replace(/"name":/g, '"n":')
-        .replace(/"price":/g, '"p":')
-        .replace(/"badge":/g, '"b":')
-        .replace(/"description":/g, '"d":')
-        .replace(/"features":/g, '"f":')
-        .replace(/"image":/g, '"m":')
-        .replace(/"images":/g, '"g":');
-    
-    const utf8Bytes = new TextEncoder().encode(compressed);
-    const base64Compressed = btoa(String.fromCharCode(...utf8Bytes));
-    
-    return `V4L:${base64Compressed}`;  // V4L = Version 4 Light
-}
-
-function scanQRCode() {
-    // モバイルデバイスでカメラを使用してQRコードをスキャン
-    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-        showMessage('QRコードスキャン機能は開発中です。\n\n代わりに「URL共有」機能をお使いください：\n1. 送信側で「URL共有」をクリック\n2. 受信側のブラウザにURLをペースト', 'info');
-    } else {
-        showMessage('このデバイスではカメラアクセスができません。\n\n「URL共有」機能をお使いください。', 'warning');
-    }
-}
-
-// ページ読み込み時にURLパラメータをチェック
-function checkForImportParameter() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const importData = urlParams.get('import');
-    const emergencyData = urlParams.get('emergency');
-    const supabaseShareId = urlParams.get('supabase');
-    
-    if (importData) {
-        console.log('URLからインポートデータを検出:', importData);
         
-        // 確認ダイアログを表示
-        const confirmImport = confirm('他のデバイスからのデータを検出しました。\n\nインポートしますか？\n\n※現在のデータは上書きされます。');
+        console.log('☁️ Supabaseアップロード成功:', data);
         
-        if (confirmImport) {
-            try {
-                // インポートデータを処理
-                document.getElementById('import-data-text').value = importData;
-                handlePasteImport();
-                
-                // URLからパラメータを削除（履歴に残さない）
-                const newUrl = window.location.origin + window.location.pathname;
-                window.history.replaceState({}, document.title, newUrl);
-                
-            } catch (error) {
-                console.error('URL経由インポートエラー:', error);
-                showMessage('データのインポートに失敗しました: ' + error.message, 'error');
-            }
+        // パブリックURLを取得
+        const { data: urlData } = supabaseClient.storage
+            .from('nice-store-images')
+            .getPublicUrl(fileName);
+        
+        if (urlData && urlData.publicUrl) {
+            console.log('✅ Supabase画像URL取得成功:', urlData.publicUrl);
+            return urlData.publicUrl;
         } else {
-            // キャンセルした場合もURLをクリーンアップ
-            const newUrl = window.location.origin + window.location.pathname;
-            window.history.replaceState({}, document.title, newUrl);
+            throw new Error('パブリックURLの取得に失敗しました');
         }
+        
+    } catch (error) {
+        console.error('☁️ Supabaseアップロードエラー:', error);
+        throw error;
     }
-    
-    // 緊急時の「mini」パラメータ処理
-    const miniData = urlParams.get('mini');
-    if (miniData) {
-        console.log('超短データを検出:', miniData);
+}
+
+async function handleLocalUpload(file) {
+    try {
+        console.log('💾 ローカルアップロード開始:', file.name);
         
-        const confirmMini = confirm('⚡ 超短モードでデータを検出しました。\n\nインポートしますか？');
-        
-        if (confirmMini) {
-            try {
-                const parsedData = JSON.parse(decodeURIComponent(miniData));
-                if (Array.isArray(parsedData)) {
-                    // [id, name, price] 形式の配列を店舗オブジェクトに変換
-                    currentStores = parsedData.map(miniStore => ({
-                        id: miniStore[0],
-                        name: miniStore[1],
-                        price: miniStore[2],
-                        badge: '',
-                        image: '',
-                        images: [],
-                        description: '',
-                        features: []
-                    }));
-                    saveStores();
-                    renderStores();
-                    showMessage('✅ 超短モードでデータをインポートしました（基本情報のみ）', 'success');
-                }
-                
-                // URLをクリーンアップ
-                const newUrl = window.location.origin + window.location.pathname;
-                window.history.replaceState({}, document.title, newUrl);
-                
-            } catch (error) {
-                console.error('超短モードインポートエラー:', error);
-                showMessage('データのインポートに失敗しました: ' + error.message, 'error');
-            }
-        } else {
-            // URLをクリーンアップ
-            const newUrl = window.location.origin + window.location.pathname;
-            window.history.replaceState({}, document.title, newUrl);
-        }
-    }
-    
-    // 緊急時のシンプルインポート（旧emergency形式）
-    if (emergencyData) {
-        console.log('緊急データを検出:', emergencyData);
-        
-        const confirmEmergency = confirm('🆘 緊急モードでデータを検出しました。\n\nインポートしますか？');
-        
-        if (confirmEmergency) {
-            try {
-                const parsedData = JSON.parse(decodeURIComponent(emergencyData));
-                if (Array.isArray(parsedData)) {
-                    currentStores = parsedData;
-                    saveStores();
-                    renderStores();
-                    showMessage('✅ 緊急モードでデータをインポートしました', 'success');
-                    
-                    // 3秒後にページリロード
-                    setTimeout(() => {
-                        window.location.reload();
-                    }, 3000);
-                }
-                
-                // URLクリーンアップ
-                const newUrl = window.location.origin + window.location.pathname;
-                window.history.replaceState({}, document.title, newUrl);
-                
-            } catch (error) {
-                console.error('緊急インポートエラー:', error);
-                showMessage('緊急インポートに失敗しました: ' + error.message, 'error');
-            }
-        } else {
-            // URLクリーンアップ
-            const newUrl = window.location.origin + window.location.pathname;
-            window.history.replaceState({}, document.title, newUrl);
-        }
-    }
-    
-    // Supabase共有データ処理
-    if (supabaseShareId) {
-        console.log('Supabase共有IDを検出:', supabaseShareId);
-        
-        // Supabaseからデータを取得
-        handleSupabaseImport(supabaseShareId).then(success => {
-            if (success) {
-                // URLクリーンアップ
-                const newUrl = window.location.origin + window.location.pathname;
-                window.history.replaceState({}, document.title, newUrl);
-            }
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                const base64 = e.target.result;
+                console.log('✅ ローカル画像変換成功, サイズ:', base64.length, '文字');
+                resolve(base64);
+            };
+            
+            reader.onerror = function(error) {
+                console.error('💾 ローカル変換エラー:', error);
+                reject(new Error('ファイルの読み込みに失敗しました'));
+            };
+            
+            reader.readAsDataURL(file);
         });
-    }
-}
-
-function showQRModal() {
-    const modal = document.getElementById('qr-modal');
-    if (modal) {
-        modal.style.display = 'flex';
-    }
-}
-
-function hideQRModal() {
-    const modal = document.getElementById('qr-modal');
-    if (modal) {
-        modal.style.display = 'none';
-    }
-}
-
-// グローバル関数として露出（HTMLから呼び出すため）
-window.editStore = editStore;
-window.deleteStore = deleteStore;
-window.exportStoreData = exportStoreData; 
-window.hideExportModal = hideExportModal; 
-window.hideImportModal = hideImportModal;
-window.hideQRModal = hideQRModal; 
-
-// フォールバック用のクリップボードコピー関数
-function fallbackCopyToClipboard(text) {
-    console.log('フォールバッククリップボード処理開始');
-    
-    try {
-        // テキストエリア方式
-        const textArea = document.createElement('textarea');
-        textArea.value = text;
-        textArea.style.cssText = 'position: fixed; top: -9999px; left: -9999px; opacity: 0;';
-        document.body.appendChild(textArea);
-        textArea.focus();
-        textArea.select();
         
-        const success = document.execCommand('copy');
-        document.body.removeChild(textArea);
-        
-        if (success) {
-            console.log('フォールバッククリップボードコピー成功');
-            showMessage('✅ 共有URLをクリップボードにコピーしました！（フォールバック方式）', 'success');
-        } else {
-            throw new Error('execCommand failed');
-        }
     } catch (error) {
-        console.error('フォールバッククリップボードも失敗:', error);
-        
-        // 最終手段: URLを表示して手動コピーを促す
-        const copyMessage = `📋 以下のURLを手動でコピーしてください：\n\n${text.substring(0, 100)}...`;
-        showMessage(copyMessage, 'warning');
-        
-        // モーダルに表示
-        const urlDisplay = document.getElementById('share-url-display');
-        if (urlDisplay) {
-            urlDisplay.value = text;
-            urlDisplay.style.display = 'block';
-            urlDisplay.select();
-        }
+        console.error('💾 ローカルアップロードエラー:', error);
+        throw error;
     }
 }
 
-function createQuickExportData() {
-    // フル版のエクスポートデータを生成（従来通り）
-    const localImages = {};
-    let localImageCounter = 0;
-    
-    function processImageForQuickExport(img) {
-        if (!img) return '';
-        if (img.includes('unsplash')) {
-            return img.match(/photo-([a-zA-Z0-9_-]+)/)?.[1] || '';
-        }
-        if (img.startsWith('data:')) {
-            const localId = `LOCAL_${++localImageCounter}`;
-            localImages[localId] = img;
-            return localId;
-        }
-        return img || '';
-    }
-    
-    const quickData = {
-        v: 2,
-        t: Math.floor(Date.now() / 1000),
-        d: navigator.userAgent.includes('Mobile') ? 1 : 0,
-        c: currentStores.length,
-        l: localImages,
-        s: currentStores.map(store => [
-            store.id,
-            store.name,
-            processImageForQuickExport(store.image),
-            (store.images || []).map(processImageForQuickExport),
-            store.price,
-            store.badge,
-            store.description || '',
-            store.features || []
-        ])
-    };
-    
-    const jsonString = JSON.stringify(quickData);
-    const utf8Bytes = new TextEncoder().encode(jsonString);
-    const base64Compressed = btoa(String.fromCharCode(...utf8Bytes));
-    
-    return `V3:${base64Compressed}`;
-}
-
-// Supabaseとの同期機能
-async function syncWithSupabase() {
-    if (!window.supabaseDB || !window.supabaseDB.isOnline) {
-        console.log('🔄 Supabase未接続 - 同期をスキップ');
-        return;
-    }
-
-    try {
-        // Supabaseからデータを取得
-        const supabaseData = await window.supabaseDB.getAllStores();
-        
-        if (supabaseData && supabaseData.length > 0) {
-            console.log('📥 Supabaseからデータ同期:', supabaseData.length, '件');
-            
-            // ローカルデータと比較
-            const localData = getLocalStores();
-            const localTimestamp = localStorage.getItem('storesLastUpdated');
-            
-            if (!localData || localData.length === 0 || shouldUpdateFromSupabase(supabaseData, localData)) {
-                // Supabaseデータでローカルを更新
-                currentStores = supabaseData;
-                saveStores();
-                renderStores();
-                
-                showMessage('📦 クラウドからデータを同期しました', 'success');
-            } else {
-                // ローカルデータをSupabaseに同期
-                await window.supabaseDB.saveAllStores(localData);
-                console.log('📤 ローカルデータをSupabaseに同期');
-            }
-        } else {
-            // Supabaseが空の場合、ローカルデータをアップロード
-            const localData = getLocalStores();
-            if (localData && localData.length > 0) {
-                await window.supabaseDB.saveAllStores(localData);
-                console.log('📤 初回ローカルデータをSupabaseに同期');
-            }
-        }
-    } catch (error) {
-        console.error('❌ Supabase同期エラー:', error);
-        showMessage('⚠️ クラウド同期でエラーが発生しました', 'warning');
-    }
-}
-
-// データ更新判定
-function shouldUpdateFromSupabase(supabaseData, localData) {
-    // 簡単な比較（データ数と最新の更新時刻）
-    if (supabaseData.length !== localData.length) {
-        return true;
-    }
-    
-    // より詳細な比較が必要な場合はここで実装
-    return false;
-}
-
-// ローカルストレージからデータ取得
-function getLocalStores() {
-    const stored = localStorage.getItem('storesData');
-    return stored ? JSON.parse(stored) : [];
-}
-
-// リアルタイム更新処理
-function handleRealtimeUpdate(payload) {
-    console.log('🔄 リアルタイム更新受信:', payload);
-    
-    // 自分の更新は無視
-    if (payload.new && payload.new.session_id === window.supabaseDB.sessionId) {
-        console.log('🔄 自分の更新のためスキップ');
-        return;
-    }
-    
-    // データを再取得して更新
-    setTimeout(async () => {
-        try {
-            const updatedData = await window.supabaseDB.getAllStores();
-            if (updatedData) {
-                currentStores = updatedData;
-                saveStores();
-                renderStores();
-                
-                showMessage('🔄 他のデバイスからの更新を反映しました', 'info');
-            }
-        } catch (error) {
-            console.error('❌ リアルタイム更新エラー:', error);
-        }
-    }, 1000); // 1秒の遅延で重複更新を防ぐ
-}
-
-// 保存時にSupabaseにも同期
-async function saveStores() {
-    // ローカルストレージに保存（既存機能）
-    localStorage.setItem('storesData', JSON.stringify(currentStores));
-    localStorage.setItem('storesLastUpdated', new Date().toISOString());
-    
-    // Supabaseに同期
-    if (window.supabaseDB && window.supabaseDB.isOnline) {
-        try {
-            await window.supabaseDB.saveAllStores(currentStores);
-            console.log('📤 Supabaseに自動同期完了');
-        } catch (error) {
-            console.error('❌ Supabase自動同期エラー:', error);
-        }
-    }
-}
-
-// 店舗削除時にSupabaseにも同期
-async function deleteStore(id) {
-    if (confirm('この店舗を削除してもよろしいですか？')) {
-        // ローカルから削除
-        currentStores = currentStores.filter(store => store.id !== id);
-        saveStores();
-        renderStores();
-        
-        // Supabaseからも削除
-        if (window.supabaseDB && window.supabaseDB.isOnline) {
-            await window.supabaseDB.deleteStore(id);
-        }
-        
-        showMessage('店舗を削除しました', 'success');
-    }
-}
-
-// 超短URL共有機能（Supabase版）
-function generateSupabaseShareURL() {
-    if (!window.supabaseDB || !window.supabaseDB.isOnline) {
-        showMessage('❌ クラウド機能が利用できません', 'error');
-        return;
-    }
-    
-    try {
-        const shareUrl = window.supabaseDB.generateShareableUrl(currentStores.length);
-        
-        if (shareUrl) {
-            console.log('🔗 Supabase共有URL生成:', shareUrl);
-            
-            // クリップボードにコピー
-            if (navigator.clipboard) {
-                navigator.clipboard.writeText(shareUrl).then(() => {
-                    showMessage(`✅ 超短URL共有リンクをコピーしました！\n\nURL: ${shareUrl}\n\n他のデバイスで開いてください`, 'success');
-                });
-            } else {
-                showMessage(`📋 共有URL: ${shareUrl}`, 'info');
-            }
-            
-            // URL表示エリアにも設定
-            const urlDisplay = document.getElementById('share-url-display');
-            if (urlDisplay) {
-                urlDisplay.value = shareUrl;
-                urlDisplay.style.display = 'block';
-            }
-        }
-    } catch (error) {
-        console.error('❌ Supabase共有URL生成エラー:', error);
-        showMessage('❌ 共有URL生成に失敗しました', 'error');
-    }
-}
-
-// 共有データ取得処理
-async function handleSupabaseImport(shareId) {
-    if (!window.supabaseDB || !window.supabaseDB.isOnline) {
-        return false;
-    }
-    
-    try {
-        const sharedData = await window.supabaseDB.getSharedData(shareId);
-        
-        if (sharedData && sharedData.length > 0) {
-            const confirmImport = confirm(`🌐 クラウドから${sharedData.length}件のデータが見つかりました。\n\nインポートしますか？`);
-            
-            if (confirmImport) {
-                currentStores = sharedData;
-                saveStores();
-                renderStores();
-                
-                showMessage('✅ クラウドデータをインポートしました！', 'success');
-                return true;
-            }
-        } else {
-            showMessage('❌ 共有データが見つかりませんでした', 'error');
-        }
-    } catch (error) {
-        console.error('❌ Supabase共有データ取得エラー:', error);
-        showMessage('❌ 共有データの取得に失敗しました', 'error');
-    }
-    
-    return false;
-}
-
-// 従来のURL共有機能を拡張
-function generateShareURL() {
-    // Supabaseが使用可能な場合は超短URL
-    if (window.supabaseDB && window.supabaseDB.isOnline) {
-        const useSupabase = confirm('🌐 クラウド機能を使用して超短URLを生成しますか？\n\n「OK」= 超短URL（推奨）\n「キャンセル」= 従来のURL');
-        
-        if (useSupabase) {
-            generateSupabaseShareURL();
-            return;
-        }
-    }
-    
-    // 従来の方法（既存コードをそのまま使用）
-}
+// アプリケーション開始
+document.addEventListener('DOMContentLoaded', initializeApp);

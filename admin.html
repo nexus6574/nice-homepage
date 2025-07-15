@@ -50,20 +50,10 @@
                     <button id="reset-data-btn" class="control-btn reset-btn">データをリセット</button>
                     <a href="cabaret-list.html" target="_blank" class="control-btn preview-btn">プレビュー</a>
                 </div>
-                <div class="controls-row sync-controls">
-                    <button id="export-data-btn" class="control-btn sync-btn">データをエクスポート</button>
-                    <button id="import-data-btn" class="control-btn sync-btn">データをインポート</button>
-                    <span class="sync-info">💡 デバイス間でデータを共有する場合に使用</span>
-                </div>
-                <div class="controls-row quick-sync-controls">
-                    <button id="generate-qr-btn" class="control-btn quick-sync-btn">📱 QRコード生成</button>
-                    <button id="share-url-btn" class="control-btn quick-sync-btn">🔗 URL共有</button>
-                    <button id="scan-qr-btn" class="control-btn quick-sync-btn">📷 QRスキャン</button>
-                    <span class="sync-info">⚡ 簡単同期：モバイル↔パソコン間の高速データ共有</span>
-                </div>
+
             </div>
 
-            <div id="stores-container" class="stores-grid">
+            <div id="stores-list" class="stores-grid">
                 <!-- 動的に店舗カードが挿入されます -->
             </div>
         </main>
@@ -76,9 +66,11 @@
                     <button class="close-btn">&times;</button>
                 </div>
                 <form id="store-form">
+                    <input type="hidden" id="store-id" name="id">
+                    <input type="hidden" id="main-image-url" name="image">
                     <div class="form-group">
                         <label for="store-name">店舗名</label>
-                        <input type="text" id="store-name" required>
+                        <input type="text" id="store-name" name="name" required>
                     </div>
                     <div class="form-group">
                         <label for="store-image">メイン画像</label>
@@ -99,93 +91,21 @@
                     </div>
                     <div class="form-group">
                         <label>店舗写真ギャラリー（5枚）</label>
+                        <small>📷 各スロットで「プリセット」または「アップロード」を選択できます。モバイルではカメラからの撮影も可能です。</small>
                         <div class="gallery-images-manager">
-                            <div class="gallery-images-grid">
-                                <div class="gallery-image-slot" data-index="0">
-                                    <img class="gallery-preview" src="" alt="" style="display: none;">
-                                    <span class="slot-number">1</span>
-                                    <div class="gallery-slot-buttons">
-                                        <button type="button" class="select-gallery-btn" onclick="showImageGallery('gallery', 0)">
-                                            プリセット
-                                        </button>
-                                        <button type="button" class="upload-gallery-btn" onclick="uploadImage('gallery', 0)">
-                                            アップロード
-                                        </button>
-                                        <button type="button" class="remove-gallery-btn" onclick="removeGalleryImage(0)" style="display: none;">
-                                            削除
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="gallery-image-slot" data-index="1">
-                                    <img class="gallery-preview" src="" alt="" style="display: none;">
-                                    <span class="slot-number">2</span>
-                                    <div class="gallery-slot-buttons">
-                                        <button type="button" class="select-gallery-btn" onclick="showImageGallery('gallery', 1)">
-                                            プリセット
-                                        </button>
-                                        <button type="button" class="upload-gallery-btn" onclick="uploadImage('gallery', 1)">
-                                            アップロード
-                                        </button>
-                                        <button type="button" class="remove-gallery-btn" onclick="removeGalleryImage(1)" style="display: none;">
-                                            削除
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="gallery-image-slot" data-index="2">
-                                    <img class="gallery-preview" src="" alt="" style="display: none;">
-                                    <span class="slot-number">3</span>
-                                    <div class="gallery-slot-buttons">
-                                        <button type="button" class="select-gallery-btn" onclick="showImageGallery('gallery', 2)">
-                                            プリセット
-                                        </button>
-                                        <button type="button" class="upload-gallery-btn" onclick="uploadImage('gallery', 2)">
-                                            アップロード
-                                        </button>
-                                        <button type="button" class="remove-gallery-btn" onclick="removeGalleryImage(2)" style="display: none;">
-                                            削除
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="gallery-image-slot" data-index="3">
-                                    <img class="gallery-preview" src="" alt="" style="display: none;">
-                                    <span class="slot-number">4</span>
-                                    <div class="gallery-slot-buttons">
-                                        <button type="button" class="select-gallery-btn" onclick="showImageGallery('gallery', 3)">
-                                            プリセット
-                                        </button>
-                                        <button type="button" class="upload-gallery-btn" onclick="uploadImage('gallery', 3)">
-                                            アップロード
-                                        </button>
-                                        <button type="button" class="remove-gallery-btn" onclick="removeGalleryImage(3)" style="display: none;">
-                                            削除
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="gallery-image-slot" data-index="4">
-                                    <img class="gallery-preview" src="" alt="" style="display: none;">
-                                    <span class="slot-number">5</span>
-                                    <div class="gallery-slot-buttons">
-                                        <button type="button" class="select-gallery-btn" onclick="showImageGallery('gallery', 4)">
-                                            プリセット
-                                        </button>
-                                        <button type="button" class="upload-gallery-btn" onclick="uploadImage('gallery', 4)">
-                                            アップロード
-                                        </button>
-                                        <button type="button" class="remove-gallery-btn" onclick="removeGalleryImage(4)" style="display: none;">
-                                            削除
-                                        </button>
-                                    </div>
-                                </div>
+                            <div id="gallery-preview" class="gallery-images-grid">
+                                <!-- ギャラリー画像はJavaScriptで動的に生成されます -->
                             </div>
                         </div>
                     </div>
                     <div class="form-group">
                         <label for="store-price">料金</label>
-                        <input type="text" id="store-price" placeholder="例: 3,000円〜" required>
+                        <input type="text" id="store-price" name="price" placeholder="例: 3,000円〜" required>
                     </div>
                     <div class="form-group">
                         <label for="store-badge">バッジ</label>
-                        <select id="store-badge">
+                        <select id="store-badge" name="badge">
+                            <option value="">選択してください</option>
                             <option value="高級店">高級店</option>
                             <option value="上品">上品</option>
                             <option value="人気">人気</option>
@@ -197,12 +117,55 @@
                     </div>
                     <div class="form-group">
                         <label for="store-description">備考・説明</label>
-                        <textarea id="store-description" rows="4" required></textarea>
+                        <textarea id="store-description" name="description" rows="4" required></textarea>
                     </div>
                     <div class="form-group">
                         <label for="store-features">特徴タグ（カンマ区切り）</label>
-                        <input type="text" id="store-features" placeholder="例: 完全個室, 経験豊富, 高級内装">
+                        <input type="text" id="store-features" name="features" placeholder="例: 完全個室, 経験豊富, 高級内装">
                         <small>カンマで区切って複数入力可能</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="store-hours">営業時間</label>
+                        <div class="time-input-group">
+                            <input type="time" id="store-hours-start" name="hoursStart" value="20:00">
+                            <span class="time-separator">〜</span>
+                            <input type="time" id="store-hours-end" name="hoursEnd" value="02:00">
+                        </div>
+                        <small>営業開始時間と終了時間を設定してください</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="store-closed-days">定休日</label>
+                        <div class="days-selector">
+                            <label class="day-checkbox">
+                                <input type="checkbox" id="closed-sunday" name="closedDays" value="日曜日">
+                                <span>日</span>
+                            </label>
+                            <label class="day-checkbox">
+                                <input type="checkbox" id="closed-monday" name="closedDays" value="月曜日">
+                                <span>月</span>
+                            </label>
+                            <label class="day-checkbox">
+                                <input type="checkbox" id="closed-tuesday" name="closedDays" value="火曜日">
+                                <span>火</span>
+                            </label>
+                            <label class="day-checkbox">
+                                <input type="checkbox" id="closed-wednesday" name="closedDays" value="水曜日">
+                                <span>水</span>
+                            </label>
+                            <label class="day-checkbox">
+                                <input type="checkbox" id="closed-thursday" name="closedDays" value="木曜日">
+                                <span>木</span>
+                            </label>
+                            <label class="day-checkbox">
+                                <input type="checkbox" id="closed-friday" name="closedDays" value="金曜日">
+                                <span>金</span>
+                            </label>
+                            <label class="day-checkbox">
+                                <input type="checkbox" id="closed-saturday" name="closedDays" value="土曜日">
+                                <span>土</span>
+                            </label>
+                        </div>
+                        <small>定休日に該当する曜日をチェックしてください</small>
                     </div>
                     <div class="modal-actions">
                         <button type="submit" class="submit-btn">保存</button>
@@ -213,13 +176,13 @@
         </div>
 
         <!-- 画像ギャラリー選択モーダル -->
-        <div id="image-gallery-modal" class="modal">
+        <div id="image-gallery" class="modal">
             <div class="modal-content gallery-modal-content">
                 <div class="modal-header">
                     <h3>画像を選択</h3>
                     <button class="close-btn" onclick="hideImageGallery()">&times;</button>
                 </div>
-                <div class="image-gallery-grid">
+                <div id="gallery-content" class="image-gallery-grid">
                     <!-- 画像は JavaScript で動的に生成 -->
                 </div>
             </div>
@@ -227,85 +190,13 @@
     </div>
 
     <!-- 隠しファイル入力 -->
-    <input type="file" id="image-upload-input" accept="image/*" style="display: none;">
-    <input type="file" id="data-import-input" accept=".json" style="display: none;">
+    <input type="file" id="image-upload-input" accept="image/*" capture="environment" style="display: none;">
 
-    <!-- エクスポート結果モーダル -->
-    <div id="export-modal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>データエクスポート結果</h3>
-                <button class="close-btn" onclick="hideExportModal()">&times;</button>
-            </div>
-            <div class="export-content">
-                <p>以下のデータをコピーして、他のデバイスで「インポート」してください：</p>
-                <textarea id="export-data-text" readonly></textarea>
-                <div class="export-actions">
-                    <button id="copy-export-btn" class="control-btn">📋 クリップボードにコピー</button>
-                    <button id="download-export-btn" class="control-btn">💾 ファイルでダウンロード</button>
-                </div>
-            </div>
-        </div>
-    </div>
 
-    <!-- インポートモーダル -->
-    <div id="import-modal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>データインポート</h3>
-                <button class="close-btn" onclick="hideImportModal()">&times;</button>
-            </div>
-            <div class="import-content">
-                <div class="import-options">
-                    <div class="import-option">
-                        <h4>📋 コピーしたデータをペースト</h4>
-                        <p>他のデバイスでエクスポートしたデータをここにペーストしてください：</p>
-                        <textarea id="import-data-text" placeholder="エクスポートしたJSONデータをここにペーストしてください..."></textarea>
-                        <button id="paste-import-btn" class="control-btn">📥 ペーストしたデータをインポート</button>
-                    </div>
-                    <div class="import-divider">または</div>
-                    <div class="import-option">
-                        <h4>📁 ファイルから選択</h4>
-                        <p>ダウンロードしたJSONファイルを選択してください：</p>
-                        <button id="file-import-btn" class="control-btn">📂 ファイルを選択</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
 
-    <!-- QRコードモーダル -->
-    <div id="qr-modal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>📱 QRコード同期</h3>
-                <button class="close-btn" onclick="hideQRModal()">&times;</button>
-            </div>
-            <div class="qr-content">
-                <div class="qr-instructions">
-                    <h4>🚀 使用方法</h4>
-                    <ol>
-                        <li>下のQRコードを他のデバイス（スマホ・タブレット・PC）でスキャン</li>
-                        <li>または、表示されたURLをコピーして他のデバイスのブラウザで開く</li>
-                        <li>自動的にデータが同期されます！</li>
-                    </ol>
-                </div>
-                <div id="qr-code-container" style="text-align: center; padding: 2rem; background: white; border-radius: 8px; border: 2px dashed #ddd;">
-                    QRコードを生成中...
-                </div>
-                <div class="qr-share-options">
-                    <textarea id="share-url-display" style="width: 100%; height: 60px; margin-top: 1rem; display: none;" readonly placeholder="共有URLがここに表示されます"></textarea>
-                </div>
-            </div>
-        </div>
-    </div>
 
-    <!-- ファイル選択用の隠しinput -->
-    <input type="file" id="data-import-input" accept=".json" style="display: none;">
-    <input type="file" id="image-upload-input" accept="image/*" style="display: none;">
-
-    <!-- Supabase JavaScript SDK -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+          <!-- Supabase JavaScript SDK -->
+      <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
     
     <!-- Supabaseサポートファイル -->
     <script src="supabase-config.js"></script>

@@ -285,7 +285,261 @@ class SupabaseDB {
             return null;
         }
     }
+
+    // 画像ファイル検証
+    validateImageFile(file) {
+        const config = SUPABASE_CONFIG.storage;
+        
+        // ファイルサイズチェック
+        if (file.size > config.maxFileSize) {
+            throw new Error(`ファイルサイズが大きすぎます。${Math.round(config.maxFileSize / 1024 / 1024)}MB以下にしてください。`);
+        }
+        
+        // ファイル形式チェック
+        if (!config.allowedTypes.includes(file.type)) {
+            throw new Error(`サポートされていないファイル形式です。${config.allowedTypes.join(', ')}のみ対応しています。`);
+        }
+        
+        return true;
+    }
+
+    // 画像最適化（簡易版）
+    async optimizeImage(file) {
+        return new Promise((resolve) => {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const img = new Image();
+            
+            img.onload = () => {
+                const config = SUPABASE_CONFIG.storage.imageOptimization;
+                
+                // アスペクト比を保持してリサイズ
+                let { width, height } = img;
+                if (width > config.width || height > config.height) {
+                    const ratio = Math.min(config.width / width, config.height / height);
+                    width = Math.round(width * ratio);
+                    height = Math.round(height * ratio);
+                }
+                
+                canvas.width = width;
+                canvas.height = height;
+                ctx.drawImage(img, 0, 0, width, height);
+                
+                canvas.toBlob(resolve, 'image/jpeg', config.quality / 100);
+            };
+            
+            img.src = URL.createObjectURL(file);
+        });
+    }
+
+    // 画像アップロード
+    async uploadImage(file, storeId = null, imageType = 'main') {
+        if (!this.isOnline) {
+            throw new Error('オフラインモードでは画像アップロードはできません');
+        }
+
+        try {
+            // ファイル検証
+            this.validateImageFile(file);
+            
+            // 画像最適化
+            console.log('🖼️ 画像を最適化中...');
+            const optimizedFile = await this.optimizeImage(file);
+            
+            // ファイル名生成
+            const timestamp = Date.now();
+            const randomStr = Math.random().toString(36).substring(2, 8);
+            const extension = file.name.split('.').pop() || 'jpg';
+            const fileName = `${imageType}_${storeId || 'new'}_${timestamp}_${randomStr}.${extension}`;
+            
+            console.log('☁️ Supabase Storageにアップロード中...');
+            
+            // Supabase Storageにアップロード
+            const { data, error } = await supabase.storage
+                .from(SUPABASE_CONFIG.storage.bucket)
+                .upload(fileName, optimizedFile, {
+                    cacheControl: '3600',
+                    upsert: false
+                });
+
+            if (error) {
+                console.error('❌ アップロードエラー:', error);
+                throw error;
+            }
+
+            // 画像URLを取得
+            const imageUrl = this.getImageUrl(fileName);
+            console.log('✅ 画像アップロード完了:', imageUrl);
+            
+            return {
+                fileName: fileName,
+                url: imageUrl,
+                size: optimizedFile.size,
+                originalSize: file.size
+            };
+
+        } catch (error) {
+            console.error('❌ 画像アップロードエラー:', error);
+            throw error;
+        }
+    }
+
+    // 画像削除
+    async deleteImage(fileName) {
+        if (!this.isOnline) {
+            console.warn('⚠️ オフラインモードでは画像削除をスキップ');
+            return;
+        }
+
+        try {
+            const { error } = await supabase.storage
+                .from(SUPABASE_CONFIG.storage.bucket)
+                .remove([fileName]);
+
+            if (error) {
+                console.error('❌ 画像削除エラー:', error);
+                // エラーでも続行（ファイルが存在しない場合など）
+            } else {
+                console.log('🗑️ 画像削除完了:', fileName);
+            }
+        } catch (error) {
+            console.error('❌ 画像削除エラー:', error);
+        }
+    }
+
+    // 画像URL取得
+    getImageUrl(fileName) {
+        const { data } = supabase.storage
+            .from(SUPABASE_CONFIG.storage.bucket)
+            .getPublicUrl(fileName);
+        
+        return data.publicUrl;
+    }
+
+    // 古い画像のクリーンアップ
+    async cleanupOldImages(storeId) {
+        if (!this.isOnline || !storeId) return;
+
+        try {
+            // ストレージ内の該当店舗の古い画像を検索
+            const { data: files, error } = await supabase.storage
+                .from(SUPABASE_CONFIG.storage.bucket)
+                .list('', {
+                    search: `_${storeId}_`
+                });
+
+            if (error || !files) return;
+
+            // 古い画像を削除（複数ある場合は最新1つを残す）
+            const storeFiles = files.filter(file => 
+                file.name.includes(`_${storeId}_`) && file.name !== files[files.length - 1]?.name
+            );
+
+            if (storeFiles.length > 1) {
+                // 最新以外を削除
+                const filesToDelete = storeFiles.slice(0, -1).map(file => file.name);
+                await supabase.storage
+                    .from(SUPABASE_CONFIG.storage.bucket)
+                    .remove(filesToDelete);
+                
+                console.log('🧹 古い画像をクリーンアップ:', filesToDelete.length, '個');
+            }
+        } catch (error) {
+            console.error('❌ 画像クリーンアップエラー:', error);
+        }
+    }
+
+    // 店舗データの読み込み（admin.js互換用）
+    async loadStores() {
+        console.log('📥 SupabaseDB.loadStores実行中...');
+        
+        if (!this.isOnline) {
+            console.log('⚠️ オフライン状態です');
+            return null;
+        }
+
+        try {
+            const stores = await this.getAllStores();
+            
+            if (stores && stores.length > 0) {
+                // admin.js形式に変換
+                const convertedStores = stores.map(store => ({
+                    id: store.id,
+                    name: store.name,
+                    description: store.description,
+                    features: store.features || [],
+                    price: store.price,
+                    badge: store.badge || '',
+                    image: store.image,
+                    gallery: store.images || [],
+                    businessHours: store.business_hours || { start: '20:00', end: '02:00' },
+                    closedDays: store.closed_days || []
+                }));
+                
+                console.log(`✅ ${convertedStores.length}件の店舗データを変換しました`);
+                return convertedStores;
+            }
+            
+            console.log('📥 データが見つかりません');
+            return [];
+            
+        } catch (error) {
+            console.error('❌ loadStoresエラー:', error);
+            return null;
+        }
+    }
+
+    // 単一店舗の保存（admin.js互換用）
+    async saveStore(store) {
+        console.log('💾 SupabaseDB.saveStore実行中...', store);
+        
+        if (!this.isOnline) {
+            console.log('⚠️ オフライン状態です');
+            return false;
+        }
+
+        try {
+            // admin.js形式からSupabase形式に変換
+            const supabaseData = {
+                id: store.id,
+                name: store.name,
+                description: store.description,
+                features: store.features || [],
+                price: store.price,
+                badge: store.badge || '',
+                image: store.image,
+                images: store.gallery || [],
+                business_hours: store.businessHours || { start: '20:00', end: '02:00' },
+                closed_days: store.closedDays || [],
+                session_id: this.sessionId,
+                updated_at: new Date().toISOString()
+            };
+
+            const { error } = await supabase
+                .from(SUPABASE_CONFIG.tables.stores)
+                .upsert(supabaseData);
+
+            if (error) {
+                console.error('❌ 店舗保存エラー:', error);
+                return false;
+            }
+
+            console.log('✅ 店舗保存成功:', store.name);
+            this.lastSync = new Date();
+            return true;
+            
+        } catch (error) {
+            console.error('❌ saveStoreエラー:', error);
+            return false;
+        }
+    }
 }
 
-// グローバルインスタンス
-window.supabaseDB = new SupabaseDB(); 
+// グローバルインスタンス作成関数
+function createSupabaseDB() {
+    return new SupabaseDB();
+}
+
+// グローバルに公開
+window.SupabaseDB = SupabaseDB;
+window.createSupabaseDB = createSupabaseDB; 

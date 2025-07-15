@@ -581,3 +581,488 @@
         border-width: 1px;
     }
 } 
+
+/* モバイル対応のスタイル */
+@media (max-width: 768px) {
+    /* 店舗ヒーローセクション - モバイル調整 */
+    .store-hero {
+        height: 50vh;
+        min-height: 300px;
+    }
+
+    .hero-title {
+        font-size: 2.5rem;
+        margin-bottom: 0.8rem;
+    }
+
+    .hero-description {
+        font-size: 1.1rem;
+        margin-bottom: 1.5rem;
+        padding: 0 1rem;
+    }
+
+    .hero-price {
+        padding: 0.8rem 1.5rem;
+        border-radius: 25px;
+    }
+
+    .hero-price .price-label {
+        font-size: 1rem;
+    }
+
+    .hero-price .price-value {
+        font-size: 1.5rem;
+    }
+
+    /* ギャラリーセクション - モバイル最適化 */
+    .store-gallery {
+        padding: 2rem 0;
+    }
+
+    .store-gallery h2 {
+        font-size: 2rem;
+        margin-bottom: 2rem;
+        padding: 0 1rem;
+    }
+
+    .gallery-slider-container {
+        margin: 0 1rem;
+        max-width: calc(100% - 2rem);
+        border-radius: 10px;
+    }
+
+    .gallery-slide img {
+        height: 250px;
+    }
+
+    /* ギャラリーボタン - タッチフレンドリー */
+    .gallery-btn {
+        width: 60px;
+        height: 60px;
+        font-size: 2rem;
+        padding: 0;
+        background: rgba(0,0,0,0.8);
+        /* タッチターゲットサイズを確保 */
+        min-width: 44px;
+        min-height: 44px;
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    .gallery-btn:active {
+        transform: translateY(-50%) scale(0.95);
+        background: rgba(0,0,0,0.9);
+    }
+
+    .gallery-prev-btn {
+        left: 10px;
+    }
+
+    .gallery-next-btn {
+        right: 10px;
+    }
+
+    /* ギャラリードット - タッチフレンドリー */
+    .gallery-dots {
+        gap: 1rem;
+        margin-top: 1.5rem;
+        flex-wrap: wrap;
+        justify-content: center;
+        padding: 0 1rem;
+    }
+
+    .gallery-dot {
+        width: 20px;
+        height: 20px;
+        /* タッチターゲットサイズを確保 */
+        min-width: 44px;
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    .gallery-dot::before {
+        content: '';
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background: inherit;
+        border: inherit;
+        transition: all 0.3s ease;
+    }
+
+    .gallery-dot.active::before,
+    .gallery-dot:hover::before {
+        background: rgba(52, 152, 219, 0.8);
+        transform: scale(1.2);
+        border-color: rgba(52, 152, 219, 1);
+        box-shadow: 0 3px 10px rgba(52, 152, 219, 0.4);
+    }
+
+    /* 店舗詳細情報 - モバイル調整 */
+    .store-details {
+        padding: 2rem 0;
+    }
+
+    .details-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+        padding: 0 1rem;
+    }
+
+    .detail-card {
+        padding: 1.5rem;
+    }
+
+    .detail-card h2 {
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+    }
+
+    /* 基本情報リスト - モバイル調整 */
+    .info-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+        padding: 0.8rem 0;
+    }
+
+    .info-label {
+        min-width: auto;
+        font-weight: bold;
+        color: #555;
+    }
+
+    .info-value {
+        text-align: left;
+    }
+
+    .info-value.special-price {
+        align-self: stretch;
+        text-align: center;
+        padding: 0.6rem 1rem;
+        border-radius: 15px;
+    }
+
+    /* 特徴リスト - モバイル調整 */
+    .features-list {
+        gap: 0.8rem;
+    }
+
+    .feature-tag {
+        padding: 0.6rem 1.2rem;
+        font-size: 0.85rem;
+        border-radius: 20px;
+    }
+
+    /* ナビゲーションボタン - モバイル調整 */
+    .navigation-section {
+        padding: 2rem 0;
+    }
+
+    .nav-buttons {
+        gap: 1rem;
+        padding: 0 1rem;
+        flex-direction: column;
+    }
+
+    .back-btn,
+    .home-btn {
+        padding: 0.8rem 1.5rem;
+        font-size: 1rem;
+        text-align: center;
+        width: 100%;
+        max-width: 300px;
+        margin: 0 auto;
+    }
+
+    /* コンタクトセクション - モバイル調整 */
+    .contact-section {
+        padding: 2rem 0;
+    }
+
+    .contact-section h2 {
+        font-size: 1.8rem;
+        padding: 0 1rem;
+    }
+
+    .contact-section p {
+        padding: 0 1rem;
+    }
+
+    .contact-buttons {
+        gap: 1rem;
+        padding: 0 1rem;
+        flex-direction: column;
+    }
+
+    .contact-btn {
+        padding: 0.8rem 1.5rem;
+        font-size: 1rem;
+        text-align: center;
+        width: 100%;
+        max-width: 300px;
+        margin: 0 auto;
+    }
+}
+
+/* 小さな画面用の追加調整 */
+@media (max-width: 480px) {
+    .hero-title {
+        font-size: 2rem;
+    }
+
+    .gallery-slide img {
+        height: 200px;
+    }
+
+    .gallery-btn {
+        width: 50px;
+        height: 50px;
+        font-size: 1.5rem;
+    }
+
+    .gallery-prev-btn {
+        left: 5px;
+    }
+
+    .gallery-next-btn {
+        right: 5px;
+    }
+
+    .store-gallery h2 {
+        font-size: 1.8rem;
+    }
+
+    .detail-card h2 {
+        font-size: 1.3rem;
+    }
+} 
+
+/* ============================
+   編集機能のスタイル
+   ============================ */
+
+.edit-toggle-btn {
+    background: linear-gradient(135deg, #3498db, #2980b9);
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 25px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-right: 10px;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 14px;
+    box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+}
+
+.edit-toggle-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
+}
+
+.edit-toggle-btn:active {
+    transform: translateY(0);
+}
+
+.edit-section {
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    padding: 40px 0;
+    margin: 20px 0;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.edit-form-container {
+    max-width: 600px;
+    margin: 0 auto;
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.edit-group {
+    margin-bottom: 20px;
+}
+
+.edit-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: #2c3e50;
+    font-size: 14px;
+}
+
+.edit-group input,
+.edit-group textarea {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid #e9ecef;
+    border-radius: 10px;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+}
+
+.edit-group input:focus,
+.edit-group textarea:focus {
+    outline: none;
+    border-color: #3498db;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+}
+
+.edit-group textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+.edit-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 30px;
+}
+
+.save-edit-btn,
+.cancel-edit-btn {
+    padding: 12px 25px;
+    border: none;
+    border-radius: 25px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.save-edit-btn {
+    background: linear-gradient(135deg, #27ae60, #2ecc71);
+    color: white;
+    box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3);
+}
+
+.save-edit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(39, 174, 96, 0.4);
+}
+
+.cancel-edit-btn {
+    background: linear-gradient(135deg, #e74c3c, #c0392b);
+    color: white;
+    box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+}
+
+.cancel-edit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(231, 76, 60, 0.4);
+}
+
+/* モバイル対応 */
+@media (max-width: 768px) {
+    .edit-toggle-btn {
+        font-size: 12px;
+        padding: 10px 15px;
+        margin-right: 5px;
+    }
+    
+    .edit-section {
+        margin: 15px;
+        padding: 20px 0;
+    }
+    
+    .edit-form-container {
+        margin: 0 15px;
+        padding: 20px;
+    }
+    
+    .edit-group input,
+    .edit-group textarea {
+        padding: 10px 12px;
+    }
+    
+    .edit-buttons {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .save-edit-btn,
+    .cancel-edit-btn {
+        width: 100%;
+        justify-content: center;
+        padding: 14px 20px;
+    }
+    
+    /* ナビゲーションボタンの調整 */
+    .nav-buttons {
+        flex-direction: column;
+        gap: 10px;
+        align-items: stretch;
+    }
+    
+    .nav-buttons .edit-toggle-btn,
+    .nav-buttons .back-btn,
+    .nav-buttons .home-btn {
+        width: 100%;
+        justify-content: center;
+        margin-right: 0;
+    }
+}
+
+/* タッチデバイス向けの改善 */
+@media (hover: none) and (pointer: coarse) {
+    .edit-toggle-btn:hover,
+    .save-edit-btn:hover,
+    .cancel-edit-btn:hover {
+        transform: none;
+    }
+    
+    .edit-toggle-btn:active,
+    .save-edit-btn:active,
+    .cancel-edit-btn:active {
+        transform: scale(0.98);
+        transition: transform 0.1s ease;
+    }
+}
+
+/* 編集フォームのアニメーション */
+.edit-section {
+    animation: slideInUp 0.5s ease-out;
+}
+
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* アクセシビリティ改善 */
+.edit-group input:focus,
+.edit-group textarea:focus {
+    outline: 2px solid transparent;
+    outline-offset: 2px;
+}
+
+/* 高解像度ディスプレイ対応 */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    .edit-toggle-btn,
+    .save-edit-btn,
+    .cancel-edit-btn {
+        border: 0.5px solid transparent;
+    }
+} 

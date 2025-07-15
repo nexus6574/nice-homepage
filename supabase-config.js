@@ -2,13 +2,25 @@
 // 使用前に https://supabase.com でプロジェクトを作成し、以下を更新してください
 
 const SUPABASE_CONFIG = {
-    url: 'YOUR_SUPABASE_URL', // 例: https://xxxxx.supabase.co
-    anonKey: 'YOUR_SUPABASE_ANON_KEY', // 公開用APIキー
+    url: 'https://rkjclmiievzgqkfgkhfl.supabase.co', // ← あなたのProject URL
+    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJramNsbWlpZXZ6Z3FrZmdraGZsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI0NTg1MTQsImV4cCI6MjA2ODAzNDUxNH0.YMjC3y7UlGmi091fBPd633KJmR6Hhbg6hUF_LgddHI8', // ← あなたのanon public key
     
     // テーブル設定
     tables: {
         stores: 'nice_stores',
         sessions: 'nice_sessions'
+    },
+    
+    // Storage設定
+    storage: {
+        bucket: 'nice-store-images', // 画像保存用バケット
+        maxFileSize: 5 * 1024 * 1024, // 5MB制限
+        allowedTypes: ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'], // 許可ファイル形式
+        imageOptimization: {
+            width: 800,  // 最大幅
+            height: 600, // 最大高さ
+            quality: 85  // 圧縮品質
+        }
     }
 };
 
@@ -17,11 +29,10 @@ const SUPABASE_CONFIG = {
 // <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 // Supabaseクライアント初期化
-let supabase;
-
 function initializeSupabase() {
-    if (typeof window.supabase !== 'undefined') {
-        supabase = window.supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
+    if (typeof window.supabase !== 'undefined' && typeof window.supabase.createClient === 'function') {
+        // グローバルにSupabaseクライアントを保存
+        window.supabase = window.supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
         console.log('✅ Supabase初期化完了');
         return true;
     } else {
