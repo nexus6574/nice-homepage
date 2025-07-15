@@ -189,396 +189,34 @@ async function initializeSupabaseAdmin() {
     }
 }
 
-// Supabase接続テスト（詳細診断機能付き）
-async function testSupabaseConnection() {
-    console.log('🔍 Supabase接続テスト開始...');
-    
-    try {
-        // ステップ1: Supabase SDK の読み込み確認
-        console.log('📋 ステップ1: Supabase SDK確認');
-        if (typeof window.supabase === 'undefined') {
-            throw new Error('❌ Supabase SDK が読み込まれていません');
-        }
-        console.log('✅ Supabase SDK が読み込まれています');
-        
-        // ステップ2: createClient 関数確認
-        console.log('📋 ステップ2: createClient関数確認');
-        if (typeof window.supabase.createClient !== 'function') {
-            throw new Error('❌ createClient関数が利用できません');
-        }
-        console.log('✅ createClient関数が利用可能です');
-        
-        // ステップ3: 設定確認
-        console.log('📋 ステップ3: 設定確認');
-        console.log('URL:', SUPABASE_CONFIG.url);
-        console.log('API Key:', SUPABASE_CONFIG.anonKey ? '設定済み (****)' : '❌ 未設定');
-        
-        // ステップ4: クライアント初期化確認
-        console.log('📋 ステップ4: クライアント初期化確認');
-        if (!window.supabaseClient) {
-            console.log('⚠️ supabaseClientが未初期化、初期化を試行...');
-            window.supabaseClient = window.supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
-        }
-        console.log('✅ Supabaseクライアント初期化完了');
-        
-        // ステップ5: 基本的な接続テスト
-        console.log('📋 ステップ5: 基本接続テスト');
-        const { data, error } = await window.supabaseClient
-            .from('nice_stores')
-            .select('*')
-            .limit(1);
-        
-        if (error) {
-            console.error('❌ 接続エラー詳細:', {
-                message: error.message,
-                details: error.details,
-                hint: error.hint,
-                code: error.code
-            });
-            
-            if (error.code === 'PGRST116') {
-                throw new Error('❌ テーブル "nice_stores" が存在しません');
-            } else if (error.message.includes('permission denied')) {
-                throw new Error('❌ 権限エラー: RLS (Row Level Security) 設定を確認してください');
-            } else {
-                throw error;
-            }
-        }
-        
-        console.log('✅ 接続成功！データ:', data);
-        console.log('✅ Supabase接続テスト完了');
-        
-        alert('✅ Supabase接続テスト成功！\n詳細はコンソールログを確認してください。');
-        
-    } catch (error) {
-        console.error('❌ Supabase接続テストエラー:', error.message);
-        alert('❌ Supabase接続エラー:\n' + error.message + '\n\n詳細はコンソールログ (F12) を確認してください。');
-        throw error;
-    }
-}
+
 
 // Supabase直接データ保存テスト
-async function testSupabaseSave() {
-    try {
-        console.log('🧪 Supabaseデータ保存テスト開始...');
-        
-        // 詳細なSupabase状態をデバッグ
-        console.log('🔍 Supabase状態診断:');
-        console.log('- window.supabase:', typeof window.supabase, window.supabase);
-        console.log('- window.supabaseClient:', typeof window.supabaseClient, window.supabaseClient);
-        console.log('- SUPABASE_CONFIG:', typeof SUPABASE_CONFIG, SUPABASE_CONFIG);
-        
-        // supabaseClientが存在しない場合は初期化を試行
-        if (!window.supabaseClient) {
-            console.log('⚠️ supabaseClientが未初期化。初期化を試行...');
-            
-            if (window.supabase && typeof window.supabase.createClient === 'function') {
-                window.supabaseClient = window.supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
-                console.log('✅ supabaseClient初期化完了');
-            } else {
-                throw new Error('❌ Supabase SDK（window.supabase）が利用できません');
-            }
-        }
-        
-        // クライアントが正しく初期化されているか確認
-        if (!window.supabaseClient || typeof window.supabaseClient.from !== 'function') {
-            throw new Error('❌ supabaseClientが正しく初期化されていません。fromメソッドが利用できません。');
-        }
-        
-        console.log('✅ supabaseClient確認完了');
-        
-        // テスト店舗データ
-        const testStore = {
-            id: Date.now(), // 現在時刻をIDに使用
-            name: 'テスト店舗 ' + new Date().toLocaleTimeString(),
-            price: '9,999円〜',
-            badge: 'テスト',
-            description: 'Supabase接続テスト用の店舗データです',
-            features: ['テスト', '接続確認'],
-            session_id: 'test_session_' + Date.now(),
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
-        };
-        
-        console.log('📤 テストデータをSupabaseに保存中...', testStore);
-        
-        const { data, error } = await window.supabaseClient
-            .from('nice_stores')
-            .upsert(testStore)
-            .select();
-        
-        console.log('🔍 Supabase応答:', { data, error });
-        
-        if (error) {
-            console.error('💥 Supabaseエラー詳細:', {
-                message: error.message,
-                details: error.details,
-                hint: error.hint,
-                code: error.code,
-                status: error.status
-            });
-            
-            if (error.message.includes('permission denied') || error.code === '42501') {
-                throw new Error(`🚨 権限エラー: ${error.message}\n\n解決方法:\n1. Supabaseダッシュボード > SQL Editor\n2. 以下のSQLを実行:\n   ALTER TABLE nice_stores DISABLE ROW LEVEL SECURITY;`);
-            }
-            
-            throw error;
-        }
-        
-        console.log('✅ Supabaseデータ保存テスト成功！', data);
-        alert('✅ Supabaseデータ保存テスト成功！\n店舗「' + testStore.name + '」を保存しました。');
-        
-        // テストデータをすぐに削除
-        setTimeout(async () => {
-            try {
-                await window.supabaseClient
-                    .from('nice_stores')
-                    .delete()
-                    .eq('id', testStore.id);
-                console.log('🗑️ テストデータを削除しました');
-            } catch (deleteError) {
-                console.warn('⚠️ テストデータ削除エラー:', deleteError);
-            }
-        }, 3000);
-        
-    } catch (error) {
-        console.error('❌ Supabaseデータ保存テストエラー:', error);
-        alert('❌ Supabaseデータ保存エラー:\n' + error.message);
-        throw error;
-    }
-}
 
-// RLS権限修正手順を表示
-function showRLSFix() {
-    const fixInstructions = `
-🔧 Supabase RLS権限修正手順
 
-データ保存で権限エラーが出る場合、以下の手順で修正してください：
 
-📋 手順:
-1. Supabaseダッシュボードにアクセス
-   → https://supabase.com/dashboard
 
-2. プロジェクト「rkjclmiievzgqkfgkhfl」を選択
 
-3. 左メニューから「SQL Editor」をクリック
 
-4. 「New query」ボタンをクリック
 
-5. 以下のSQLをコピー&ペーストして「Run」をクリック:
-
-   DROP POLICY IF EXISTS "Enable all operations for anon users" ON nice_stores;
-   ALTER TABLE nice_stores DISABLE ROW LEVEL SECURITY;
-   GRANT ALL ON TABLE nice_stores TO anon;
-   GRANT ALL ON TABLE nice_stores TO authenticated;
-
-6. 「Success. No rows returned」が表示されれば完了
-
-✅ 修正後、再度「💾 Supabase保存テスト」を実行してください
-
-❓ 困った時は:
-- コンソールログ(F12)でエラー詳細を確認
-- SQLエラーが出た場合はメッセージをコピーして報告
-    `;
-    
-    // モーダル形式で表示
-    const modal = document.createElement('div');
-    modal.style.cssText = `
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0,0,0,0.8);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        z-index: 10000;
-    `;
-    
-    const content = document.createElement('div');
-    content.style.cssText = `
-        background: white;
-        padding: 30px;
-        border-radius: 10px;
-        max-width: 600px;
-        max-height: 80%;
-        overflow-y: auto;
-        font-family: monospace;
-        line-height: 1.6;
-    `;
-    
-    content.innerHTML = `
-        <pre style="white-space: pre-wrap; margin: 0;">${fixInstructions}</pre>
-        <div style="text-align: center; margin-top: 20px;">
-            <button onclick="this.closest('.modal').remove()" 
-                    style="background: #007bff; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">
-                閉じる
-            </button>
-        </div>
-    `;
-    
-    modal.appendChild(content);
-    modal.className = 'modal';
-    document.body.appendChild(modal);
-    
-    // モーダル外をクリックで閉じる
-    modal.addEventListener('click', (e) => {
-        if (e.target === modal) {
-            modal.remove();
-        }
-    });
-}
-
-// 永続テストデータ挿入
-async function insertTestData() {
-    try {
-        if (!window.supabaseClient) {
-            throw new Error('Supabaseクライアントが初期化されていません');
-        }
-        
-        console.log('➕ 永続テストデータ挿入開始...');
-        
-        // 既存データを確認
-        const { data: existingData, error: checkError } = await window.supabaseClient
-            .from('nice_stores')
-            .select('*');
-            
-        console.log('📊 既存データ:', existingData?.length || 0, '件');
-        
-        if (checkError) {
-            throw checkError;
-        }
-        
-        // サンプル店舗データ
-        const sampleStores = [
-            {
-                id: 1,
-                name: 'Premium Club TOKYO',
-                price: '1,500円〜',
-                badge: '高級',
-                description: '高級感あふれる店内で最高のひと時を',
-                features: ['高級感', '完全個室', '最高級サービス'],
-                session_id: 'admin_permanent',
-                created_at: new Date().toISOString(),
-                updated_at: new Date().toISOString()
-            },
-            {
-                id: 2, 
-                name: 'Club Elegance',
-                price: '1,200円〜',
-                badge: '上品',
-                description: '上品で落ち着いた雰囲気のお店',
-                features: ['上品', '落ち着いた雰囲気', '大人の空間'],
-                session_id: 'admin_permanent',
-                created_at: new Date().toISOString(),
-                updated_at: new Date().toISOString()
-            },
-            {
-                id: 3,
-                name: 'Night Paradise', 
-                price: '1,000円〜',
-                badge: '人気',
-                description: '活気あふれる楽しい空間',
-                features: ['活気', '楽しい', 'アットホーム'],
-                session_id: 'admin_permanent',
-                created_at: new Date().toISOString(),
-                updated_at: new Date().toISOString()
-            }
-        ];
-        
-        console.log('📤 永続データをSupabaseに保存中...', sampleStores.length, '件');
-        
-        const { data, error } = await window.supabaseClient
-            .from('nice_stores')
-            .upsert(sampleStores)
-            .select();
-        
-        if (error) {
-            console.error('💥 Supabaseエラー詳細:', error);
-            
-            if (error.message.includes('permission denied') || error.code === '42501') {
-                throw new Error(`🚨 権限エラー: ${error.message}\n\n解決方法:\n1. Supabaseダッシュボード > SQL Editor\n2. 以下のSQLを実行:\n\nDROP POLICY IF EXISTS "Enable all operations for anon users" ON nice_stores;\nALTER TABLE nice_stores DISABLE ROW LEVEL SECURITY;\nGRANT ALL ON TABLE nice_stores TO anon;\nGRANT ALL ON TABLE nice_stores TO authenticated;`);
-            }
-            
-            throw error;
-        }
-        
-        console.log('✅ 永続データ保存成功！', data?.length || 0, '件');
-        alert(`✅ 永続テストデータ保存成功！\n${data?.length || 0}件の店舗データを保存しました。\n\nTable Editorで確認してください。`);
-        
-        // 店舗リストを更新
-        await loadStoresFromSupabase();
-        
-    } catch (error) {
-        console.error('❌ 永続データ保存エラー:', error);
-        alert('❌ 永続データ保存エラー:\n' + error.message);
-        throw error;
-    }
-}
-
-// Supabaseデータ確認
-async function checkSupabaseData() {
-    try {
-        if (!window.supabaseClient) {
-            throw new Error('Supabaseクライアントが初期化されていません');
-        }
-        
-        console.log('📊 Supabaseデータ確認開始...');
-        
-        const { data, error } = await window.supabaseClient
-            .from('nice_stores')
-            .select('*')
-            .order('updated_at', { ascending: false });
-        
-        if (error) {
-            throw error;
-        }
-        
-        console.log('📊 Supabaseデータ:', data);
-        
-        let message = `📊 Supabaseデータ確認結果\n\n`;
-        message += `🗄️ 総データ数: ${data?.length || 0}件\n\n`;
-        
-        if (data && data.length > 0) {
-            message += `📋 最新データ:\n`;
-            data.slice(0, 5).forEach((store, index) => {
-                message += `${index + 1}. ${store.name} (${store.price})\n`;
-            });
-            
-            if (data.length > 5) {
-                message += `... 他${data.length - 5}件\n`;
-            }
-        } else {
-            message += `❌ データが見つかりません\n\n`;
-            message += `💡 対処法:\n`;
-            message += `1. "➕ 永続テストデータ挿入"を実行\n`;
-            message += `2. 管理画面で店舗を追加\n`;
-            message += `3. "🔄 ローカル→Supabase同期"を実行`;
-        }
-        
-        alert(message);
-        
-    } catch (error) {
-        console.error('❌ Supabaseデータ確認エラー:', error);
-        alert('❌ Supabaseデータ確認エラー:\n' + error.message);
-    }
-}
 
 // ローカル→Supabase同期
 async function syncLocalToSupabase() {
     try {
+        // より詳細なデバッグログ
+        console.log('🔄 ローカル→Supabase同期開始...');
+        console.log('📍 Supabaseクライアント確認:', !!window.supabaseClient);
+        
         if (!window.supabaseClient) {
             throw new Error('Supabaseクライアントが初期化されていません');
         }
         
-        console.log('🔄 ローカル→Supabase同期開始...');
-        
         // ローカルストレージからデータを取得
         const localStores = JSON.parse(localStorage.getItem('nice_stores') || '[]');
+        console.log('📍 ローカルストレージから取得したデータ:', localStores);
         
         if (localStores.length === 0) {
-            alert('❌ ローカルストレージにデータがありません');
+            alert('❌ ローカルストレージにデータがありません\n\n管理画面で店舗を追加・編集してから同期を試してください。');
             return;
         }
         
@@ -586,33 +224,68 @@ async function syncLocalToSupabase() {
         
         let successCount = 0;
         let errorCount = 0;
+        const errorDetails = [];
         
-        for (const store of localStores) {
+        for (let i = 0; i < localStores.length; i++) {
+            const store = localStores[i];
+            console.log(`📍 処理中 ${i + 1}/${localStores.length}: ${store.name}`);
+            
             try {
-                const success = await saveStoreToSupabase(store);
-                if (success) {
-                    successCount++;
-                } else {
+                // saveStoreToSupabaseの代わりに直接Supabaseに保存
+                const storeData = {
+                    name: store.name || '',
+                    price: store.price || '',
+                    badge: store.badge || '',
+                    description: store.description || '',
+                    features: Array.isArray(store.features) ? store.features : [],
+                    image: store.image || '',
+                    images: Array.isArray(store.images) ? store.images : [],
+                    session_id: store.session_id || 'admin-sync'
+                };
+                
+                console.log(`📍 ${store.name} のデータ準備完了:`, storeData);
+                
+                const { data, error } = await window.supabaseClient
+                    .from('nice_stores')
+                    .insert([storeData])
+                    .select();
+                
+                if (error) {
+                    console.error(`❌ ${store.name} の保存エラー:`, error);
+                    errorDetails.push(`${store.name}: ${error.message}`);
                     errorCount++;
+                } else {
+                    console.log(`✅ ${store.name} 保存成功:`, data);
+                    successCount++;
                 }
+                
+                // 少し待機（API制限対策）
+                await new Promise(resolve => setTimeout(resolve, 100));
+                
             } catch (error) {
-                console.error(`店舗 ${store.name} の同期エラー:`, error);
+                console.error(`❌ ${store.name} の同期エラー:`, error);
+                errorDetails.push(`${store.name}: ${error.message}`);
                 errorCount++;
             }
         }
         
-        const message = `🔄 ローカル→Supabase同期完了\n\n` +
-                       `✅ 成功: ${successCount}件\n` +
-                       `❌ 失敗: ${errorCount}件\n\n` +
-                       `📊 Supabaseデータ確認ボタンで結果を確認してください。`;
+        let message = `🔄 ローカル→Supabase同期完了\n\n` +
+                     `✅ 成功: ${successCount}件\n` +
+                     `❌ 失敗: ${errorCount}件`;
+        
+        if (errorDetails.length > 0) {
+            message += `\n\n失敗詳細:\n${errorDetails.join('\n')}`;
+        }
+        
+        message += `\n\n📊 Supabaseデータ確認ボタンで結果を確認してください。`;
         
         alert(message);
         
-        console.log('✅ 同期完了:', { successCount, errorCount });
+        console.log('✅ 同期完了:', { successCount, errorCount, errorDetails });
         
     } catch (error) {
         console.error('❌ 同期エラー:', error);
-        alert('❌ 同期エラー:\n' + error.message);
+        alert('❌ 同期エラー:\n' + error.message + '\n\nコンソール(F12)で詳細なエラーログを確認してください。');
     }
 }
 
@@ -880,14 +553,34 @@ async function initializeApp() {
     }
 }
 
-// 認証状態チェック
+// 認証状態チェック（セッション期限付き）
 function checkAuthStatus() {
     const savedAuth = localStorage.getItem('admin_auth');
-    if (savedAuth === 'authenticated') {
-        isAuthenticated = true;
-        showAdminScreen();
+    const authTime = localStorage.getItem('admin_auth_time');
+    const currentTime = Date.now();
+    
+    // セッション期限（24時間）
+    const SESSION_DURATION = 24 * 60 * 60 * 1000;
+    
+    if (savedAuth === 'authenticated' && authTime) {
+        const timeDiff = currentTime - parseInt(authTime);
+        
+        if (timeDiff < SESSION_DURATION) {
+            isAuthenticated = true;
+            showAdminScreen();
+            console.log('🔐 認証済み - セッション有効');
+        } else {
+            // セッション期限切れ
+            localStorage.removeItem('admin_auth');
+            localStorage.removeItem('admin_auth_time');
+            isAuthenticated = false;
+            showLoginScreen();
+            console.log('⏰ セッション期限切れ - 再ログインが必要');
+        }
     } else {
+        isAuthenticated = false;
         showLoginScreen();
+        console.log('🔓 未認証 - ログインが必要');
     }
 }
 
@@ -1113,11 +806,15 @@ function handleLogin(e) {
     
     if (username === ADMIN_CREDENTIALS.username && password === ADMIN_CREDENTIALS.password) {
         isAuthenticated = true;
+        const currentTime = Date.now();
         localStorage.setItem('admin_auth', 'authenticated');
+        localStorage.setItem('admin_auth_time', currentTime.toString());
         showAdminScreen();
         showMessage('ログインしました', 'success');
+        console.log('✅ ログイン成功 - セッション開始:', new Date(currentTime).toLocaleString());
     } else {
         showError('ユーザー名またはパスワードが正しくありません');
+        console.log('❌ ログイン失敗');
     }
 }
 
@@ -1125,9 +822,27 @@ function handleLogout() {
     if (confirm('ログアウトしますか？')) {
         isAuthenticated = false;
         localStorage.removeItem('admin_auth');
+        localStorage.removeItem('admin_auth_time');
         showLoginScreen();
         loginForm.reset();
         showMessage('ログアウトしました', 'success');
+        console.log('🔓 ログアウト完了');
+    }
+}
+
+// 強制セッションクリア
+function forceClearAuth() {
+    if (confirm('🔒 セッション情報をクリアしますか？\n\n現在の認証状態がリセットされ、ログイン画面に戻ります。')) {
+        isAuthenticated = false;
+        localStorage.removeItem('admin_auth');
+        localStorage.removeItem('admin_auth_time');
+        console.log('🔒 強制セッションクリア実行');
+        showMessage('セッション情報をクリアしました', 'success');
+        
+        // 1秒後にページをリロード
+        setTimeout(() => {
+            window.location.reload();
+        }, 1000);
     }
 }
 
