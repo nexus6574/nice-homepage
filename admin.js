@@ -216,6 +216,62 @@ async function testSupabaseConnection() {
     }
 }
 
+// Supabase直接データ保存テスト
+async function testSupabaseSave() {
+    try {
+        if (!window.supabase) {
+            throw new Error('Supabaseクライアントが初期化されていません');
+        }
+        
+        console.log('🧪 Supabaseデータ保存テスト開始...');
+        
+        // テスト店舗データ
+        const testStore = {
+            id: Date.now(), // 現在時刻をIDに使用
+            name: 'テスト店舗 ' + new Date().toLocaleTimeString(),
+            price: '9,999円〜',
+            badge: 'テスト',
+            description: 'Supabase接続テスト用の店舗データです',
+            features: ['テスト', '接続確認'],
+            session_id: 'test_session_' + Date.now(),
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+        };
+        
+        console.log('📤 テストデータをSupabaseに保存中...', testStore);
+        
+        const { data, error } = await window.supabase
+            .from('nice_stores')
+            .upsert(testStore)
+            .select();
+        
+        if (error) {
+            throw error;
+        }
+        
+        console.log('✅ Supabaseデータ保存テスト成功！', data);
+        alert('✅ Supabaseデータ保存テスト成功！\n店舗「' + testStore.name + '」を保存しました。');
+        
+        // テストデータをすぐに削除
+        setTimeout(async () => {
+            try {
+                await window.supabase
+                    .from('nice_stores')
+                    .delete()
+                    .eq('id', testStore.id);
+                console.log('🗑️ テストデータを削除しました');
+            } catch (deleteError) {
+                console.warn('⚠️ テストデータ削除エラー:', deleteError);
+            }
+        }, 3000);
+        
+    } catch (error) {
+        console.error('❌ Supabaseデータ保存テストエラー:', error);
+        alert('❌ Supabaseデータ保存エラー:\n' + error.message);
+        throw error;
+    }
+}
+
 // クラウド同期状態をUIに更新
 function updateCloudSyncStatus(isOnline) {
     // 既存の状態表示を削除
