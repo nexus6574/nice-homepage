@@ -31,12 +31,16 @@ const SUPABASE_CONFIG = {
 // Supabaseクライアント初期化
 function initializeSupabase() {
     if (typeof window.supabase !== 'undefined' && typeof window.supabase.createClient === 'function') {
-        // グローバルにSupabaseクライアントを保存
-        window.supabase = window.supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
+        // グローバルにSupabaseクライアントインスタンスを保存
+        window.supabaseClient = window.supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
         console.log('✅ Supabase初期化完了');
+        console.log('🔗 Project URL:', SUPABASE_CONFIG.url);
+        console.log('🔑 API Key設定:', SUPABASE_CONFIG.anonKey ? '✅ 設定済み' : '❌ 未設定');
         return true;
     } else {
         console.error('❌ Supabase SDK が読み込まれていません');
+        console.error('HTMLで以下のスクリプトタグが必要です:');
+        console.error('<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>');
         return false;
     }
 }

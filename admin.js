@@ -189,29 +189,70 @@ async function initializeSupabaseAdmin() {
     }
 }
 
-// Supabase接続テスト
+// Supabase接続テスト（詳細診断機能付き）
 async function testSupabaseConnection() {
+    console.log('🔍 Supabase接続テスト開始...');
+    
     try {
-        if (!window.supabase) {
-            throw new Error('Supabaseクライアントが初期化されていません');
+        // ステップ1: Supabase SDK の読み込み確認
+        console.log('📋 ステップ1: Supabase SDK確認');
+        if (typeof window.supabase === 'undefined') {
+            throw new Error('❌ Supabase SDK が読み込まれていません');
         }
+        console.log('✅ Supabase SDK が読み込まれています');
         
-        const { data, error } = await window.supabase
+        // ステップ2: createClient 関数確認
+        console.log('📋 ステップ2: createClient関数確認');
+        if (typeof window.supabase.createClient !== 'function') {
+            throw new Error('❌ createClient関数が利用できません');
+        }
+        console.log('✅ createClient関数が利用可能です');
+        
+        // ステップ3: 設定確認
+        console.log('📋 ステップ3: 設定確認');
+        console.log('URL:', SUPABASE_CONFIG.url);
+        console.log('API Key:', SUPABASE_CONFIG.anonKey ? '設定済み (****)' : '❌ 未設定');
+        
+        // ステップ4: クライアント初期化確認
+        console.log('📋 ステップ4: クライアント初期化確認');
+        if (!window.supabaseClient) {
+            console.log('⚠️ supabaseClientが未初期化、初期化を試行...');
+            window.supabaseClient = window.supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
+        }
+        console.log('✅ Supabaseクライアント初期化完了');
+        
+        // ステップ5: 基本的な接続テスト
+        console.log('📋 ステップ5: 基本接続テスト');
+        const { data, error } = await window.supabaseClient
             .from('nice_stores')
-            .select('count')
+            .select('*')
             .limit(1);
         
-        if (error && error.code === 'PGRST116') {
-            throw new Error('テーブルが存在しません。SUPABASE_SETUP.mdの手順でテーブルを作成してください。');
-        }
-        
         if (error) {
-            throw error;
+            console.error('❌ 接続エラー詳細:', {
+                message: error.message,
+                details: error.details,
+                hint: error.hint,
+                code: error.code
+            });
+            
+            if (error.code === 'PGRST116') {
+                throw new Error('❌ テーブル "nice_stores" が存在しません');
+            } else if (error.message.includes('permission denied')) {
+                throw new Error('❌ 権限エラー: RLS (Row Level Security) 設定を確認してください');
+            } else {
+                throw error;
+            }
         }
         
-        console.log('✅ Supabase接続テスト成功');
+        console.log('✅ 接続成功！データ:', data);
+        console.log('✅ Supabase接続テスト完了');
+        
+        alert('✅ Supabase接続テスト成功！\n詳細はコンソールログを確認してください。');
+        
     } catch (error) {
         console.error('❌ Supabase接続テストエラー:', error.message);
+        alert('❌ Supabase接続エラー:\n' + error.message + '\n\n詳細はコンソールログ (F12) を確認してください。');
         throw error;
     }
 }
