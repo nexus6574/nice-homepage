@@ -247,6 +247,76 @@ async function checkSupabaseData() {
     }
 }
 
+// 削除テスト機能（デバッグ用）
+async function testDelete() {
+    try {
+        if (!window.supabaseClient) {
+            throw new Error('Supabaseクライアントが初期化されていません');
+        }
+        
+        console.log('🧪 削除テスト開始...');
+        
+        // 現在のSupabaseデータを表示
+        const { data: allStores, error } = await window.supabaseClient
+            .from('nice_stores')
+            .select('*')
+            .order('id', { ascending: true });
+        
+        if (error) {
+            throw error;
+        }
+        
+        console.log('📊 削除テスト - 現在のSupabaseデータ:', allStores);
+        
+        if (!allStores || allStores.length === 0) {
+            alert('🔍 削除テスト結果\n\nSupabaseにデータがありません。\n先に同期を実行してください。');
+            return;
+        }
+        
+        // 削除対象を選択
+        let options = '削除テスト - 削除対象を選択してください:\n\n';
+        allStores.forEach((store, index) => {
+            options += `${index + 1}. ${store.name} (ID: ${store.id})\n`;
+        });
+        options += '\n削除する店舗の番号を入力してください:';
+        
+        const choice = prompt(options);
+        const storeIndex = parseInt(choice) - 1;
+        
+        if (isNaN(storeIndex) || storeIndex < 0 || storeIndex >= allStores.length) {
+            alert('❌ 無効な選択です');
+            return;
+        }
+        
+        const targetStore = allStores[storeIndex];
+        console.log(`🎯 削除対象: ${targetStore.name} (ID: ${targetStore.id})`);
+        
+        const confirm1 = confirm(`削除テスト実行\n\n対象: ${targetStore.name}\nID: ${targetStore.id}\n\n本当に削除しますか？`);
+        if (!confirm1) return;
+        
+        // IDベースで削除を試行
+        console.log(`🗑️ IDベース削除実行中: ID=${targetStore.id}`);
+        const { data: deleteResult, error: deleteError } = await window.supabaseClient
+            .from('nice_stores')
+            .delete()
+            .eq('id', targetStore.id)
+            .select();
+        
+        if (deleteError) {
+            console.error('❌ IDベース削除エラー:', deleteError);
+            alert(`❌ 削除エラー:\n${deleteError.message}`);
+        } else {
+            const deletedCount = deleteResult ? deleteResult.length : 0;
+            console.log(`✅ IDベース削除成功: ${deletedCount}件削除`, deleteResult);
+            alert(`✅ 削除テスト成功！\n\n削除された店舗: ${targetStore.name}\n削除件数: ${deletedCount}件\n\n📊 Supabaseデータ確認で結果を確認してください。`);
+        }
+        
+    } catch (error) {
+        console.error('❌ 削除テストエラー:', error);
+        alert(`❌ 削除テストエラー:\n${error.message}`);
+    }
+}
+
 // ローカル→Supabase同期
 async function syncLocalToSupabase() {
     try {
@@ -1257,24 +1327,76 @@ async function deleteStore(id) {
             if (window.supabaseClient) {
                 console.log(`🗑️ Supabaseから削除中: ${storeName}`);
                 
-                // 店舗名で検索して削除（IDはローカルとSupabaseで異なる可能性があるため）
-                const { data: deleteResult, error } = await window.supabaseClient
+                // まず該当データが存在するか確認
+                console.log(`🔍 削除対象検索中: name = "${storeName}"`);
+                const { data: searchResult, error: searchError } = await window.supabaseClient
                     .from('nice_stores')
-                    .delete()
-                    .eq('name', storeName)
-                    .select();
+                    .select('*')
+                    .eq('name', storeName);
                 
-                if (error) {
-                    console.error(`❌ Supabase削除エラー (${storeName}):`, error);
-                    showMessage(`ローカル削除は成功しましたが、Supabase削除でエラーが発生しました:\n${error.message}`, 'warning');
+                if (searchError) {
+                    console.error(`❌ 検索エラー (${storeName}):`, searchError);
+                    showMessage(`ローカル削除は成功しましたが、Supabase検索でエラーが発生しました:\n${searchError.message}`, 'warning');
                 } else {
-                    supabaseDeleted = true;
-                    console.log(`✅ Supabaseから削除完了: ${storeName}`, deleteResult);
+                    console.log(`🔍 検索結果 (${storeName}):`, searchResult);
                     
-                    if (deleteResult && deleteResult.length > 0) {
-                        showMessage(`店舗「${storeName}」を完全に削除しました`, 'success');
+                    if (!searchResult || searchResult.length === 0) {
+                        console.log(`⚠️ Supabaseに「${storeName}」が見つかりません`);
+                        showMessage(`ローカルから削除しました。\n（Supabaseに該当データが見つかりません）`, 'success');
                     } else {
-                        showMessage(`ローカルから削除しました。\n（Supabaseに該当データなし）`, 'success');
+                        // データが見つかった場合、削除を実行
+                        console.log(`🗑️ ${searchResult.length}件のデータを削除中...`);
+                        
+                        // 名前ベースの削除を試行
+                        const { data: deleteResult, error: deleteError } = await window.supabaseClient
+                            .from('nice_stores')
+                            .delete()
+                            .eq('name', storeName)
+                            .select();
+                        
+                        if (deleteError) {
+                            console.error(`❌ 名前ベース削除エラー (${storeName}):`, deleteError);
+                            
+                            // フォールバック: IDベースの削除を試行
+                            console.log(`🔄 フォールバック: IDベース削除を試行...`);
+                            
+                            let idDeleteSuccess = false;
+                            let totalDeleted = 0;
+                            
+                            for (const store of searchResult) {
+                                try {
+                                    console.log(`🗑️ IDベース削除試行: ID=${store.id}, Name=${store.name}`);
+                                    const { data: idDeleteResult, error: idDeleteError } = await window.supabaseClient
+                                        .from('nice_stores')
+                                        .delete()
+                                        .eq('id', store.id)
+                                        .select();
+                                    
+                                    if (idDeleteError) {
+                                        console.error(`❌ IDベース削除エラー (ID: ${store.id}):`, idDeleteError);
+                                    } else {
+                                        idDeleteSuccess = true;
+                                        const deletedCount = idDeleteResult ? idDeleteResult.length : 0;
+                                        totalDeleted += deletedCount;
+                                        console.log(`✅ IDベース削除成功 (ID: ${store.id}): ${deletedCount}件削除`);
+                                    }
+                                } catch (idError) {
+                                    console.error(`❌ IDベース削除例外 (ID: ${store.id}):`, idError);
+                                }
+                            }
+                            
+                            if (idDeleteSuccess) {
+                                supabaseDeleted = true;
+                                showMessage(`店舗「${storeName}」を削除しました\n（フォールバック削除で${totalDeleted}件削除）`, 'success');
+                            } else {
+                                showMessage(`ローカル削除は成功しましたが、Supabase削除でエラーが発生しました:\n${deleteError.message}`, 'warning');
+                            }
+                        } else {
+                            supabaseDeleted = true;
+                            const deletedCount = deleteResult ? deleteResult.length : 0;
+                            console.log(`✅ 名前ベース削除完了: ${storeName} (${deletedCount}件削除)`, deleteResult);
+                            showMessage(`店舗「${storeName}」を完全に削除しました\n（Supabaseから${deletedCount}件削除）`, 'success');
+                        }
                     }
                 }
             } else {
