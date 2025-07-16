@@ -7,6 +7,7 @@ const ADMIN_CREDENTIALS = { username: 'admin', password: 'nice2024' };
 let currentStores = [];
 let editingStoreId = null;
 let currentMainImageFile = null;
+let galleryFiles = Array(5).fill(null); // ギャラリー用一時ファイル保持
 
 // ===================================
 // 初期化
@@ -39,6 +40,71 @@ async function loadStores() {
 }
 
 // ===================================
+// ギャラリー表示・イベント補助関数
+// ===================================
+function renderGalleryPreview(existingUrls = []) {
+    const container = document.getElementById('gallery-preview');
+    if (!container) return;
+
+    container.innerHTML = '';
+    for (let i = 0; i < 5; i++) {
+        const url = existingUrls[i] || null;
+
+        const slot = document.createElement('div');
+        slot.className = 'gallery-slot';
+
+        const img = document.createElement('img');
+        img.id = `gallery-img-${i}`;
+        img.style.maxWidth = '100%';
+        img.style.maxHeight = '120px';
+        img.style.objectFit = 'cover';
+        img.src = url || 'nice-storefront.jpg';
+        slot.appendChild(img);
+
+        const uploadBtn = document.createElement('button');
+        uploadBtn.type = 'button';
+        uploadBtn.textContent = 'アップロード';
+        uploadBtn.className = 'gallery-upload-btn';
+        uploadBtn.dataset.index = i;
+        slot.appendChild(uploadBtn);
+
+        const fileInput = document.createElement('input');
+        fileInput.type = 'file';
+        fileInput.accept = 'image/*';
+        fileInput.style.display = 'none';
+        fileInput.dataset.index = i;
+        fileInput.id = `gallery-file-input-${i}`;
+        fileInput.addEventListener('change', handleGalleryFileSelect);
+        slot.appendChild(fileInput);
+
+        container.appendChild(slot);
+    }
+
+    // ボタンクリックで対応する file input をトリガー
+    container.querySelectorAll('.gallery-upload-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const idx = e.target.dataset.index;
+            container.querySelector(`#gallery-file-input-${idx}`).click();
+        });
+    });
+}
+
+function handleGalleryFileSelect(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const idx = parseInt(e.target.dataset.index, 10);
+    galleryFiles[idx] = file;
+
+    // プレビュー更新
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+        const imgEl = document.getElementById(`gallery-img-${idx}`);
+        if (imgEl) imgEl.src = ev.target.result;
+    };
+    reader.readAsDataURL(file);
+}
+
+// ===================================
 // イベントリスナー設定
 // ===================================
 function setupEventListeners() {
@@ -49,6 +115,7 @@ function setupEventListeners() {
     });
     document.getElementById('main-image-file-input').addEventListener('change', handleFileSelect);
 
+    // ギャラリーのプレビュー生成は openEditModal 内で都度呼び出します。
     const modal = document.getElementById('edit-modal');
     modal.querySelector('.close-btn').addEventListener('click', () => modal.style.display = 'none');
     modal.querySelector('.cancel-btn').addEventListener('click', () => modal.style.display = 'none');
@@ -87,6 +154,7 @@ function renderStores() {
 function openEditModal(id) {
     editingStoreId = id;
     currentMainImageFile = null;
+    galleryFiles = Array(5).fill(null); // ギャラリー選択をリセット
     const modal = document.getElementById('edit-modal');
     const form = document.getElementById('store-form');
     const title = document.getElementById('modal-title');
@@ -100,11 +168,17 @@ function openEditModal(id) {
             form.elements['description'].value = store.description;
             // 他のフォーム要素も同様に設定...
             previewContainer.innerHTML = `<img src="${store.image || 'nice-storefront.jpg'}" style="max-width: 100%; max-height: 200px; object-fit: contain;">`;
+
+            // ギャラリー画像プレビュー
+            const existingGallery = store.images || [];
+            renderGalleryPreview(existingGallery);
         }
     } else {
         title.textContent = '新規店舗追加';
         form.reset();
         previewContainer.innerHTML = '<span class="no-image-text">画像を選択してください</span>';
+
+        renderGalleryPreview([]); // 空のギャラリー
     }
     modal.style.display = 'flex';
 }
@@ -117,6 +191,13 @@ async function handleFormSubmit(e) {
     const form = e.target;
     const storeName = form.elements['name'].value;
     let imageUrl = null;
+
+    // 保存時に既存ストアのギャラリーURLを保持
+    let existingGalleryUrls = [];
+    if (editingStoreId) {
+        const existingStore = currentStores.find(s => s.id === editingStoreId);
+        existingGalleryUrls = existingStore?.images || [];
+    }
 
     showToast('保存処理を開始します...', 'info');
 
@@ -148,6 +229,32 @@ async function handleFormSubmit(e) {
 
     if (imageUrl) {
         storeData.image = imageUrl;
+    }
+
+    // 2-1. ギャラリー画像のアップロード処理
+    let galleryUrls = [...existingGalleryUrls];
+    for (let i = 0; i < 5; i++) {
+        const gFile = galleryFiles[i];
+        if (gFile) {
+            showToast(`ギャラリー画像 ${i + 1} をアップロード中...`, 'info');
+            const gFileName = `public/gallery/${Date.now()}-${i}-${gFile.name}`;
+            const { data: gUploadData, error: gUploadErr } = await supabase.storage
+                .from('nice-store-images')
+                .upload(gFileName, gFile);
+            if (gUploadErr) {
+                showToast(`ギャラリー画像 ${i + 1} のアップロードに失敗`, 'error');
+                console.error('Gallery upload error:', gUploadErr);
+                return; // 1 枚でも失敗したら中断
+            }
+            const { data: gUrlData } = supabase.storage.from('nice-store-images').getPublicUrl(gFileName);
+            galleryUrls[i] = gUrlData.publicUrl;
+        }
+    }
+
+    // 3. ギャラリー URL をデータに反映
+    if (galleryUrls.length > 0) {
+        // null / undefined を除いて配列にする
+        storeData.images = galleryUrls.filter(Boolean);
     }
 
     // 3. データベースに保存 (新規 or 更新)
