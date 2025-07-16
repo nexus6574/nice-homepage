@@ -200,6 +200,53 @@ async function initializeSupabaseAdmin() {
 
 
 
+// Supabaseデータ確認
+async function checkSupabaseData() {
+    try {
+        if (!window.supabaseClient) {
+            throw new Error('Supabaseクライアントが初期化されていません');
+        }
+        
+        console.log('📊 Supabaseデータ確認開始...');
+        
+        const { data, error } = await window.supabaseClient
+            .from('nice_stores')
+            .select('*')
+            .order('updated_at', { ascending: false });
+        
+        if (error) {
+            throw error;
+        }
+        
+        console.log('📊 Supabaseデータ:', data);
+        
+        let message = `📊 Supabaseデータ確認結果\n\n`;
+        message += `🗄️ 総データ数: ${data?.length || 0}件\n\n`;
+        
+        if (data && data.length > 0) {
+            message += `📋 最新データ:\n`;
+            data.slice(0, 5).forEach((store, index) => {
+                message += `${index + 1}. ${store.name} (${store.price})\n`;
+            });
+            
+            if (data.length > 5) {
+                message += `... 他${data.length - 5}件\n`;
+            }
+        } else {
+            message += `❌ データが見つかりません\n\n`;
+            message += `💡 対処法:\n`;
+            message += `1. 管理画面で店舗を追加\n`;
+            message += `2. "🔄 ローカル→Supabase同期"を実行`;
+        }
+        
+        alert(message);
+        
+    } catch (error) {
+        console.error('❌ Supabaseデータ確認エラー:', error);
+        alert('❌ Supabaseデータ確認エラー:\n' + error.message);
+    }
+}
+
 // ローカル→Supabase同期
 async function syncLocalToSupabase() {
     try {
@@ -222,16 +269,36 @@ async function syncLocalToSupabase() {
         
         console.log('📤 ローカルデータをSupabaseに同期中...', localStores.length, '件');
         
+        // 既存データをチェック（重複防止）
+        console.log('📍 既存データをチェック中...');
+        const { data: existingStores } = await window.supabaseClient
+            .from('nice_stores')
+            .select('name');
+        
+        const existingNames = existingStores ? existingStores.map(store => store.name) : [];
+        console.log('📍 既存店舗名:', existingNames);
+        
         let successCount = 0;
         let errorCount = 0;
+        let skippedCount = 0;
         const errorDetails = [];
+        const skippedDetails = [];
         
         for (let i = 0; i < localStores.length; i++) {
             const store = localStores[i];
             console.log(`📍 処理中 ${i + 1}/${localStores.length}: ${store.name}`);
             
+            // 重複チェック
+            if (existingNames.includes(store.name)) {
+                console.log(`⚠️ ${store.name} は既に存在します - スキップ`);
+                skippedDetails.push(`${store.name}: 既に存在`);
+                skippedCount++;
+                continue;
+            }
+            
             try {
                 // saveStoreToSupabaseの代わりに直接Supabaseに保存
+                // IDを除外してSupabase側で自動生成させる
                 const storeData = {
                     name: store.name || '',
                     price: store.price || '',
@@ -240,8 +307,13 @@ async function syncLocalToSupabase() {
                     features: Array.isArray(store.features) ? store.features : [],
                     image: store.image || '',
                     images: Array.isArray(store.images) ? store.images : [],
-                    session_id: store.session_id || 'admin-sync'
+                    session_id: store.session_id || 'admin-sync',
+                    created_at: new Date().toISOString(),
+                    updated_at: new Date().toISOString()
                 };
+                
+                // IDフィールドは除外（Supabaseで自動生成）
+                delete storeData.id;
                 
                 console.log(`📍 ${store.name} のデータ準備完了:`, storeData);
                 
@@ -271,17 +343,22 @@ async function syncLocalToSupabase() {
         
         let message = `🔄 ローカル→Supabase同期完了\n\n` +
                      `✅ 成功: ${successCount}件\n` +
-                     `❌ 失敗: ${errorCount}件`;
+                     `❌ 失敗: ${errorCount}件\n` +
+                     `⚠️ スキップ: ${skippedCount}件`;
         
         if (errorDetails.length > 0) {
             message += `\n\n失敗詳細:\n${errorDetails.join('\n')}`;
         }
         
-        message += `\n\n📊 Supabaseデータ確認ボタンで結果を確認してください。`;
+        if (skippedDetails.length > 0) {
+            message += `\n\nスキップ詳細:\n${skippedDetails.join('\n')}`;
+        }
+        
+        message += `\n\n💡 次回は新しい店舗のみが同期されます。`;
+        
+        console.log('✅ 同期完了:', { successCount, errorCount, skippedCount, errorDetails, skippedDetails });
         
         alert(message);
-        
-        console.log('✅ 同期完了:', { successCount, errorCount, errorDetails });
         
     } catch (error) {
         console.error('❌ 同期エラー:', error);
@@ -1152,12 +1229,70 @@ function hideImageGallery() {
     imageGallery.style.display = 'none';
 }
 
-function deleteStore(id) {
-    if (confirm('この店舗を削除しますか？')) {
-        currentStores = currentStores.filter(store => store.id !== id);
-        renderStores();
-        saveStores();
-        showMessage('店舗を削除しました', 'success');
+async function deleteStore(id) {
+    const storeToDelete = currentStores.find(store => store.id === id);
+    if (!storeToDelete) {
+        showMessage('削除対象の店舗が見つかりません', 'error');
+        return;
+    }
+
+    const storeName = storeToDelete.name;
+    const confirmMessage = `店舗「${storeName}」を削除しますか？\n\n⚠️ ローカルとSupabaseの両方から完全に削除されます。`;
+    
+    if (confirm(confirmMessage)) {
+        console.log(`🗑️ 店舗削除開始: ${storeName} (ID: ${id})`);
+        
+        let localDeleted = false;
+        let supabaseDeleted = false;
+        
+        try {
+            // 1. ローカルストレージから削除
+            currentStores = currentStores.filter(store => store.id !== id);
+            renderStores();
+            saveStores();
+            localDeleted = true;
+            console.log(`✅ ローカルから削除完了: ${storeName}`);
+            
+            // 2. Supabaseからも削除を試行
+            if (window.supabaseClient) {
+                console.log(`🗑️ Supabaseから削除中: ${storeName}`);
+                
+                // 店舗名で検索して削除（IDはローカルとSupabaseで異なる可能性があるため）
+                const { data: deleteResult, error } = await window.supabaseClient
+                    .from('nice_stores')
+                    .delete()
+                    .eq('name', storeName)
+                    .select();
+                
+                if (error) {
+                    console.error(`❌ Supabase削除エラー (${storeName}):`, error);
+                    showMessage(`ローカル削除は成功しましたが、Supabase削除でエラーが発生しました:\n${error.message}`, 'warning');
+                } else {
+                    supabaseDeleted = true;
+                    console.log(`✅ Supabaseから削除完了: ${storeName}`, deleteResult);
+                    
+                    if (deleteResult && deleteResult.length > 0) {
+                        showMessage(`店舗「${storeName}」を完全に削除しました`, 'success');
+                    } else {
+                        showMessage(`ローカルから削除しました。\n（Supabaseに該当データなし）`, 'success');
+                    }
+                }
+            } else {
+                console.warn('⚠️ Supabaseクライアントが利用できません - ローカルのみ削除');
+                showMessage(`ローカルから削除しました。\n（Supabase接続なし）`, 'success');
+            }
+            
+        } catch (error) {
+            console.error(`❌ 削除処理エラー (${storeName}):`, error);
+            
+            if (localDeleted) {
+                showMessage(`ローカル削除は成功しましたが、Supabaseでエラーが発生しました:\n${error.message}`, 'warning');
+            } else {
+                showMessage(`削除処理でエラーが発生しました:\n${error.message}`, 'error');
+            }
+        }
+        
+        console.log(`🏁 削除処理完了: ${storeName} (ローカル: ${localDeleted}, Supabase: ${supabaseDeleted})`);
     }
 }
 
@@ -1290,12 +1425,56 @@ function handleSaveAll() {
     showMessage('すべてのデータを保存しました', 'success');
 }
 
-function handleResetData() {
-    if (confirm('すべてのデータをリセットしますか？この操作は取り消せません。')) {
+async function handleResetData() {
+    const firstConfirm = confirm('⚠️ すべてのデータをリセットしますか？\n\nこの操作により：\n- ローカルデータが初期状態に戻ります\n- Supabaseの全データも削除されます\n\n本当に実行しますか？');
+    
+    if (!firstConfirm) return;
+    
+    // Supabaseからも削除するか選択
+    const deleteFromSupabase = confirm('🗄️ Supabaseの全データも削除しますか？\n\n「OK」= ローカル + Supabase両方をリセット\n「キャンセル」= ローカルのみリセット');
+    
+    console.log(`🔄 データリセット開始 (Supabase削除: ${deleteFromSupabase})`);
+    
+    try {
+        // 1. ローカルデータをリセット
         currentStores = [...DEFAULT_STORES];
         renderStores();
         saveStores();
-        showMessage('データをリセットしました', 'success');
+        console.log('✅ ローカルデータリセット完了');
+        
+        let message = 'ローカルデータをリセットしました';
+        
+        // 2. Supabaseからも削除
+        if (deleteFromSupabase && window.supabaseClient) {
+            console.log('🗑️ Supabaseの全データ削除中...');
+            
+            const { data: deleteResult, error } = await window.supabaseClient
+                .from('nice_stores')
+                .delete()
+                .neq('id', 0); // 全データを削除（id != 0 で全レコード対象）
+            
+            if (error) {
+                console.error('❌ Supabase削除エラー:', error);
+                message += `\n\n⚠️ Supabaseデータ削除でエラーが発生しました:\n${error.message}`;
+                showMessage(message, 'warning');
+            } else {
+                console.log('✅ Supabase全データ削除完了:', deleteResult);
+                const deletedCount = deleteResult ? deleteResult.length : 0;
+                message = `データを完全にリセットしました\n\n📊 削除されたSupabaseデータ: ${deletedCount}件`;
+                showMessage(message, 'success');
+            }
+        } else if (deleteFromSupabase && !window.supabaseClient) {
+            message += '\n\n⚠️ Supabase接続がないため、ローカルのみリセットしました';
+            showMessage(message, 'warning');
+        } else {
+            showMessage(message, 'success');
+        }
+        
+        console.log('🏁 データリセット完了');
+        
+    } catch (error) {
+        console.error('❌ データリセットエラー:', error);
+        showMessage(`データリセットでエラーが発生しました:\n${error.message}`, 'error');
     }
 }
 
