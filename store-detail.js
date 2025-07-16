@@ -285,10 +285,9 @@ function displayStoreDetail(store) {
         document.getElementById('detail-closed-days').textContent = 'なし（年中無休）';
     }
     
-    // 写真ギャラリーを初期化（複数のフォールバック）
-    const galleryImages = store.gallery || store.images || [store.image];
+    // 写真ギャラリーを初期化（imagesフィールドを使用）
+    const galleryImages = store.images || [store.image];
     console.log('📸 ギャラリー画像を初期化:', {
-        galleryCount: store.gallery ? store.gallery.length : 0,
         imagesCount: store.images ? store.images.length : 0,
         finalCount: galleryImages.length,
         images: galleryImages
@@ -594,12 +593,12 @@ function addImageDataToStores(stores) {
     const imageData = getImageDataForStores();
     
     return stores.map(store => {
-        // 管理画面の gallery 配列を優先的に使用
+        // 管理画面の images 配列を優先的に使用
         let galleryImages = [];
         
-        if (store.gallery && Array.isArray(store.gallery) && store.gallery.length > 0) {
+        if (store.images && Array.isArray(store.images) && store.images.length > 0) {
             // 管理画面で設定されたギャラリー画像を使用
-            galleryImages = store.gallery.filter(img => img && img.trim() !== '');
+            galleryImages = store.images.filter(img => img && img.trim() !== '');
             console.log(`📱 店舗 ${store.name}: 管理画面のギャラリー画像を使用 (${galleryImages.length}枚)`);
         } else if (imageData[store.name]) {
             // デフォルトの画像データを使用
@@ -613,9 +612,7 @@ function addImageDataToStores(stores) {
 
         return {
             ...store,
-            images: galleryImages,
-            // 互換性のため既存のgalleryも保持
-            gallery: store.gallery || galleryImages
+            images: galleryImages
         };
     });
 }
@@ -882,7 +879,7 @@ async function saveStoreToSupabase(store) {
             price: store.price,
             badge: store.badge,
             image: store.image,
-            images: store.gallery || store.images || [],
+            images: store.images || [],
             business_hours: store.businessHours || { start: '20:00', end: '02:00' },
             closed_days: store.closedDays || [],
             session_id: `detail_edit_${Date.now()}`,

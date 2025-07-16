@@ -467,20 +467,51 @@ class SupabaseDB {
             
             if (stores && stores.length > 0) {
                 // admin.js形式に変換
-                const convertedStores = stores.map(store => ({
-                    id: store.id,
-                    name: store.name,
-                    description: store.description,
-                    features: store.features || [],
-                    price: store.price,
-                    badge: store.badge || '',
-                    image: store.image,
-                    gallery: store.images || [],
-                    businessHours: store.business_hours || { start: '20:00', end: '02:00' },
-                    closedDays: store.closed_days || []
-                }));
+                const convertedStores = stores.map(store => {
+                    // featuresフィールドの形式を判定（既存データとの互換性対応）
+                    let businessHours = { start: '20:00', end: '02:00' };
+                    let closedDays = [];
+                    let features = [];
+                    
+                    if (Array.isArray(store.features)) {
+                        // 既存データ：featuresが配列形式の場合
+                        features = store.features;
+                        console.log(`📄 ${store.name}: 既存データ形式 (features配列)`);
+                    } else if (store.features && typeof store.features === 'object') {
+                        // 新データ：featuresがオブジェクト形式の場合
+                        features = store.features.features || [];
+                        businessHours = store.features.businessHours || businessHours;
+                        closedDays = store.features.closedDays || [];
+                        console.log(`📄 ${store.name}: 新データ形式 (拡張features)`);
+                    }
+                    
+                    return {
+                        id: store.id,
+                        name: store.name,
+                        description: store.description,
+                        features: features,  // 元のfeatures配列
+                        price: store.price,
+                        badge: store.badge || '',
+                        image: store.image,
+                        images: store.images || [],  // gallery→imagesに統一
+                        businessHours: businessHours,
+                        closedDays: closedDays
+                    };
+                });
                 
                 console.log(`✅ ${convertedStores.length}件の店舗データを変換しました`);
+                
+                // モバイル版でのデータ詳細ログ
+                if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+                    console.log('📱 モバイル版データ詳細:');
+                    convertedStores.forEach((store, index) => {
+                        console.log(`  ${index + 1}. ${store.name}:`);
+                        console.log(`     - 画像数: ${store.images?.length || 0}`);
+                        console.log(`     - 営業時間: ${store.businessHours?.start || '未設定'} - ${store.businessHours?.end || '未設定'}`);
+                        console.log(`     - 定休日: ${store.closedDays?.join('、') || '未設定'}`);
+                    });
+                }
+                
                 return convertedStores;
             }
             
@@ -504,17 +535,22 @@ class SupabaseDB {
 
         try {
             // admin.js形式からSupabase形式に変換
+            // featuresフィールドに営業時間・定休日情報も含める
+            const extendedFeatures = {
+                features: store.features || [],
+                businessHours: store.businessHours || { start: '20:00', end: '02:00' },
+                closedDays: store.closedDays || []
+            };
+            
             const supabaseData = {
                 id: store.id,
                 name: store.name,
                 description: store.description,
-                features: store.features || [],
+                features: extendedFeatures,  // 拡張されたfeaturesオブジェクト
                 price: store.price,
                 badge: store.badge || '',
                 image: store.image,
-                images: store.gallery || [],
-                business_hours: store.businessHours || { start: '20:00', end: '02:00' },
-                closed_days: store.closedDays || [],
+                images: store.images || [],  // imagesフィールドで統一
                 session_id: this.sessionId,
                 updated_at: new Date().toISOString()
             };

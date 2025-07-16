@@ -615,7 +615,7 @@ const DEFAULT_STORES = [
         price: "30,000円〜",
         badge: "人気",
         image: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=800&h=600&fit=crop&crop=center",
-        gallery: [
+        images: [
             "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=800&h=600&fit=crop&crop=center",
             "https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=800&h=600&fit=crop&crop=center",
             "https://images.unsplash.com/photo-1549490349-8643362247b5?w=800&h=600&fit=crop&crop=center"
@@ -629,7 +629,7 @@ const DEFAULT_STORES = [
         price: "50,000円〜",
         badge: "王室級",
         image: "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=800&h=600&fit=crop&crop=center",
-        gallery: [
+        images: [
             "https://images.unsplash.com/photo-1516997121675-4c2d1684aa3e?w=800&h=600&fit=crop&crop=center",
             "https://images.unsplash.com/photo-1574391884720-bfafb0d70327?w=800&h=600&fit=crop&crop=center"
         ]
@@ -832,7 +832,7 @@ function addDebugTestButtons() {
             badge: 'テスト',
             features: ['テスト機能'],
             image: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=800&h=600&fit=crop&crop=center',
-            gallery: [],
+                images: [],
             businessHours: { start: '20:00', end: '02:00' },
             closedDays: []
         };
@@ -1118,7 +1118,7 @@ function editStore(id) {
     editingStoreId = id;
     
     // 現在の画像配列を初期化（5スロット）
-    currentStoreImages = store.gallery ? [...store.gallery] : [];
+    currentStoreImages = store.images ? [...store.images] : [];
     
     // 配列が5要素未満の場合は空文字で埋める
     while (currentStoreImages.length < 5) {
@@ -1465,7 +1465,7 @@ async function handleStoreSubmit(e) {
         }
         
         // 空の要素を除去してギャラリー配列を作成
-        const gallery = currentStoreImages.filter(img => img && img.trim() !== '');
+        const images = currentStoreImages.filter(img => img && img.trim() !== '');
         
         // 営業時間の取得
         const businessHours = {
@@ -1484,7 +1484,7 @@ async function handleStoreSubmit(e) {
             price: storePrice,
             badge: storeBadge,
             image: storeImage,
-            gallery: gallery,
+            images: images,  // galleryからimagesに変更
             businessHours: businessHours,
             closedDays: closedDays
         };
@@ -2053,3 +2053,190 @@ async function handleLocalUpload(file) {
 
 // アプリケーション開始
 document.addEventListener('DOMContentLoaded', initializeApp);
+
+// デバッグ用：テスト店舗データを直接保存する関数
+async function testSupabaseGalleryAndSchedule() {
+    console.log('🧪 写真ギャラリー・営業時間・定休日のテスト開始');
+    
+    try {
+        // テスト用店舗データ
+        const testStoreData = {
+            id: 999,
+            name: 'テスト店舗（ギャラリー・営業時間付き）',
+            description: '写真ギャラリー、営業時間、定休日のテスト店舗です',
+            features: ['テスト機能1', '写真ギャラリー対応', '営業時間設定'],
+            price: '1,500円〜',
+            badge: 'テスト',
+            image: 'https://images.unsplash.com/photo-1514933651103-005eec06c04b?w=800&h=600&fit=crop&crop=center',
+            images: [
+                'https://images.unsplash.com/photo-1514933651103-005eec06c04b?w=800&h=600&fit=crop&crop=center',
+                'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=800&h=600&fit=crop&crop=center',
+                'https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=800&h=600&fit=crop&crop=center',
+                'https://images.unsplash.com/photo-1549490349-8643362247b5?w=800&h=600&fit=crop&crop=center',
+                'https://images.unsplash.com/photo-1516997121675-4c2d1684aa3e?w=800&h=600&fit=crop&crop=center'
+            ],
+            businessHours: {
+                start: '19:30',
+                end: '01:30'
+            },
+            closedDays: ['月曜日', '火曜日']
+        };
+        
+        console.log('📝 テストデータ:', testStoreData);
+        
+        // SupabaseDBインスタンスを取得
+        const supabaseDB = window.supabaseDB || window.createSupabaseDB();
+        
+        // テスト保存実行
+        const success = await supabaseDB.saveStore(testStoreData);
+        
+        if (success) {
+            console.log('✅ テスト保存成功');
+            showMessage('テスト店舗データの保存に成功しました！', 'success');
+            
+            // データを再読み込みして確認
+            setTimeout(async () => {
+                const stores = await supabaseDB.loadStores();
+                const testStore = stores.find(s => s.id === 999);
+                if (testStore) {
+                    console.log('✅ テスト店舗読み込み成功:', testStore);
+                    console.log('📷 ギャラリー画像数:', testStore.images?.length || 0);
+                    console.log('🕐 営業時間:', testStore.businessHours);
+                    console.log('📅 定休日:', testStore.closedDays);
+                }
+            }, 1000);
+            
+        } else {
+            console.error('❌ テスト保存失敗');
+            showMessage('テスト保存に失敗しました', 'error');
+        }
+        
+    } catch (error) {
+        console.error('❌ テストエラー:', error);
+        showMessage('テスト実行エラー: ' + error.message, 'error');
+    }
+}
+
+// 既存店舗にギャラリーデータを追加する関数
+async function updateExistingStoresWithGallery() {
+    console.log('🔄 既存店舗にギャラリーデータを追加中...');
+    showMessage('既存店舗にギャラリー・営業時間・定休日を追加中...', 'info');
+    
+    try {
+        const supabaseDB = window.supabaseDB || window.createSupabaseDB();
+        
+        // 店舗1: asian Club
+        const store1 = {
+            id: 1,
+            name: 'asian Club',
+            description: '高級感あふれるアジアンスタイルのキャバクラ。上品なキャストが心を込めておもてなしいたします。',
+            features: ['高級店', '上品', '写真ギャラリー対応', 'アジアンテイスト'],
+            price: '1,800円〜',
+            badge: '高級志向',
+            image: 'https://images.unsplash.com/photo-1514933651103-005eec06c04b?w=800&h=600&fit=crop&crop=center',
+            images: [
+                'https://images.unsplash.com/photo-1514933651103-005eec06c04b?w=800&h=600&fit=crop&crop=center',
+                'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=800&h=600&fit=crop&crop=center',
+                'https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=800&h=600&fit=crop&crop=center',
+                'https://images.unsplash.com/photo-1549490349-8643362247b5?w=800&h=600&fit=crop&crop=center',
+                'https://images.unsplash.com/photo-1516997121675-4c2d1684aa3e?w=800&h=600&fit=crop&crop=center'
+            ],
+            businessHours: { start: '19:30', end: '01:30' },
+            closedDays: ['月曜日']
+        };
+        
+        // 店舗2: FOURTY FIVE  
+        const store2 = {
+            id: 2,
+            name: 'FOURTY FIVE',
+            description: 'モダンで洗練された空間のキャバクラ。若いキャストが活気あふれるサービスを提供します。',
+            features: ['モダン', '若いキャスト', '写真ギャラリー', 'イベント多数'],
+            price: '1,500円〜',
+            badge: '人気上昇中',
+            image: 'https://images.unsplash.com/photo-1574391884720-bfafb0d70327?w=800&h=600&fit=crop&crop=center',
+            images: [
+                'https://images.unsplash.com/photo-1574391884720-bfafb0d70327?w=800&h=600&fit=crop&crop=center',
+                'https://images.unsplash.com/photo-1516997121675-4c2d1684aa3e?w=800&h=600&fit=crop&crop=center',
+                'https://images.unsplash.com/photo-1549490349-8643362247b5?w=800&h=600&fit=crop&crop=center',
+                'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=800&h=600&fit=crop&crop=center'
+            ],
+            businessHours: { start: '20:00', end: '02:00' },
+            closedDays: ['火曜日']
+        };
+        
+        // 両方の店舗を保存
+        const success1 = await supabaseDB.saveStore(store1);
+        const success2 = await supabaseDB.saveStore(store2);
+        
+        if (success1 && success2) {
+            console.log('✅ 両方の店舗更新成功');
+            showMessage('既存店舗のギャラリー・営業時間・定休日を更新しました！', 'success');
+            
+            // データを確認
+            setTimeout(async () => {
+                const stores = await supabaseDB.loadStores();
+                console.log('🔍 更新後のデータ確認:', stores);
+                
+                if (stores && stores.length > 0) {
+                    stores.forEach(store => {
+                        console.log(`📋 ${store.name}:`);
+                        console.log(`   - 画像数: ${store.images?.length || 0}`);
+                        console.log(`   - 営業時間: ${store.businessHours?.start} - ${store.businessHours?.end}`);
+                        console.log(`   - 定休日: ${store.closedDays?.join('、') || 'なし'}`);
+                    });
+                }
+            }, 1000);
+            
+        } else {
+            console.error('❌ 店舗更新失敗');
+            showMessage('店舗更新に失敗しました', 'error');
+        }
+        
+    } catch (error) {
+        console.error('❌ 店舗更新エラー:', error);
+        showMessage('店舗更新エラー: ' + error.message, 'error');
+    }
+}
+
+// モバイル版データ強制更新関数
+async function forceMobileDataRefresh() {
+    console.log('📱 モバイル版データ強制更新開始');
+    showMessage('モバイル版のデータを強制更新中...', 'info');
+    
+    try {
+        // キャッシュクリア
+        localStorage.removeItem('nice_stores');
+        localStorage.removeItem('nice_stores_cache_timestamp');
+        
+        // Supabaseから最新データを取得
+        const supabaseDB = window.supabaseDB || window.createSupabaseDB();
+        const freshStores = await supabaseDB.loadStores();
+        
+        if (freshStores && freshStores.length > 0) {
+            console.log(`📱 最新データ取得成功: ${freshStores.length}件`);
+            console.log('📱 データサンプル:', freshStores[0]);
+            
+            // ローカルストレージに保存
+            localStorage.setItem('nice_stores', JSON.stringify(freshStores));
+            
+            showMessage(`モバイル版データ更新完了！${freshStores.length}件の店舗データを更新しました`, 'success');
+            
+            // フロントエンドサイトを新しいタブで開く
+            setTimeout(() => {
+                const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+                if (isMobile) {
+                    window.open('/cabaret-list.html', '_blank');
+                    showMessage('モバイル版店舗一覧を新しいタブで開きました', 'info');
+                }
+            }, 1000);
+            
+        } else {
+            console.error('❌ データ取得失敗');
+            showMessage('データ取得に失敗しました', 'error');
+        }
+        
+    } catch (error) {
+        console.error('❌ モバイル版データ更新エラー:', error);
+        showMessage('データ更新エラー: ' + error.message, 'error');
+    }
+}

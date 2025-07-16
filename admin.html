@@ -198,6 +198,51 @@
         </div>
     </div>
 
+    <!-- デバッグテスト用ボタンエリア -->
+    <div id="debug-button-area" style="position: fixed; bottom: 120px; right: 20px; z-index: 9999;">
+        <button onclick="testSupabaseGalleryAndSchedule()" 
+                style="background: #9b59b6; color: white; padding: 8px 12px; border: none; border-radius: 5px; cursor: pointer; margin: 5px; font-size: 11px; box-shadow: 0 2px 10px rgba(0,0,0,0.3);">
+            📷 ギャラリー・営業時間テスト
+        </button>
+        <br>
+        <button onclick="forceMobileDataRefresh()" 
+                style="background: #e74c3c; color: white; padding: 8px 12px; border: none; border-radius: 5px; cursor: pointer; margin: 5px; font-size: 11px; box-shadow: 0 2px 10px rgba(0,0,0,0.3);">
+            📱 モバイル版データ強制更新
+        </button>
+        <br>
+        <button onclick="updateExistingStoresWithGallery()" 
+                style="background: #f39c12; color: white; padding: 8px 12px; border: none; border-radius: 5px; cursor: pointer; margin: 5px; font-size: 11px; box-shadow: 0 2px 10px rgba(0,0,0,0.3);">
+            🔄 既存店舗にギャラリー追加
+        </button>
+    </div>
+
+    <style>
+        /* レスポンシブ対応のボタン位置調整 */
+        @media (max-width: 768px) {
+            #debug-button-area {
+                bottom: 140px !important;
+                right: 10px !important;
+            }
+            #debug-button-area button {
+                font-size: 10px !important;
+                padding: 6px 10px !important;
+                transform: scale(0.9);
+            }
+        }
+        
+        @media (max-width: 480px) {
+            #debug-button-area {
+                bottom: 160px !important;
+                right: 5px !important;
+            }
+            #debug-button-area button {
+                font-size: 9px !important;
+                padding: 5px 8px !important;
+                transform: scale(0.8);
+            }
+        }
+    </style>
+
     <!-- 隠しファイル入力 -->
     <input type="file" id="image-upload-input" accept="image/*" capture="environment" style="display: none;">
 
