@@ -54,10 +54,25 @@
                 <div class="controls-row" style="margin-top: 10px; border-top: 1px solid #eee; padding-top: 10px;">
                     <button onclick="syncLocalToSupabase()" class="control-btn" style="background: #20c997; color: white;">🔄 ローカル→Supabase同期</button>
                     <button onclick="checkSupabaseData()" class="control-btn" style="background: #6f42c1; color: white;">📊 Supabaseデータ確認</button>
+                    <button onclick="updateExistingStoresWithGallery()" class="control-btn" style="background: #28a745; color: white;">🔄 既存店舗にギャラリー追加</button>
                 </div>
                 <div class="controls-row" style="margin-top: 10px; border-top: 1px solid #ddd; padding-top: 10px;">
                     <button onclick="testDelete()" class="control-btn" style="background: #fd7e14; color: white;">🧪 削除テスト</button>
+                </div>
+                <div class="controls-row" style="margin-top: 10px; border-top: 2px solid #ff6b6b; padding-top: 10px; background: #f8f9fa;">
+                    <small style="color: #dc3545; font-weight: bold;">🔧 デバッグテスト:</small><br>
+                    <button onclick="basicTest()" class="control-btn" style="background: #28a745; color: white; font-size: 12px; padding: 5px 15px; margin: 2px;">✅ JS動作確認</button>
+                    <button onclick="buttonClickTest()" class="control-btn" style="background: #17a2b8; color: white; font-size: 12px; padding: 5px 15px; margin: 2px;">🔍 関数確認</button>
+                    <button onclick="simpleUploadTest()" class="control-btn" style="background: #ffc107; color: black; font-size: 12px; padding: 5px 15px; margin: 2px;">📁 アップロードテスト</button>
+                </div>
+                <div class="controls-row" style="margin-top: 5px; padding-top: 5px;">
+                    <small style="color: #dc3545; font-weight: bold;">🔍 詳細追跡:</small><br>
+                    <button onclick="checkUploadState()" class="control-btn" style="background: #6f42c1; color: white; font-size: 12px; padding: 5px 15px; margin: 2px;">📊 状態確認</button>
+                    <button onclick="checkDatabaseState()" class="control-btn" style="background: #e83e8c; color: white; font-size: 12px; padding: 5px 15px; margin: 2px;">🗄️ DB確認</button>
+                    <button onclick="toggleTrackingLog()" class="control-btn" style="background: #fd7e14; color: white; font-size: 12px; padding: 5px 15px; margin: 2px;">📋 ログ表示</button>
                     <button onclick="forceClearAuth()" class="control-btn" style="background: #dc3545; color: white;">🔒 セッションクリア</button>
+                    <button onclick="testSupabaseGalleryAndSchedule()" class="control-btn" style="background: #17a2b8; color: white;">🧪 ギャラリーテスト</button>
+                    <button onclick="forceMobileDataRefresh()" class="control-btn" style="background: #ffc107; color: white;">📱 モバイル強制更新</button>
                 </div>
 
             </div>
@@ -76,23 +91,27 @@
                 </div>
                 <form id="store-form">
                     <input type="hidden" id="store-id" name="id">
-                    <input type="hidden" id="main-image-url" name="image">
                     <div class="form-group">
                         <label for="store-name">店舗名</label>
                         <input type="text" id="store-name" name="name" required>
                     </div>
                     <div class="form-group">
-                        <label for="store-image">メイン画像</label>
-                        <div class="image-selector">
-                            <div class="selected-image-preview">
-                                <img id="selected-main-image" src="" alt="選択された画像" style="display: none;">
+                        <label>メイン画像</label>
+                        <div class="main-image-container">
+                            <input type="hidden" id="main-image-url" name="image">
+                            <!-- 永続的な非表示ファイル入力: これが新しいアップロードの本体です -->
+                            <input type="file" id="main-image-file-input" accept="image/*" style="display: none;">
+
+                            <div id="main-image-preview-container" class="selected-image-preview">
+                                <!-- 画像プレビューはJavaScriptによってここに表示されます -->
                                 <span class="no-image-text">画像を選択してください</span>
                             </div>
                             <div class="image-selector-buttons">
                                 <button type="button" class="select-image-btn" onclick="showImageGallery('main')">
                                     プリセット画像
                                 </button>
-                                <button type="button" class="upload-image-btn" onclick="uploadImage('main')">
+                                <!-- このボタンはJavaScript経由でファイル入力をトリガーします -->
+                                <button type="button" id="upload-main-image-button" class="upload-image-btn">
                                     ファイルアップロード
                                 </button>
                             </div>
@@ -257,6 +276,6 @@
     <script src="supabase-db.js"></script>
     
     <!-- メインスクリプト -->
-    <script src="admin.js?v=20241219"></script>
+    <script src="admin.js?v=202407163"></script>
 </body>
 </html> 

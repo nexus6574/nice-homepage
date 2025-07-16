@@ -11,31 +11,69 @@ class SupabaseDB {
 
     // 初期化
     async initialize() {
+        if (window.debugLog) debugLog('🚀 SupabaseDB初期化開始...');
+        console.log('🚀 SupabaseDB初期化開始...');
+        
         if (!checkSupabaseConfig()) {
+            if (window.debugLog) debugLog('🔄 Supabase未設定 - ローカルモードで継続');
             console.log('🔄 Supabase未設定 - ローカルモードで継続');
             return false;
         }
+        
+        if (window.debugLog) debugLog('✅ Supabase設定確認完了');
+        console.log('✅ Supabase設定確認完了');
 
         try {
-            if (initializeSupabase()) {
+            if (window.debugLog) debugLog('🔗 Supabaseクライアント初期化中...');
+            console.log('🔗 Supabaseクライアント初期化中...');
+            
+            // 管理機能かどうかを判定（admin.htmlからの呼び出しかチェック）
+            const isAdminPage = window.location.pathname.includes('admin.html') || 
+                               window.location.href.includes('admin.html') || 
+                               document.title.includes('管理');
+            
+            // 管理機能の場合はService Role Keyを使用
+            const initResult = isAdminPage ? initializeSupabaseAdmin() : initializeSupabase();
+            
+            if (initResult) {
+                if (window.debugLog) debugLog(`✅ Supabaseクライアント初期化成功 (${isAdminPage ? 'Admin' : 'Public'}モード)`);
+                console.log(`✅ Supabaseクライアント初期化成功 (${isAdminPage ? 'Admin' : 'Public'}モード)`);
+                
+                if (window.debugLog) debugLog('🔍 接続テスト実行中...');
+                console.log('🔍 接続テスト実行中...');
                 await this.testConnection();
+                
                 this.isOnline = true;
+                if (window.debugLog) debugLog('🌐 Supabaseオンラインモード開始');
                 console.log('🌐 Supabaseオンラインモード開始');
                 return true;
+            } else {
+                throw new Error('Supabaseクライアント初期化に失敗しました');
             }
         } catch (error) {
             console.error('❌ Supabase初期化失敗:', error);
-            console.log('🔄 ローカルモードで継続');
+            if (window.debugLog) debugLog(`❌ Supabase初期化失敗: ${error.message}`, 'error');
+            this.isOnline = false;
+            return false;
         }
-        return false;
     }
 
     // 接続テスト
     async testConnection() {
+        if (window.debugLog) debugLog('🔍 Supabase接続テスト開始...');
+        console.log('🔍 Supabase接続テスト開始...');
+        
         if (!window.supabaseClient) {
             throw new Error('Supabaseクライアントが初期化されていません');
         }
         
+        if (window.debugLog) debugLog('✅ supabaseClient存在確認: OK');
+        console.log('✅ supabaseClient存在確認: OK');
+        if (window.debugLog) debugLog(`🔗 テーブル名: ${SUPABASE_CONFIG.tables.stores}`);
+        console.log('🔗 テーブル名:', SUPABASE_CONFIG.tables.stores);
+        
+        if (window.debugLog) debugLog('📡 データベースアクセス中...');
+        console.log('📡 データベースアクセス中...');
         const { data, error } = await window.supabaseClient
             .from(SUPABASE_CONFIG.tables.stores)
             .select('count')
@@ -43,14 +81,20 @@ class SupabaseDB {
         
         if (error && error.code === 'PGRST116') {
             // テーブルが存在しない場合は作成指示
+            if (window.debugLog) debugLog(`❌ テーブルが存在しません: ${error.message}`, 'error');
+            console.error('❌ テーブルが存在しません:', error);
             throw new Error('テーブルが存在しません。Supabaseダッシュボードでテーブルを作成してください。');
         }
         
         if (error) {
-            throw error;
+            if (window.debugLog) debugLog(`❌ 接続テストエラー: ${error.message}`, 'error');
+            console.error('❌ 接続テストエラー:', error);
+            throw new Error(`接続テストに失敗しました: ${error.message}`);
         }
         
-        console.log('✅ Supabase接続確認完了');
+        if (window.debugLog) debugLog('✅ Supabase接続テスト成功', 'success');
+        console.log('✅ Supabase接続テスト成功');
+        return true;
     }
 
     // セッションID生成
@@ -524,18 +568,22 @@ class SupabaseDB {
         }
     }
 
-    // 単一店舗の保存（admin.js互換用）
+    // 個別店舗保存（upsert）
     async saveStore(store) {
-        console.log('💾 SupabaseDB.saveStore実行中...', store);
-        
-        if (!this.isOnline) {
-            console.log('⚠️ オフライン状態です');
-            return false;
-        }
-
         try {
-            // admin.js形式からSupabase形式に変換
-            // featuresフィールドに営業時間・定休日情報も含める
+            console.log('🗃️ saveStore関数開始:', store.name);
+            console.log('📋 保存するデータ:', JSON.stringify(store, null, 2));
+            
+            if (!window.supabaseClient) {
+                console.error('❌ Supabaseクライアントが初期化されていません');
+                return false;
+            }
+            
+            console.log('✅ Supabaseクライアント確認完了');
+            
+            // Supabaseに保存するデータを準備
+            console.log('📝 Supabaseデータ形式に変換中...');
+            
             const extendedFeatures = {
                 features: store.features || [],
                 businessHours: store.businessHours || { start: '20:00', end: '02:00' },
@@ -545,31 +593,47 @@ class SupabaseDB {
             const supabaseData = {
                 id: store.id,
                 name: store.name,
-                description: store.description,
-                features: extendedFeatures,  // 拡張されたfeaturesオブジェクト
-                price: store.price,
+                description: store.description || '',
+                features: extendedFeatures,
+                price: store.price || '',
                 badge: store.badge || '',
-                image: store.image,
-                images: store.images || [],  // imagesフィールドで統一
-                session_id: this.sessionId,
+                image: store.image || '',
+                images: store.images || [],
+                contact: store.contact || '',
                 updated_at: new Date().toISOString()
             };
-
-            const { error } = await window.supabaseClient
-                .from(SUPABASE_CONFIG.tables.stores)
-                .upsert(supabaseData);
-
+            
+            console.log('📊 Supabase用データ:', JSON.stringify(supabaseData, null, 2));
+            
+            // upsert実行
+            console.log('💾 データベースupsert実行中...');
+            
+            const { data, error } = await window.supabaseClient
+                .from('nice_stores')
+                .upsert(supabaseData, { 
+                    onConflict: 'id',
+                    returning: 'minimal' 
+                });
+            
             if (error) {
-                console.error('❌ 店舗保存エラー:', error);
+                console.error('💥 データベースupsertエラー:', error);
+                console.error('📊 エラー詳細:', {
+                    message: error.message,
+                    details: error.details,
+                    hint: error.hint,
+                    code: error.code
+                });
                 return false;
             }
-
-            console.log('✅ 店舗保存成功:', store.name);
-            this.lastSync = new Date();
+            
+            console.log('✅ データベースupsert成功');
+            console.log('📊 返却データ:', data);
+            
             return true;
             
         } catch (error) {
-            console.error('❌ saveStoreエラー:', error);
+            console.error('💥 saveStore関数でエラー発生:', error);
+            console.error('📊 エラースタック:', error.stack);
             return false;
         }
     }

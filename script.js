@@ -339,12 +339,34 @@ function createStoreCard(store) {
     const card = document.createElement('div');
     card.className = 'store-card fade-in';
     
-    const featuresHTML = store.features.map(feature => 
-        `<span class="feature-tag">${feature}</span>`
-    ).join('');
+    // 安全なフィーチャー処理
+    const featuresHTML = (store.features && Array.isArray(store.features)) ? 
+        store.features.map(feature => 
+            `<span class="feature-tag">${feature}</span>`
+        ).join('') : '';
     
-    // 写真ギャラリーの準備（imagesフィールドを使用）
-    const galleryImages = store.images || [store.image];
+    // メイン画像とギャラリー画像の処理を改善
+    let galleryImages = [];
+    
+    // 1. メイン画像（store.image）を最優先
+    if (store.image && store.image.trim() !== '') {
+        galleryImages.push(store.image);
+    }
+    
+    // 2. ギャラリー画像（store.images）を追加（重複を避ける）
+    if (store.images && Array.isArray(store.images)) {
+        store.images.forEach(img => {
+            if (img && img.trim() !== '' && !galleryImages.includes(img)) {
+                galleryImages.push(img);
+            }
+        });
+    }
+    
+    // 3. フォールバック画像（画像が1つもない場合）
+    if (galleryImages.length === 0) {
+        galleryImages = ['https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=400&h=300&fit=crop&crop=center'];
+    }
+    
     const hasMultipleImages = galleryImages.length > 1;
     
     // ギャラリー用のHTMLを生成
@@ -361,13 +383,18 @@ function createStoreCard(store) {
             ).join('')}
          </div>` : '';
     
+    // 店舗のバッジ、価格、説明のデフォルト値設定
+    const badge = store.badge || (store.features && store.features.length > 0 ? store.features[0] : '店舗');
+    const price = store.price || '要問合せ';
+    const description = store.description || store.name + 'の詳細情報です。';
+    
     card.innerHTML = `
         <div class="store-image">
             <div class="image-gallery">
                 ${galleryHTML}
             </div>
             ${indicatorHTML}
-            <div class="store-badge">${store.badge}</div>
+            <div class="store-badge">${badge}</div>
             ${hasMultipleImages ? '<div class="gallery-info">📷 ' + galleryImages.length + '枚</div>' : ''}
         </div>
         <div class="store-info">
@@ -375,11 +402,11 @@ function createStoreCard(store) {
             <div class="store-details">
                 <div class="price-info">
                     <span class="price-label">料金</span>
-                    <span class="price-value">${store.price}</span>
+                    <span class="price-value">${price}</span>
                 </div>
                 <div class="remarks">
                     <span class="remarks-label">備考</span>
-                    <p class="remarks-text">${store.description}</p>
+                    <p class="remarks-text">${description}</p>
                 </div>
             </div>
             <div class="store-features">
@@ -400,24 +427,23 @@ function createStoreCard(store) {
     }
     
     // クリックイベントを追加
-    card.style.cursor = 'pointer';
-    card.addEventListener('click', function() {
-        navigateToStoreDetail(store);
+    const overlay = card.querySelector('.store-card-overlay');
+    if (overlay) {
+        overlay.addEventListener('click', () => {
+            // 店舗詳細ページに遷移
+            window.location.href = `store-detail.html?id=${store.id}`;
+        });
+    }
+    
+    // ホバーエフェクト
+    card.addEventListener('mouseenter', () => {
+        const overlay = card.querySelector('.store-card-overlay');
+        if (overlay) overlay.style.opacity = '1';
     });
     
-    // ホバー効果のためのイベント
-    card.addEventListener('mouseenter', function() {
+    card.addEventListener('mouseleave', () => {
         const overlay = card.querySelector('.store-card-overlay');
-        if (overlay) {
-            overlay.style.opacity = '1';
-        }
-    });
-    
-    card.addEventListener('mouseleave', function() {
-        const overlay = card.querySelector('.store-card-overlay');
-        if (overlay) {
-            overlay.style.opacity = '0';
-        }
+        if (overlay) overlay.style.opacity = '0';
     });
     
     return card;
