@@ -1359,6 +1359,20 @@ function hideLoading() {
     document.getElementById('loading').style.display = 'none';
 }
 
+// エラー表示を隠す関数
+function hideError() {
+    const errorElement = document.getElementById('error-content');
+    if (errorElement) {
+        errorElement.style.display = 'none';
+    }
+    
+    // その他のエラー表示も隠す
+    const errorElements = document.querySelectorAll('.error-message, .error-display');
+    errorElements.forEach(el => {
+        el.style.display = 'none';
+    });
+}
+
 // エラー表示
 function showError(message) {
     console.error('Error:', message);
@@ -2032,6 +2046,508 @@ async function performDesktopEmergencyFix() {
             btn.style.background = '#e74c3c';
             btn.disabled = false;
         }
+    }
+}
+
+// 緊急パネルを閉じる
+function closeEmergencyPanel() {
+    const panel = document.getElementById('emergency-debug-panel');
+    if (panel) {
+        panel.remove();
+    }
+}
+
+// 🏪 店舗詳細情報を表示する関数（緊急実装）
+function displayStoreDetail(store) {
+    console.log('🏪 店舗詳細表示開始:', store.name);
+    
+    try {
+        // 現在のローディング表示やエラー表示を隠す
+        hideLoading();
+        hideError();
+        
+        // 店舗詳細コンテンツエリアを取得または作成
+        let storeContent = document.getElementById('store-content');
+        if (!storeContent) {
+            console.log('🏗️ store-contentが存在しないため作成');
+            storeContent = document.createElement('div');
+            storeContent.id = 'store-content';
+            
+            // body内の適切な場所に挿入
+            const mainElement = document.querySelector('main') || document.body;
+            mainElement.appendChild(storeContent);
+        }
+        
+        // 店舗データの安全な取得
+        const storeName = store.name || '店舗名不明';
+        const storeDescription = store.description || '詳細情報はお問い合わせください。';
+        const storePrice = store.price || '料金要相談';
+        const storeBadge = store.badge || '';
+        
+        // 特徴タグの処理
+        let featuresArray = [];
+        if (Array.isArray(store.features)) {
+            featuresArray = store.features;
+        } else if (store.features && typeof store.features === 'object' && store.features.features) {
+            featuresArray = store.features.features;
+        }
+        
+        // 営業時間の処理
+        let businessHours = store.business_hours || store.businessHours;
+        if (!businessHours && store.features && typeof store.features === 'object' && store.features.businessHours) {
+            businessHours = store.features.businessHours;
+        }
+        
+        const hoursDisplay = businessHours && businessHours.start && businessHours.end 
+            ? `${businessHours.start} - ${businessHours.end}`
+            : '20:00 - 02:00';
+        
+        // 定休日の処理
+        let closedDays = store.closed_days || store.closedDays;
+        if (!closedDays && store.features && typeof store.features === 'object' && store.features.closedDays) {
+            closedDays = store.features.closedDays;
+        }
+        const closedDaysDisplay = closedDays && closedDays.length > 0 
+            ? closedDays.join('、') 
+            : '不定休';
+        
+        // 画像の処理
+        let galleryImages = [];
+        
+        // メイン画像を最優先
+        if (store.image && store.image.trim() !== '') {
+            galleryImages.push(store.image);
+        }
+        
+        // ギャラリー画像を追加
+        if (store.images && Array.isArray(store.images)) {
+            store.images.forEach(img => {
+                if (img && img.trim() !== '' && !galleryImages.includes(img)) {
+                    galleryImages.push(img);
+                }
+            });
+        }
+        
+        // フォールバック画像
+        if (galleryImages.length === 0) {
+            galleryImages = ['nice-storefront.jpg'];
+        }
+        
+        // ギャラリーHTMLの生成
+        const galleryHTML = galleryImages.map((img, index) => 
+            `<div class="gallery-slide ${index === 0 ? 'active' : ''}" data-index="${index}">
+                <img src="${img}" alt="${storeName} 画像 ${index + 1}" onerror="this.src='nice-storefront.jpg'">
+            </div>`
+        ).join('');
+        
+        // インジケーターHTML（複数画像がある場合）
+        const indicatorHTML = galleryImages.length > 1 
+            ? `<div class="gallery-indicators">
+                ${galleryImages.map((_, index) => 
+                    `<span class="indicator ${index === 0 ? 'active' : ''}" data-index="${index}"></span>`
+                ).join('')}
+            </div>`
+            : '';
+        
+        // 特徴タグHTML
+        const featuresHTML = featuresArray.length > 0 
+            ? `<div class="store-features">
+                ${featuresArray.map(feature => 
+                    `<span class="feature-tag">${feature}</span>`
+                ).join('')}
+            </div>`
+            : '';
+        
+        // 店舗詳細HTMLを生成
+        storeContent.innerHTML = `
+            <div class="store-detail-container">
+                <!-- 店舗ヘッダー -->
+                <div class="store-header">
+                    <div class="store-title-section">
+                        <h1 class="store-name">${storeName}</h1>
+                        ${storeBadge ? `<span class="store-badge">${storeBadge}</span>` : ''}
+                    </div>
+                    <div class="store-price-section">
+                        <span class="price-label">料金</span>
+                        <span class="price-value">${storePrice}</span>
+                    </div>
+                </div>
+                
+                <!-- 画像ギャラリー -->
+                <div class="store-gallery">
+                    <div class="gallery-container">
+                        ${galleryHTML}
+                        ${indicatorHTML}
+                        ${galleryImages.length > 1 ? '<div class="gallery-info">📷 ' + galleryImages.length + '枚</div>' : ''}
+                    </div>
+                </div>
+                
+                <!-- 店舗情報 -->
+                <div class="store-info-section">
+                    <div class="info-item">
+                        <h3>店舗詳細</h3>
+                        <p class="store-description">${storeDescription.replace(/\n/g, '<br>')}</p>
+                    </div>
+                    
+                    <div class="info-item">
+                        <h3>営業時間</h3>
+                        <p>${hoursDisplay}</p>
+                    </div>
+                    
+                    <div class="info-item">
+                        <h3>定休日</h3>
+                        <p>${closedDaysDisplay}</p>
+                    </div>
+                    
+                    ${featuresHTML ? `<div class="info-item">${featuresHTML}</div>` : ''}
+                </div>
+                
+                <!-- アクションボタン -->
+                <div class="store-actions">
+                    <button onclick="window.history.back()" class="back-button">
+                        ← 一覧に戻る
+                    </button>
+                    <button onclick="window.location.href='tel:03-0000-0000'" class="contact-button">
+                        📞 お問い合わせ
+                    </button>
+                </div>
+            </div>
+        `;
+        
+        // スタイルを追加（存在しない場合）
+        addStoreDetailStyles();
+        
+        // ギャラリー機能を初期化
+        if (galleryImages.length > 1) {
+            initializeGallerySlider();
+        }
+        
+        // 表示完了
+        storeContent.style.display = 'block';
+        
+        // グローバル変数に保存
+        currentStore = store;
+        
+        console.log('✅ 店舗詳細表示完了:', storeName);
+        
+        // ページタイトルを更新
+        document.title = `${storeName} - NICE キャバクラ詳細`;
+        
+    } catch (error) {
+        console.error('❌ 店舗詳細表示エラー:', error);
+        showError(`店舗詳細の表示に失敗しました: ${error.message}`);
+    }
+}
+
+// 🎨 店舗詳細ページ用のスタイルを追加
+function addStoreDetailStyles() {
+    const styleId = 'store-detail-styles';
+    if (document.getElementById(styleId)) return;
+    
+    const style = document.createElement('style');
+    style.id = styleId;
+    style.textContent = `
+        .store-detail-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        
+        .store-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .store-title-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .store-name {
+            font-size: 28px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin: 0;
+        }
+        
+        .store-badge {
+            background: #e74c3c;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        
+        .store-price-section {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+        
+        .price-label {
+            font-size: 12px;
+            color: #7f8c8d;
+            margin-bottom: 5px;
+        }
+        
+        .price-value {
+            font-size: 20px;
+            font-weight: bold;
+            color: #e74c3c;
+        }
+        
+        .store-gallery {
+            margin-bottom: 30px;
+        }
+        
+        .gallery-container {
+            position: relative;
+            width: 100%;
+            height: 400px;
+            border-radius: 15px;
+            overflow: hidden;
+            background: #f8f9fa;
+        }
+        
+        .gallery-slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+        
+        .gallery-slide.active {
+            opacity: 1;
+        }
+        
+        .gallery-slide img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .gallery-indicators {
+            position: absolute;
+            bottom: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 8px;
+        }
+        
+        .indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.5);
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        
+        .indicator.active {
+            background: white;
+        }
+        
+        .gallery-info {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+        }
+        
+        .store-info-section {
+            margin-bottom: 30px;
+        }
+        
+        .info-item {
+            margin-bottom: 25px;
+        }
+        
+        .info-item h3 {
+            font-size: 18px;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            border-left: 4px solid #e74c3c;
+            padding-left: 15px;
+        }
+        
+        .store-description {
+            font-size: 16px;
+            line-height: 1.6;
+            color: #34495e;
+            margin: 0;
+        }
+        
+        .store-features {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .feature-tag {
+            background: #3498db;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .store-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .back-button, .contact-button {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .back-button {
+            background: #95a5a6;
+            color: white;
+        }
+        
+        .back-button:hover {
+            background: #7f8c8d;
+            transform: translateY(-2px);
+        }
+        
+        .contact-button {
+            background: #27ae60;
+            color: white;
+        }
+        
+        .contact-button:hover {
+            background: #229954;
+            transform: translateY(-2px);
+        }
+        
+        /* モバイル対応 */
+        @media (max-width: 768px) {
+            .store-detail-container {
+                padding: 15px;
+                margin: 10px;
+            }
+            
+            .store-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .store-name {
+                font-size: 24px;
+            }
+            
+            .gallery-container {
+                height: 250px;
+            }
+            
+            .store-actions {
+                flex-direction: column;
+            }
+            
+            .back-button, .contact-button {
+                width: 100%;
+                text-align: center;
+            }
+        }
+    `;
+    
+    document.head.appendChild(style);
+}
+
+// 🎯 ギャラリースライダーの初期化
+function initializeGallerySlider() {
+    const slides = document.querySelectorAll('.gallery-slide');
+    const indicators = document.querySelectorAll('.gallery-indicators .indicator');
+    
+    if (slides.length <= 1) return;
+    
+    let currentSlide = 0;
+    let autoSlideInterval;
+    
+    // インジケータークリック処理
+    indicators.forEach((indicator, index) => {
+        indicator.addEventListener('click', () => {
+            showSlide(index);
+            resetAutoSlide();
+        });
+    });
+    
+    // スライド表示関数
+    function showSlide(index) {
+        slides.forEach(slide => slide.classList.remove('active'));
+        indicators.forEach(indicator => indicator.classList.remove('active'));
+        
+        if (slides[index]) {
+            slides[index].classList.add('active');
+        }
+        if (indicators[index]) {
+            indicators[index].classList.add('active');
+        }
+        
+        currentSlide = index;
+    }
+    
+    // 自動スライド開始
+    function startAutoSlide() {
+        autoSlideInterval = setInterval(() => {
+            currentSlide = (currentSlide + 1) % slides.length;
+            showSlide(currentSlide);
+        }, 4000);
+    }
+    
+    // 自動スライドリセット
+    function resetAutoSlide() {
+        if (autoSlideInterval) {
+            clearInterval(autoSlideInterval);
+        }
+        setTimeout(startAutoSlide, 2000);
+    }
+    
+    // 自動スライド開始
+    startAutoSlide();
+    
+    // ギャラリーエリアのホバー処理
+    const gallery = document.querySelector('.gallery-container');
+    if (gallery) {
+        gallery.addEventListener('mouseenter', () => {
+            if (autoSlideInterval) {
+                clearInterval(autoSlideInterval);
+            }
+        });
+        
+        gallery.addEventListener('mouseleave', () => {
+            startAutoSlide();
+        });
     }
 }
  
