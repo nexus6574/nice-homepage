@@ -1,19 +1,4 @@
-// ハンバーガーメニューとスライダーの初期化
-document.addEventListener('DOMContentLoaded', function() {
-    initializeMobileMenu();
-    
-    // モバイル版でのデータ強制更新
-    if (isMobileDevice()) {
-        console.log('📱 モバイルデバイス検出 - データ同期を強化します');
-        forceDataRefreshOnMobile();
-    }
-    
-    // ページ読み込み時にスライダーを初期化
-    setTimeout(() => {
-        console.log('ページ読み込み完了 - スライダーを初期化します');
-        initializeSlider();
-    }, 300);
-});
+// ハンバーガーメニューとスライダーの初期化（統合版のDOMContentLoadedに移行済み）
 
 function initializeMobileMenu() {
     const mobileMenuToggle = document.querySelector('.mobile-menu-toggle');
@@ -176,12 +161,15 @@ async function loadStoreData() {
                 console.log('店舗数:', supabaseStores.length);
                 console.log('店舗データサンプル:', supabaseStores[0]?.name || 'なし');
                 
+                // IDフィールドの確認と自動追加
+                const processedStores = ensureStoreIds(supabaseStores);
+                
                 // モバイル版での詳細データチェック
                 if (isMobile) {
                     console.log('📱 モバイル版データ詳細確認:');
-                    supabaseStores.forEach((store, index) => {
+                    processedStores.forEach((store, index) => {
                         if (index < 3) { // 最初の3店舗のみ表示
-                            console.log(`📱 店舗${index + 1}: ${store.name}`);
+                            console.log(`📱 店舗${index + 1}: ${store.name} (ID: ${store.id})`);
                             console.log(`    - 画像数: ${store.images?.length || 0}`);
                             console.log(`    - 画像URL例: ${store.images?.[0] ? store.images[0].substring(0, 50) + '...' : 'なし'}`);
                             console.log(`    - 営業時間: ${store.businessHours?.start || '未設定'} - ${store.businessHours?.end || '未設定'}`);
@@ -191,13 +179,13 @@ async function loadStoreData() {
                 }
                 
                 // Supabaseのデータを最新として保存
-                localStorage.setItem('nice_stores', JSON.stringify(supabaseStores));
+                localStorage.setItem('nice_stores', JSON.stringify(processedStores));
                 
                 if (isMobile) {
                     console.log('📱 ローカルストレージに保存完了');
                 }
                 
-                return supabaseStores;
+                return processedStores;
             }
         } catch (error) {
             console.error('❌ Supabaseデータ読み込みエラー:', error);
@@ -217,18 +205,27 @@ async function loadStoreData() {
             console.log('店舗数:', parsedData.length);
             console.log('店舗データサンプル:', parsedData[0]?.name || 'なし');
             
+            // IDフィールドの確認と自動追加
+            const processedStores = ensureStoreIds(parsedData);
+            
+            // 更新されたデータをローカルストレージに保存
+            if (JSON.stringify(processedStores) !== JSON.stringify(parsedData)) {
+                console.log('🔢 IDフィールドを追加して更新保存');
+                localStorage.setItem('nice_stores', JSON.stringify(processedStores));
+            }
+            
             if (isMobile) {
                 console.log('📱 モバイル版: ローカルストレージから復旧');
-                console.log('📱 データ件数:', parsedData.length);
+                console.log('📱 データ件数:', processedStores.length);
                 // モバイル版でのデータ確認
-                if (parsedData.length > 0 && parsedData[0].images?.length > 0) {
+                if (processedStores.length > 0 && processedStores[0].images?.length > 0) {
                     console.log('📱 ギャラリーデータ確認OK');
                 } else {
                     console.log('📱 ⚠️ ギャラリーデータが不足 - 管理画面でデータ更新が必要');
                 }
             }
             
-            return parsedData;
+            return processedStores;
         } catch (error) {
             console.error('❌ JSONパースエラー:', error);
             console.log('デフォルトデータにフォールバック');
@@ -246,10 +243,65 @@ async function loadStoreData() {
     return getDefaultStoreData();
 }
 
+// 店舗データにIDフィールドを確実に設定する関数
+function ensureStoreIds(stores) {
+    if (!stores || !Array.isArray(stores)) {
+        return stores;
+    }
+    
+    let hasChanged = false;
+    const processedStores = stores.map((store, index) => {
+        // IDフィールドがない、または無効な場合は自動設定
+        if (!store.id || store.id === '' || store.id === null || store.id === undefined) {
+            const newId = index + 1;
+            console.log(`🔢 店舗 ${store.name}: IDを自動設定 (${newId})`);
+            hasChanged = true;
+            return {
+                ...store,
+                id: newId
+            };
+        }
+        
+        // 既存のIDが文字列の場合は数値に変換
+        const numericId = parseInt(store.id);
+        if (!isNaN(numericId) && store.id !== numericId) {
+            console.log(`🔢 店舗 ${store.name}: IDを数値に統一 (${store.id} → ${numericId})`);
+            hasChanged = true;
+            return {
+                ...store,
+                id: numericId
+            };
+        }
+        
+        return store;
+    });
+    
+    if (hasChanged) {
+        console.log('✅ IDフィールドの自動追加・統一が完了しました');
+        
+        // モバイル版でIDが変更された場合の通知
+        if (isMobileDevice()) {
+            console.log('📱 モバイル版: 店舗IDが統一されました');
+            const processedCount = processedStores.filter(store => store.id !== undefined).length;
+            console.log(`📱 処理後の店舗数: ${processedCount}件`);
+            
+            // IDリストを表示（デバッグ用）
+            processedStores.forEach((store, index) => {
+                if (index < 5) { // 最初の5店舗のみ表示
+                    console.log(`📱 店舗${index + 1}: ${store.name} (ID: ${store.id})`);
+                }
+            });
+        }
+    }
+    
+    return processedStores;
+}
+
 // デフォルトの店舗データ
 function getDefaultStoreData() {
     return [
         {
+            id: 1,
             name: "Premium Club TOKYO",
             image: "nice-storefront.jpg",
             price: "1,500円〜",
@@ -260,6 +312,7 @@ function getDefaultStoreData() {
             closedDays: ["日曜日"]
         },
         {
+            id: 2,
             name: "Club Elegance",
             image: "nice-storefront.jpg",
             price: "1,200円〜",
@@ -270,6 +323,7 @@ function getDefaultStoreData() {
             closedDays: ["月曜日"]
         },
         {
+            id: 3,
             name: "Night Paradise",
             image: "nice-storefront.jpg",
             price: "1,000円〜",
@@ -280,6 +334,7 @@ function getDefaultStoreData() {
             closedDays: []
         },
         {
+            id: 4,
             name: "Luxury Lounge",
             image: "nice-storefront.jpg",
             price: "2,000円〜",
@@ -290,6 +345,7 @@ function getDefaultStoreData() {
             closedDays: ["日曜日", "月曜日"]
         },
         {
+            id: 5,
             name: "Royal Cabinet",
             image: "nice-storefront.jpg",
             price: "1,750円〜",
@@ -300,6 +356,7 @@ function getDefaultStoreData() {
             closedDays: ["火曜日"]
         },
         {
+            id: 6,
             name: "Diamond Club",
             image: "nice-storefront.jpg",
             price: "1,400円〜",
@@ -426,25 +483,21 @@ function createStoreCard(store) {
         setupCardGallery(card, galleryImages);
     }
     
-    // クリックイベントを追加
-    const overlay = card.querySelector('.store-card-overlay');
-    if (overlay) {
-        overlay.addEventListener('click', () => {
-            // 店舗詳細ページに遷移
-            window.location.href = `store-detail.html?id=${store.id}`;
+    // 改善されたクリック・タッチイベント処理
+    setupStoreCardNavigation(card, store);
+    
+    // ホバーエフェクト（デスクトップのみ）
+    if (!isMobileDevice()) {
+        card.addEventListener('mouseenter', () => {
+            const overlay = card.querySelector('.store-card-overlay');
+            if (overlay) overlay.style.opacity = '1';
+        });
+        
+        card.addEventListener('mouseleave', () => {
+            const overlay = card.querySelector('.store-card-overlay');
+            if (overlay) overlay.style.opacity = '0';
         });
     }
-    
-    // ホバーエフェクト
-    card.addEventListener('mouseenter', () => {
-        const overlay = card.querySelector('.store-card-overlay');
-        if (overlay) overlay.style.opacity = '1';
-    });
-    
-    card.addEventListener('mouseleave', () => {
-        const overlay = card.querySelector('.store-card-overlay');
-        if (overlay) overlay.style.opacity = '0';
-    });
     
     return card;
 }
@@ -465,24 +518,35 @@ function setupCardGallery(card, images) {
             showImage(index);
         });
         
-        // モバイル版：タッチイベント
+        // モバイル版：タッチイベント（改善版）
         if (isMobileDevice()) {
+            let touchStartTime = 0;
+            
             indicator.addEventListener('touchstart', (e) => {
                 e.stopPropagation();
                 e.preventDefault();
-            });
+                touchStartTime = Date.now();
+            }, { passive: false });
             
             indicator.addEventListener('touchend', (e) => {
                 e.stopPropagation();
                 e.preventDefault();
-                showImage(index);
                 
-                // ビジュアルフィードバック
-                indicator.style.transform = 'scale(1.2)';
-                setTimeout(() => {
-                    indicator.style.transform = '';
-                }, 150);
-            });
+                const touchDuration = Date.now() - touchStartTime;
+                
+                // 短いタップのみ有効（スワイプと区別）
+                if (touchDuration < 300) {
+                    showImage(index);
+                    
+                    // ビジュアルフィードバック
+                    indicator.style.transform = 'scale(1.2)';
+                    indicator.style.transition = 'transform 0.1s ease';
+                    setTimeout(() => {
+                        indicator.style.transform = '';
+                        indicator.style.transition = '';
+                    }, 150);
+                }
+            }, { passive: false });
         }
     });
     
@@ -493,8 +557,12 @@ function setupCardGallery(card, images) {
         indicators.forEach(ind => ind.classList.remove('active'));
         
         // 新しい画像とインジケーターをアクティブに
-        imageElements[index].style.display = 'block';
-        indicators[index].classList.add('active');
+        if (imageElements[index]) {
+            imageElements[index].style.display = 'block';
+        }
+        if (indicators[index]) {
+            indicators[index].classList.add('active');
+        }
         
         currentIndex = index;
     }
@@ -531,31 +599,160 @@ function setupCardGallery(card, images) {
         }
     });
     
-    // モバイル版でのタッチ操作
+    // モバイル版でのタッチ操作（改善版）
     if (isMobileDevice()) {
         let touchStartTime = 0;
+        let isLongPress = false;
         
         card.addEventListener('touchstart', (e) => {
             touchStartTime = Date.now();
-        });
+            isLongPress = false;
+            
+            // 長押し検出用タイマー
+            setTimeout(() => {
+                if (Date.now() - touchStartTime >= 500) {
+                    isLongPress = true;
+                }
+            }, 500);
+        }, { passive: true });
         
         card.addEventListener('touchend', (e) => {
             const touchDuration = Date.now() - touchStartTime;
             
-            // 長押し（500ms以上）でギャラリー自動スライド開始
-            if (touchDuration >= 500) {
+            // 長押し（500ms以上）でギャラリー自動スライド開始/停止
+            if (isLongPress) {
                 e.preventDefault();
                 e.stopPropagation();
                 
                 if (autoSlideInterval) {
                     stopAutoSlide();
                     showImage(0);
+                    
+                    // フィードバック表示
+                    showMobileFeedback(card, 'スライドショー停止 ⏸️');
                 } else {
                     startAutoSlide();
+                    
+                    // フィードバック表示
+                    showMobileFeedback(card, 'スライドショー開始 ▶️');
                 }
             }
-        });
+        }, { passive: false });
     }
+}
+
+// 🔗 店舗カードのナビゲーション設定（パソコン版強化）
+function setupStoreCardNavigation(card, store) {
+    console.log('🔗 店舗カードナビゲーション設定:', store.name);
+    
+    // IDの確保と検証
+    let storeId = store.id;
+    if (!storeId || storeId === '' || storeId === null || storeId === undefined) {
+        console.warn('⚠️ 店舗IDが未設定:', store.name);
+        storeId = generateStoreId(store.name);
+        console.log('🔧 生成されたID:', storeId);
+    }
+    
+    // パソコン版での強化されたクリック処理
+    if (window.innerWidth > 768) {
+        console.log('🖥️ パソコン版クリックイベント設定:', store.name);
+        
+        // クリックイベント
+        card.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            console.log('🖥️ パソコン版店舗カードクリック:', {
+                storeName: store.name,
+                storeId: storeId,
+                clickTarget: e.target
+            });
+            
+            // インジケーターのクリックは無視（ギャラリー切り替え用）
+            if (e.target.classList.contains('indicator')) {
+                console.log('🖥️ インジケータークリックのため無視');
+                return;
+            }
+            
+            navigateToStoreDetail(store);
+        });
+        
+        // ダブルクリック防止
+        card.addEventListener('dblclick', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+        });
+        
+        // カーソルポインター設定
+        card.style.cursor = 'pointer';
+        
+    } else {
+        // モバイル版のタッチ処理
+        console.log('📱 モバイル版タッチイベント設定:', store.name);
+        
+        let touchStartTime = 0;
+        let touchStartX = 0;
+        let touchStartY = 0;
+        
+        card.addEventListener('touchstart', (e) => {
+            touchStartTime = Date.now();
+            touchStartX = e.touches[0].clientX;
+            touchStartY = e.touches[0].clientY;
+            
+            console.log('📱 タッチ開始:', store.name);
+        }, { passive: false });
+        
+        card.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const touchEndTime = Date.now();
+            const touchDuration = touchEndTime - touchStartTime;
+            const touchEndX = e.changedTouches[0].clientX;
+            const touchEndY = e.changedTouches[0].clientY;
+            
+            // タッチの移動距離を計算
+            const deltaX = Math.abs(touchEndX - touchStartX);
+            const deltaY = Math.abs(touchEndY - touchStartY);
+            const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+            
+            console.log('📱 タッチ終了:', {
+                storeName: store.name,
+                duration: touchDuration,
+                distance: distance,
+                target: e.target
+            });
+            
+            // インジケーターのタッチは無視
+            if (e.target.classList.contains('indicator')) {
+                console.log('📱 インジケータータッチのため無視');
+                return;
+            }
+            
+            // 短いタップで移動距離が少ない場合のみ詳細ページに遷移
+            if (touchDuration < 500 && distance < 30) {
+                console.log('📱 有効なタップ検出 - 店舗詳細に遷移');
+                navigateToStoreDetail(store);
+            } else {
+                console.log('📱 無効なタップ（スワイプまたは長押し）');
+            }
+        }, { passive: false });
+    }
+    
+    // キーボードナビゲーション（アクセシビリティ）
+    card.setAttribute('tabindex', '0');
+    card.setAttribute('role', 'button');
+    card.setAttribute('aria-label', `${store.name}の詳細を見る`);
+    
+    card.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            console.log('⌨️ キーボードナビゲーション:', store.name);
+            navigateToStoreDetail(store);
+        }
+    });
+    
+    console.log('✅ 店舗カードナビゲーション設定完了:', store.name);
 }
 
 // モバイルデバイス判定関数
@@ -579,6 +776,20 @@ function forceDataRefreshOnMobile() {
                 const freshData = await loadStoreData();
                 console.log(`📱 モバイル版データ更新完了: ${freshData?.length || 0}件`);
                 
+                // データの整合性チェック
+                if (freshData && freshData.length > 0) {
+                    const validIds = freshData.filter(store => store.id !== undefined && store.id !== null);
+                    console.log(`📱 有効なIDを持つ店舗: ${validIds.length}/${freshData.length}件`);
+                    
+                    // モバイル版特有のチェック
+                    const mobileTestResult = validateMobileStoreData(freshData);
+                    if (mobileTestResult.isValid) {
+                        console.log('📱 モバイル版データ検証: ✅ 正常');
+                    } else {
+                        console.log('📱 モバイル版データ検証: ⚠️ 問題あり:', mobileTestResult.issues);
+                    }
+                }
+                
                 // 店舗一覧ページの場合は即座に更新
                 if (window.location.pathname.includes('cabaret-list.html')) {
                     updateCabaretListPage();
@@ -596,18 +807,203 @@ function forceDataRefreshOnMobile() {
     }
 }
 
-// 店舗詳細ページへのナビゲーション
+// モバイル版店舗データ検証
+function validateMobileStoreData(stores) {
+    const result = {
+        isValid: true,
+        issues: []
+    };
+    
+    if (!stores || !Array.isArray(stores)) {
+        result.isValid = false;
+        result.issues.push('店舗データが配列ではありません');
+        return result;
+    }
+    
+    stores.forEach((store, index) => {
+        // ID検証
+        if (!store.id || store.id === '' || store.id === null || store.id === undefined) {
+            result.issues.push(`店舗${index + 1}(${store.name}): IDが未設定`);
+        }
+        
+        // 名前検証
+        if (!store.name || store.name.trim() === '') {
+            result.issues.push(`店舗${index + 1}: 名前が未設定`);
+        }
+        
+        // 画像検証
+        if (!store.image || store.image.trim() === '') {
+            result.issues.push(`店舗${index + 1}(${store.name}): メイン画像が未設定`);
+        }
+    });
+    
+    if (result.issues.length > 0) {
+        result.isValid = false;
+    }
+    
+    return result;
+}
+
+// モバイル版フィードバック表示
+function showMobileFeedback(element, message) {
+    const feedback = document.createElement('div');
+    feedback.textContent = message;
+    feedback.style.cssText = `
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: rgba(0, 0, 0, 0.8);
+        color: white;
+        padding: 8px 12px;
+        border-radius: 15px;
+        font-size: 12px;
+        font-weight: bold;
+        z-index: 1000;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.2s ease;
+    `;
+    
+    element.style.position = 'relative';
+    element.appendChild(feedback);
+    
+    // フェードイン
+    setTimeout(() => {
+        feedback.style.opacity = '1';
+    }, 10);
+    
+    // フェードアウトして削除
+    setTimeout(() => {
+        feedback.style.opacity = '0';
+        setTimeout(() => {
+            if (feedback.parentNode) {
+                feedback.remove();
+            }
+        }, 200);
+    }, 1500);
+}
+
+// モバイル版ナビゲーションフィードバック
+function showMobileNavigationFeedback(card, storeName) {
+    const feedback = document.createElement('div');
+    feedback.textContent = `${storeName}の詳細へ 🔗`;
+    feedback.style.cssText = `
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: rgba(46, 204, 113, 0.95);
+        color: white;
+        padding: 10px 15px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: bold;
+        z-index: 1000;
+        pointer-events: none;
+        opacity: 0;
+        transition: all 0.2s ease;
+        backdrop-filter: blur(10px);
+        box-shadow: 0 4px 15px rgba(46, 204, 113, 0.3);
+        text-align: center;
+        max-width: 200px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    `;
+    
+    card.style.position = 'relative';
+    card.appendChild(feedback);
+    
+    // フェードイン
+    setTimeout(() => {
+        feedback.style.opacity = '1';
+        feedback.style.transform = 'translate(-50%, -50%) scale(1.05)';
+    }, 10);
+    
+    // フェードアウトして削除
+    setTimeout(() => {
+        feedback.style.opacity = '0';
+        feedback.style.transform = 'translate(-50%, -50%) scale(0.95)';
+        setTimeout(() => {
+            if (feedback.parentNode) {
+                feedback.remove();
+            }
+        }, 200);
+    }, 1000);
+}
+
+// 店舗詳細ページへのナビゲーション（統一版 - 数値IDを使用）
 function navigateToStoreDetail(store) {
-    console.log('店舗詳細ページに移動:', store.name);
+    console.log('🔗 navigateToStoreDetail:', store.name);
     
-    // 店舗名からIDを生成
-    const storeId = generateStoreId(store.name);
+    // IDの存在確認と修正
+    let storeId = store.id;
+    if (!storeId || storeId === '' || storeId === null || storeId === undefined) {
+        console.warn('⚠️ 店舗IDが未設定 - 名前ベースのIDを生成:', store.name);
+        storeId = generateStoreId(store.name);
+    }
     
-    // 店舗詳細ページのURLを構築
-    const detailUrl = `store-detail.html?id=${encodeURIComponent(storeId)}&name=${encodeURIComponent(store.name)}`;
+    // 確実に数値IDを使用（店舗詳細ページでの検索と統一）
+    let finalId = storeId;
+    
+    // 数値でない場合は数値に変換を試行
+    const numericId = parseInt(storeId);
+    if (!isNaN(numericId)) {
+        finalId = numericId;
+    }
+    
+    const detailUrl = `store-detail.html?id=${finalId}`;
+    
+    console.log('🔗 生成されたリンク:', {
+        storeName: store.name,
+        originalId: store.id,
+        finalId: finalId,
+        detailUrl: detailUrl
+    });
+    
+    // モバイル版での追加ログ
+    if (isMobileDevice()) {
+        console.log('📱 モバイル版店舗詳細遷移:', {
+            currentPage: window.location.pathname,
+            targetUrl: detailUrl,
+            storeData: {
+                name: store.name,
+                originalId: store.id,
+                finalId: finalId
+            }
+        });
+        
+        // モバイル版のローカルストレージ状態を確認
+        const savedStores = localStorage.getItem('nice_stores');
+        if (savedStores) {
+            try {
+                const stores = JSON.parse(savedStores);
+                const targetStore = stores.find(s => s.id == finalId || s.id === finalId);
+                if (targetStore) {
+                    console.log('📱 ローカルストレージで対象店舗確認:', targetStore.name);
+                } else {
+                    console.warn('📱 ローカルストレージで対象店舗が見つかりません');
+                    console.log('📱 利用可能な店舗ID:', stores.map(s => s.id));
+                }
+            } catch (error) {
+                console.error('📱 ローカルストレージ確認エラー:', error);
+            }
+        } else {
+            console.warn('📱 ローカルストレージが空です');
+        }
+    }
     
     // ページ遷移
-    window.location.href = detailUrl;
+    try {
+        window.location.href = detailUrl;
+    } catch (error) {
+        console.error('❌ ページ遷移エラー:', error);
+        
+        // フォールバック遷移
+        console.log('🔄 フォールバック遷移を試行');
+        window.location.assign(detailUrl);
+    }
 }
 
 // 店舗名からIDを生成（日本語名を安全なIDに変換）
@@ -618,7 +1014,7 @@ function generateStoreId(storeName) {
         .toLowerCase();
 }
 
-// メインページのスライダー更新
+// メインページのスライダー更新（改善されたタッチイベント付き）
 async function updateMainPageSlider() {
     const storeData = await loadStoreData();
     if (!storeData || storeData.length === 0) return;
@@ -636,6 +1032,12 @@ async function updateMainPageSlider() {
     const slidesToShow = storeData.slice(0, 5);
     
     slidesToShow.forEach((store, index) => {
+        // 店舗データのIDフィールドを確認・修正
+        if (!store.id || store.id === '' || store.id === null || store.id === undefined) {
+            store.id = index + 1;
+            console.log(`🔢 スライダー: 店舗 ${store.name} にID ${store.id} を設定`);
+        }
+        
         // スライド作成
         const slide = document.createElement('div');
         slide.className = index === 0 ? 'slide active' : 'slide';
@@ -654,11 +1056,8 @@ async function updateMainPageSlider() {
             </div>
         `;
         
-        // スライドにクリックイベントを追加
-        slide.style.cursor = 'pointer';
-        slide.addEventListener('click', function() {
-            navigateToStoreDetail(store);
-        });
+        // モバイル版でのクリック処理を改善（統一版）
+        setupSlideNavigation(slide, store);
         
         slider.appendChild(slide);
         
@@ -674,6 +1073,120 @@ async function updateMainPageSlider() {
         console.log('スライダーを再初期化します');
         initializeSlider();
     }, 200);
+}
+
+// スライドのナビゲーション処理（店舗カードと統一）
+function setupSlideNavigation(slide, store) {
+    slide.style.cursor = 'pointer';
+    
+    // タッチ状態管理
+    let touchState = {
+        startTime: 0,
+        startX: 0,
+        startY: 0,
+        hasMoved: false,
+        isLongPress: false
+    };
+    
+    // モバイル版でのタッチイベント
+    if (isMobileDevice()) {
+        // タッチスタート（モバイル）
+        slide.addEventListener('touchstart', function(e) {
+            const touch = e.touches[0];
+            touchState.startTime = Date.now();
+            touchState.startX = touch.clientX;
+            touchState.startY = touch.clientY;
+            touchState.hasMoved = false;
+            
+            // 自動スライドを一時停止
+            if (sliderState.autoSlideInterval) {
+                clearInterval(sliderState.autoSlideInterval);
+                sliderState.autoSlideInterval = null;
+            }
+            
+            console.log('📱 スライダータッチ開始:', store.name);
+        }, { passive: true });
+        
+        // タッチ移動（スワイプ検出）
+        slide.addEventListener('touchmove', function(e) {
+            if (touchState.startTime === 0) return;
+            
+            const touch = e.touches[0];
+            const deltaX = Math.abs(touch.clientX - touchState.startX);
+            const deltaY = Math.abs(touch.clientY - touchState.startY);
+            
+            if (deltaX > 10 || deltaY > 10) {
+                touchState.hasMoved = true;
+            }
+        }, { passive: true });
+        
+        // タッチエンド（モバイル）
+        slide.addEventListener('touchend', function(e) {
+            if (touchState.startTime === 0) return;
+            
+            const touchDuration = Date.now() - touchState.startTime;
+            
+            // スワイプではなく、短時間のタップの場合のみナビゲート
+            if (!touchState.hasMoved && touchDuration < 500) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                console.log('📱 スライダータップで店舗詳細へ:', {
+                    storeName: store.name,
+                    storeId: store.id,
+                    link: `store-detail.html?id=${store.id}`
+                });
+                
+                // ビジュアルフィードバック
+                showMobileNavigationFeedback(slide, store.name);
+                
+                // 店舗詳細ページに遷移
+                setTimeout(() => {
+                    navigateToStoreDetail(store);
+                }, 200);
+                return;
+            }
+            
+            // 自動スライドを再開（遅延）
+            setTimeout(() => {
+                if (sliderState.isInitialized && !sliderState.autoSlideInterval) {
+                    sliderState.autoSlideInterval = setInterval(() => {
+                        if (!sliderState.isTransitioning) {
+                            const slides = document.querySelectorAll('.slide');
+                            if (slides.length > 1) {
+                                sliderState.currentSlide = (sliderState.currentSlide + 1) % slides.length;
+                                const slider = document.querySelector('.slider');
+                                if (slider) {
+                                    slider.style.transform = `translateX(-${sliderState.currentSlide * 100}%)`;
+                                }
+                                const dots = document.querySelectorAll('.dot');
+                                dots.forEach((dot, i) => {
+                                    dot.classList.toggle('active', i === sliderState.currentSlide);
+                                });
+                            }
+                        }
+                    }, 5000);
+                }
+            }, 2000);
+            
+            // タッチ状態をリセット
+            touchState.startTime = 0;
+            
+        }, { passive: false });
+        
+    } else {
+        // デスクトップ版のクリックイベント
+        slide.addEventListener('click', function(e) {
+            console.log('🖱️ スライダークリック（デスクトップ）:', {
+                storeName: store.name,
+                storeId: store.id,
+                link: `store-detail.html?id=${store.id}`
+            });
+            
+            // 数値IDを使用してリンク生成
+            navigateToStoreDetail(store);
+        });
+    }
 }
 
 // グローバルスライダー変数
@@ -858,6 +1371,12 @@ function cleanupSlider() {
 window.addEventListener('load', async function() {
     console.log('ページ読み込み完了 - 初期化開始');
     
+    // モバイル版の詳細初期化
+    if (isMobileDevice()) {
+        console.log('📱 モバイル版初期化開始');
+        initializeMobileDebugFeatures();
+    }
+    
     // Supabaseを初期化
     await initializeSupabaseFrontend();
     
@@ -875,6 +1394,13 @@ window.addEventListener('load', async function() {
     if (window.location.pathname.includes('cabaret-list.html')) {
         console.log('店舗一覧ページを検出 - 店舗リスト更新中...');
         await updateCabaretListPage();
+        
+        // モバイル版でのリスト更新確認
+        if (isMobileDevice()) {
+            setTimeout(() => {
+                validateMobileStoreList();
+            }, 1000);
+        }
     }
     
     // 管理画面リンクを追加（開発用）
@@ -882,6 +1408,194 @@ window.addEventListener('load', async function() {
     
     console.log('🎉 フロントエンド初期化完了');
 });
+
+// モバイル版デバッグ機能初期化
+function initializeMobileDebugFeatures() {
+    console.log('📱 モバイル版デバッグ機能を初期化');
+    
+    // デバッグ情報収集
+    const debugInfo = {
+        userAgent: navigator.userAgent,
+        screenSize: `${window.innerWidth}x${window.innerHeight}`,
+        devicePixelRatio: window.devicePixelRatio || 1,
+        touchSupport: 'ontouchstart' in window,
+        orientation: window.orientation || 'unknown',
+        currentPage: window.location.pathname,
+        timestamp: new Date().toISOString()
+    };
+    
+    console.log('📱 モバイル環境情報:', debugInfo);
+    
+    // パフォーマンス監視
+    if ('performance' in window) {
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                const perfData = {
+                    loadTime: Math.round(performance.now()),
+                    domContentLoaded: performance.timing.domContentLoadedEventEnd - performance.timing.navigationStart,
+                    pageLoad: performance.timing.loadEventEnd - performance.timing.navigationStart
+                };
+                console.log('📱 パフォーマンス情報:', perfData);
+            }, 1000);
+        });
+    }
+    
+    // モバイル専用のエラーハンドリング
+    window.addEventListener('error', function(e) {
+        console.error('📱 モバイル版エラー:', {
+            message: e.message,
+            filename: e.filename,
+            lineno: e.lineno,
+            stack: e.error?.stack
+        });
+    });
+    
+    // ビューポート変更監視
+    window.addEventListener('resize', debounce(() => {
+        console.log('📱 ビューポート変更:', `${window.innerWidth}x${window.innerHeight}`);
+    }, 500));
+    
+    // オリエンテーション変更監視
+    window.addEventListener('orientationchange', () => {
+        setTimeout(() => {
+            console.log('📱 オリエンテーション変更:', window.orientation || 'unknown');
+            
+            // オリエンテーション変更後のデータ再検証
+            if (window.location.pathname.includes('cabaret-list.html')) {
+                validateMobileStoreList();
+            }
+        }, 500);
+    });
+}
+
+// モバイル版店舗リスト検証
+function validateMobileStoreList() {
+    console.log('📱 モバイル版店舗リスト検証開始');
+    
+    const storeCards = document.querySelectorAll('.store-card');
+    const storeGrid = document.querySelector('.store-grid');
+    
+    const validation = {
+        storeGridExists: !!storeGrid,
+        totalCards: storeCards.length,
+        cardsWithImages: 0,
+        cardsWithOverlays: 0,
+        cardsWithValidIds: 0,
+        touchEventsAttached: 0
+    };
+    
+    storeCards.forEach((card, index) => {
+        // 画像チェック
+        const images = card.querySelectorAll('img');
+        if (images.length > 0) {
+            validation.cardsWithImages++;
+        }
+        
+        // オーバーレイチェック
+        const overlay = card.querySelector('.store-card-overlay');
+        if (overlay) {
+            validation.cardsWithOverlays++;
+        }
+        
+        // タッチイベントチェック（間接的）
+        const hasPointerEvents = card.style.cursor === 'pointer' || 
+                                getComputedStyle(card).cursor === 'pointer';
+        if (hasPointerEvents) {
+            validation.touchEventsAttached++;
+        }
+        
+        // ID検証のための店舗名取得
+        const storeName = card.querySelector('.store-name');
+        if (storeName) {
+            console.log(`📱 店舗カード${index + 1}: ${storeName.textContent}`);
+        }
+    });
+    
+    console.log('📱 検証結果:', validation);
+    
+    // 問題がある場合の警告
+    if (validation.totalCards === 0) {
+        console.warn('⚠️ 店舗カードが1つも見つかりません');
+        showMobileValidationMessage('店舗データが見つかりません', 'warning');
+    } else if (validation.cardsWithOverlays < validation.totalCards) {
+        console.warn('⚠️ 一部の店舗カードにオーバーレイがありません');
+        showMobileValidationMessage('一部の店舗カードに問題があります', 'warning');
+    } else {
+        console.log('✅ モバイル版店舗リスト検証完了');
+        showMobileValidationMessage(`${validation.totalCards}件の店舗が正常に表示されています`, 'success');
+    }
+    
+    return validation;
+}
+
+// モバイル版検証メッセージ表示
+function showMobileValidationMessage(message, type = 'info') {
+    if (window.innerWidth > 768) return; // モバイルのみ
+    
+    const messageDiv = document.createElement('div');
+    messageDiv.textContent = message;
+    messageDiv.style.cssText = `
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        padding: 8px 15px;
+        border-radius: 15px;
+        font-size: 11px;
+        font-weight: bold;
+        z-index: 10000;
+        max-width: 80%;
+        text-align: center;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        pointer-events: none;
+    `;
+    
+    // 種類に応じて色を設定
+    if (type === 'success') {
+        messageDiv.style.background = 'rgba(46, 204, 113, 0.9)';
+        messageDiv.style.color = 'white';
+    } else if (type === 'warning') {
+        messageDiv.style.background = 'rgba(241, 196, 15, 0.9)';
+        messageDiv.style.color = '#2c3e50';
+    } else if (type === 'error') {
+        messageDiv.style.background = 'rgba(231, 76, 60, 0.9)';
+        messageDiv.style.color = 'white';
+    } else {
+        messageDiv.style.background = 'rgba(52, 152, 219, 0.9)';
+        messageDiv.style.color = 'white';
+    }
+    
+    document.body.appendChild(messageDiv);
+    
+    // フェードイン
+    setTimeout(() => {
+        messageDiv.style.opacity = '1';
+    }, 10);
+    
+    // フェードアウトして削除
+    setTimeout(() => {
+        messageDiv.style.opacity = '0';
+        setTimeout(() => {
+            if (messageDiv.parentNode) {
+                messageDiv.remove();
+            }
+        }, 300);
+    }, 3000);
+}
+
+// デバウンス関数
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
 
 // 管理画面へのリンクを追加（デバッグ用）
 function addAdminLink() {
@@ -927,4 +1641,448 @@ document.addEventListener('visibilitychange', function() {
         console.log('ページが再表示されました');
     }
 });
+
+// loadStoreData関数をグローバルに公開（store-detail.jsから使用するため）
+window.loadStoreData = loadStoreData;
+
+// モバイル版店舗詳細遷移のテスト関数（デバッグ用）
+window.testMobileStoreNavigation = function(storeIndex = 0) {
+    console.log('📱 モバイル版店舗遷移テスト開始');
+    
+    const storeCards = document.querySelectorAll('.store-card');
+    if (storeCards.length === 0) {
+        console.error('❌ 店舗カードが見つかりません');
+        return;
+    }
+    
+    const targetCard = storeCards[storeIndex];
+    if (!targetCard) {
+        console.error(`❌ インデックス ${storeIndex} の店舗カードが見つかりません`);
+        return;
+    }
+    
+    const storeName = targetCard.querySelector('.store-name')?.textContent || 'Unknown';
+    console.log(`📱 テスト対象店舗: ${storeName}`);
+    
+    // クリックイベントをシミュレート
+    const overlay = targetCard.querySelector('.store-card-overlay');
+    if (overlay) {
+        const event = new Event('click', { bubbles: true, cancelable: true });
+        overlay.dispatchEvent(event);
+        console.log('📱 クリックイベントをシミュレートしました');
+    } else {
+        console.error('❌ オーバーレイが見つかりません');
+    }
+};
+
+// DOM読み込み完了後に実行
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('🚀 ページ読み込み完了 - 初期化開始');
+    
+    // URLパラメータを確認して緊急モードを判定
+    const urlParams = new URLSearchParams(window.location.search);
+    const isEmergencyMode = urlParams.get('emergency') === '1';
+    const isDebugMode = urlParams.get('debug') === '1';
+    
+    if (isEmergencyMode) {
+        console.log('🚨 緊急モードが有効化されました');
+        showEmergencyNotification('緊急モード: Supabaseから直接データを読み込みます');
+    }
+    
+    if (isDebugMode) {
+        console.log('🔍 デバッグモードが有効化されました');
+        addDebugPanel();
+    }
+    
+    // 基本機能の初期化
+    initializeMobileMenu();
+    initializeFadeInAnimation();
+    initializeHeaderBackground();
+    
+    // スライダーの初期化
+    setTimeout(() => {
+        console.log('ページ読み込み完了 - スライダーを初期化します');
+        initializeSlider();
+    }, 300);
+    
+    // Supabaseとデータ読み込み
+    initializeSupabaseFrontend().then(() => {
+        // 緊急モードの場合はSupabaseから直接読み込み
+        if (isEmergencyMode) {
+            loadStoreDataEmergency().then(stores => {
+                if (stores && stores.length > 0) {
+                    updatePageContent(stores);
+                    showEmergencyNotification(`緊急モード: ${stores.length}件のデータを読み込みました`, 'success');
+                } else {
+                    showEmergencyNotification('緊急モード: データが見つかりません', 'error');
+                }
+            });
+        } else {
+            // 通常モード
+            loadStoreData().then(stores => {
+                if (stores && stores.length > 0) {
+                    updatePageContent(stores);
+                }
+            });
+        }
+    });
+    
+    // 📊 ローカルストレージ変更監視を開始（管理画面との同期用）
+    startLocalStorageMonitoring();
+    
+    // モバイル版でのデータ自動更新機能
+    if (isMobileDevice()) {
+        console.log('📱 モバイル版機能を初期化中...');
+        console.log('📱 モバイルデバイス検出 - データ同期を強化します');
+        forceDataRefreshOnMobile(); // 即座に実行
+        initializeMobileDebugFeatures();
+        
+        // データ更新を定期的にチェック
+        setInterval(() => {
+            forceDataRefreshOnMobile();
+        }, 30000); // 30秒ごと
+    }
+});
+
+// 🚨 緊急モード用データ読み込み
+async function loadStoreDataEmergency() {
+    console.log('🚨 緊急モード: Supabaseから直接データ読み込み開始');
+    
+    try {
+        // Supabaseクライアントが初期化されているか確認
+        if (!supabaseDB || !isSupabaseInitialized) {
+            console.log('🚨 Supabase未初期化 - 初期化を試行');
+            await initializeSupabaseFrontend();
+        }
+        
+        // Supabaseから直接データを取得
+        const supabaseStores = await supabaseDB.getStores();
+        
+        if (supabaseStores && supabaseStores.length > 0) {
+            console.log('🚨 緊急モード: Supabaseデータ取得成功', supabaseStores.length, '件');
+            
+            // IDフィールドの確認と自動追加
+            const processedStores = ensureStoreIds(supabaseStores);
+            
+            // ローカルストレージも更新
+            localStorage.setItem('nice_stores', JSON.stringify(processedStores));
+            console.log('🚨 緊急モード: ローカルストレージも更新');
+            
+            return processedStores;
+        } else {
+            console.log('🚨 緊急モード: Supabaseにデータがありません');
+            return [];
+        }
+        
+    } catch (error) {
+        console.error('🚨 緊急モードエラー:', error);
+        
+        // フォールバック: ローカルストレージから読み込み
+        console.log('🚨 フォールバック: ローカルストレージから読み込み');
+        const savedStores = localStorage.getItem('nice_stores');
+        if (savedStores) {
+            try {
+                return JSON.parse(savedStores);
+            } catch (parseError) {
+                console.error('🚨 フォールバックもエラー:', parseError);
+                return getDefaultStoreData();
+            }
+        }
+        
+        return getDefaultStoreData();
+    }
+}
+
+// 📄 ページコンテンツ更新
+function updatePageContent(stores) {
+    // メインページのスライダーを更新
+    if (document.querySelector('.main-slider')) {
+        console.log('📄 メインページスライダーを更新');
+        updateMainPageSlider(stores);
+    }
+    
+    // キャバクラ一覧ページを更新
+    if (document.querySelector('.store-grid')) {
+        console.log('📄 店舗一覧ページを更新');
+        updateCabaretListPage(stores);
+    }
+}
+
+// 🚨 緊急通知表示
+function showEmergencyNotification(message, type = 'info') {
+    // 既存の通知を削除
+    const existingNotification = document.querySelector('.emergency-notification');
+    if (existingNotification) {
+        existingNotification.remove();
+    }
+    
+    // 新しい通知を作成
+    const notification = document.createElement('div');
+    notification.className = 'emergency-notification';
+    notification.textContent = message;
+    
+    let bgColor, textColor;
+    switch (type) {
+        case 'success':
+            bgColor = '#27ae60';
+            textColor = 'white';
+            break;
+        case 'error':
+            bgColor = '#e74c3c';
+            textColor = 'white';
+            break;
+        case 'warning':
+            bgColor = '#f39c12';
+            textColor = 'white';
+            break;
+        default:
+            bgColor = '#3498db';
+            textColor = 'white';
+    }
+    
+    notification.style.cssText = `
+        position: fixed;
+        top: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: ${bgColor};
+        color: ${textColor};
+        padding: 15px 25px;
+        border-radius: 25px;
+        font-size: 14px;
+        font-weight: bold;
+        z-index: 10000;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        animation: emergencySlideDown 0.3s ease;
+        max-width: 90%;
+        text-align: center;
+        border: 2px solid white;
+    `;
+    
+    // アニメーション用のCSSを追加
+    if (!document.querySelector('#emergency-notification-styles')) {
+        const style = document.createElement('style');
+        style.id = 'emergency-notification-styles';
+        style.textContent = `
+            @keyframes emergencySlideDown {
+                from { transform: translateX(-50%) translateY(-100%); opacity: 0; }
+                to { transform: translateX(-50%) translateY(0); opacity: 1; }
+            }
+            @keyframes emergencySlideUp {
+                from { transform: translateX(-50%) translateY(0); opacity: 1; }
+                to { transform: translateX(-50%) translateY(-100%); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+    }
+    
+    document.body.appendChild(notification);
+    
+    // 自動削除（エラーの場合は長く表示）
+    const duration = type === 'error' ? 10000 : 5000;
+    setTimeout(() => {
+        notification.style.animation = 'emergencySlideUp 0.3s ease';
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.remove();
+            }
+        }, 300);
+    }, duration);
+}
+
+// 🔍 デバッグパネル追加
+function addDebugPanel() {
+    const debugPanel = document.createElement('div');
+    debugPanel.id = 'frontend-debug-panel';
+    debugPanel.style.cssText = `
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background: rgba(0, 0, 0, 0.9);
+        color: white;
+        padding: 15px;
+        border-radius: 10px;
+        z-index: 9999;
+        font-family: monospace;
+        font-size: 11px;
+        max-width: 300px;
+        border: 1px solid #3498db;
+    `;
+    
+    debugPanel.innerHTML = `
+        <div style="font-weight: bold; margin-bottom: 10px;">🔍 フロントエンドデバッグ</div>
+        <div id="debug-info">読み込み中...</div>
+        <div style="margin-top: 10px;">
+            <button onclick="debugRefreshData()" style="background: #3498db; color: white; border: none; padding: 5px 10px; border-radius: 3px; font-size: 10px; margin-right: 5px;">🔄 更新</button>
+            <button onclick="debugShowLocalStorage()" style="background: #f39c12; color: white; border: none; padding: 5px 10px; border-radius: 3px; font-size: 10px; margin-right: 5px;">💾 LS</button>
+            <button onclick="document.getElementById('frontend-debug-panel').remove()" style="background: #e74c3c; color: white; border: none; padding: 5px 10px; border-radius: 3px; font-size: 10px;">❌</button>
+        </div>
+    `;
+    
+    document.body.appendChild(debugPanel);
+    
+    // 初期デバッグ情報を表示
+    updateDebugInfo();
+}
+
+// 🔍 デバッグ情報更新
+function updateDebugInfo() {
+    const debugInfo = document.getElementById('debug-info');
+    if (!debugInfo) return;
+    
+    const savedStores = localStorage.getItem('nice_stores');
+    let storeCount = 0;
+    try {
+        if (savedStores) {
+            storeCount = JSON.parse(savedStores).length;
+        }
+    } catch (error) {
+        // エラーは無視
+    }
+    
+    const urlParams = new URLSearchParams(window.location.search);
+    
+    debugInfo.innerHTML = `
+        <div>ページ: ${window.location.pathname}</div>
+        <div>ローカル店舗数: ${storeCount}件</div>
+        <div>緊急モード: ${urlParams.get('emergency') === '1' ? 'ON' : 'OFF'}</div>
+        <div>デバッグモード: ${urlParams.get('debug') === '1' ? 'ON' : 'OFF'}</div>
+        <div>Supabase: ${isSupabaseInitialized ? '✅' : '❌'}</div>
+        <div>更新: ${new Date().toLocaleTimeString()}</div>
+    `;
+}
+
+// 🔍 デバッグ用データ更新
+async function debugRefreshData() {
+    console.log('🔍 デバッグ: データ更新を実行');
+    const stores = await loadStoreDataEmergency();
+    if (stores && stores.length > 0) {
+        updatePageContent(stores);
+        showEmergencyNotification(`デバッグ: ${stores.length}件のデータを更新`, 'success');
+    }
+    updateDebugInfo();
+}
+
+// 🔍 ローカルストレージ表示
+function debugShowLocalStorage() {
+    const savedStores = localStorage.getItem('nice_stores');
+    if (savedStores) {
+        try {
+            const stores = JSON.parse(savedStores);
+            const storeNames = stores.map(s => s.name).join('\n');
+            alert(`ローカルストレージ (${stores.length}件):\n\n${storeNames}`);
+        } catch (error) {
+            alert('ローカルストレージのデータが破損しています');
+        }
+    } else {
+        alert('ローカルストレージが空です');
+    }
+}
+
+// 📊 ローカルストレージ変更監視機能
+function startLocalStorageMonitoring() {
+    console.log('📊 ローカルストレージ監視を開始');
+    
+    // StorageEvent（他のタブからの変更）を監視
+    window.addEventListener('storage', function(e) {
+        if (e.key === 'nice_stores' && e.newValue) {
+            console.log('📊 他のタブからのデータ更新を検出');
+            handleDataSync(e.newValue);
+        }
+    });
+    
+    // カスタムイベント（同じタブ内での変更）を監視
+    window.addEventListener('localDataUpdate', function(e) {
+        console.log('📊 同じタブ内でのデータ更新を検出');
+        if (e.detail && e.detail.stores) {
+            handleDataSync(JSON.stringify(e.detail.stores));
+        }
+    });
+    
+    // ページのvisibilityが変わった時にデータを再確認
+    document.addEventListener('visibilitychange', function() {
+        if (!document.hidden) {
+            console.log('📊 ページが再フォーカス - データ更新をチェック');
+            setTimeout(() => {
+                checkAndUpdateData();
+            }, 500);
+        }
+    });
+}
+
+// 📊 データ同期処理
+function handleDataSync(newDataJson) {
+    try {
+        const newStores = JSON.parse(newDataJson);
+        console.log('📊 新しいデータを受信:', newStores.length, '件');
+        
+        // データの検証
+        if (!Array.isArray(newStores) || newStores.length === 0) {
+            console.log('📊 無効なデータのため同期をスキップ');
+            return;
+        }
+        
+        // 現在のページに応じて更新
+        const currentPage = getCurrentPageType();
+        console.log('📊 現在のページタイプ:', currentPage);
+        
+        switch (currentPage) {
+            case 'main':
+                if (document.querySelector('.main-slider')) {
+                    console.log('📊 メインページスライダーを更新');
+                    updateMainPageSlider(newStores);
+                    showEmergencyNotification('店舗データが更新されました', 'success');
+                }
+                break;
+                
+            case 'list':
+                if (document.querySelector('.store-grid')) {
+                    console.log('📊 店舗一覧ページを更新');
+                    updateCabaretListPage(newStores);
+                    showEmergencyNotification('店舗一覧が更新されました', 'success');
+                }
+                break;
+                
+            case 'detail':
+                console.log('📊 店舗詳細ページでは手動リロードが必要');
+                showEmergencyNotification('店舗データが更新されました。ページを再読み込みしてください。', 'warning');
+                break;
+        }
+        
+    } catch (error) {
+        console.error('📊 データ同期エラー:', error);
+    }
+}
+
+// 📊 現在のページタイプを取得
+function getCurrentPageType() {
+    const path = window.location.pathname;
+    const filename = path.substring(path.lastIndexOf('/') + 1);
+    
+    if (filename === 'index.html' || filename === '' || filename === '/') {
+        return 'main';
+    } else if (filename === 'cabaret-list.html') {
+        return 'list';
+    } else if (filename === 'store-detail.html') {
+        return 'detail';
+    } else {
+        return 'other';
+    }
+}
+
+// 📊 データ更新チェック
+async function checkAndUpdateData() {
+    try {
+        const savedStores = localStorage.getItem('nice_stores');
+        if (!savedStores) {
+            console.log('📊 ローカルストレージが空 - データを再読み込み');
+            const stores = await loadStoreData();
+            if (stores && stores.length > 0) {
+                handleDataSync(JSON.stringify(stores));
+            }
+        }
+    } catch (error) {
+        console.error('📊 データ更新チェックエラー:', error);
+    }
+}
 
