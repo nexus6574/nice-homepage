@@ -2323,7 +2323,7 @@ function addStoreDetailStyles() {
         }
         
         .price-value {
-            font-size: 20px;
+            font-size: 24px;
             font-weight: bold;
             color: #e74c3c;
         }
@@ -2403,18 +2403,20 @@ function addStoreDetailStyles() {
         }
         
         .info-item h3 {
-            font-size: 18px;
+            font-size: 20px;
             color: #2c3e50;
             margin-bottom: 10px;
             border-left: 4px solid #e74c3c;
             padding-left: 15px;
+            font-weight: bold;
         }
         
-        .store-description {
-            font-size: 16px;
+        .info-item p {
+            font-size: 18px;
             line-height: 1.6;
             color: #34495e;
             margin: 0;
+            font-weight: 500;
         }
         
         .store-features {
@@ -3053,7 +3055,7 @@ function addMobileStoreDetailStyles() {
         
         .mobile-store-price {
             margin: 0;
-            font-size: 20px;
+            font-size: 24px;
             opacity: 0.9;
             font-weight: bold;
         }
@@ -3091,13 +3093,13 @@ function addMobileStoreDetailStyles() {
         .mobile-business-info h3 {
             margin: 0 0 15px 0;
             color: #27ae60;
-            font-size: 18px;
+            font-size: 20px;
             font-weight: bold;
         }
         
         .mobile-business-info .business-item {
             margin: 10px 0;
-            font-size: 16px;
+            font-size: 18px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -3107,11 +3109,11 @@ function addMobileStoreDetailStyles() {
         .mobile-business-info .business-label {
             font-weight: bold;
             color: #34495e;
-            font-size: 16px;
+            font-size: 18px;
         }
         
         .mobile-business-info .business-value {
-            font-size: 16px;
+            font-size: 18px;
             color: #2c3e50;
             font-weight: 600;
         }
