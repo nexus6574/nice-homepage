@@ -1374,7 +1374,7 @@ window.addEventListener('load', async function() {
     // モバイル版の詳細初期化
     if (isMobileDevice()) {
         console.log('📱 モバイル版初期化開始');
-        initializeMobileDebugFeatures();
+        // initializeMobileDebugFeatures(); // セキュリティのため無効化
     }
     
     // Supabaseを初期化
@@ -1403,8 +1403,8 @@ window.addEventListener('load', async function() {
         }
     }
     
-    // 管理画面リンクを追加（開発用）
-    addAdminLink();
+    // 管理画面リンクを追加（開発用） - セキュリティのため無効化
+    // addAdminLink();
     
     console.log('🎉 フロントエンド初期化完了');
 });
@@ -1597,43 +1597,43 @@ function debounce(func, wait) {
     };
 }
 
-// 管理画面へのリンクを追加（デバッグ用）
-function addAdminLink() {
-    if (window.location.pathname.includes('admin.html')) return;
-    
-    const adminLink = document.createElement('div');
-    adminLink.style.cssText = `
-        position: fixed;
-        bottom: 20px;
-        right: 20px;
-        z-index: 1000;
-        background: linear-gradient(45deg, #e74c3c, #c0392b);
-        color: white;
-        padding: 10px 15px;
-        border-radius: 25px;
-        font-size: 12px;
-        font-weight: bold;
-        box-shadow: 0 5px 15px rgba(231, 76, 60, 0.4);
-        cursor: pointer;
-        transition: all 0.3s ease;
-        text-decoration: none;
-        display: inline-block;
-    `;
-    adminLink.innerHTML = '⚙️ 管理画面';
-    adminLink.onclick = () => window.open('admin.html', '_blank');
-    
-    adminLink.addEventListener('mouseenter', function() {
-        this.style.transform = 'translateY(-3px)';
-        this.style.boxShadow = '0 8px 25px rgba(231, 76, 60, 0.6)';
-    });
-    
-    adminLink.addEventListener('mouseleave', function() {
-        this.style.transform = 'translateY(0)';
-        this.style.boxShadow = '0 5px 15px rgba(231, 76, 60, 0.4)';
-    });
-    
-    document.body.appendChild(adminLink);
-}
+// 管理画面へのリンクを追加（デバッグ用） - セキュリティのため無効化
+// function addAdminLink() {
+//     if (window.location.pathname.includes('admin.html')) return;
+//     
+//     const adminLink = document.createElement('div');
+//     adminLink.style.cssText = `
+//         position: fixed;
+//         bottom: 20px;
+//         right: 20px;
+//         z-index: 1000;
+//         background: linear-gradient(45deg, #e74c3c, #c0392b);
+//         color: white;
+//         padding: 10px 15px;
+//         border-radius: 25px;
+//         font-size: 12px;
+//         font-weight: bold;
+//         box-shadow: 0 5px 15px rgba(231, 76, 60, 0.4);
+//         cursor: pointer;
+//         transition: all 0.3s ease;
+//         text-decoration: none;
+//         display: inline-block;
+//     `;
+//     adminLink.innerHTML = '⚙️ 管理画面';
+//     adminLink.onclick = () => window.open('admin.html', '_blank');
+//     
+//     adminLink.addEventListener('mouseenter', function() {
+//         this.style.transform = 'translateY(-3px)';
+//         this.style.boxShadow = '0 8px 25px rgba(231, 76, 60, 0.6)';
+//     });
+//     
+//     adminLink.addEventListener('mouseleave', function() {
+//         this.style.transform = 'translateY(0)';
+//         this.style.boxShadow = '0 5px 15px rgba(231, 76, 60, 0.4)';
+//     });
+//     
+//     document.body.appendChild(adminLink);
+// }
 
 // ページ可視性変更時にデータをチェック（タブ切り替え時など）
 document.addEventListener('visibilitychange', function() {
@@ -1645,35 +1645,35 @@ document.addEventListener('visibilitychange', function() {
 // loadStoreData関数をグローバルに公開（store-detail.jsから使用するため）
 window.loadStoreData = loadStoreData;
 
-// モバイル版店舗詳細遷移のテスト関数（デバッグ用）
-window.testMobileStoreNavigation = function(storeIndex = 0) {
-    console.log('📱 モバイル版店舗遷移テスト開始');
-    
-    const storeCards = document.querySelectorAll('.store-card');
-    if (storeCards.length === 0) {
-        console.error('❌ 店舗カードが見つかりません');
-        return;
-    }
-    
-    const targetCard = storeCards[storeIndex];
-    if (!targetCard) {
-        console.error(`❌ インデックス ${storeIndex} の店舗カードが見つかりません`);
-        return;
-    }
-    
-    const storeName = targetCard.querySelector('.store-name')?.textContent || 'Unknown';
-    console.log(`📱 テスト対象店舗: ${storeName}`);
-    
-    // クリックイベントをシミュレート
-    const overlay = targetCard.querySelector('.store-card-overlay');
-    if (overlay) {
-        const event = new Event('click', { bubbles: true, cancelable: true });
-        overlay.dispatchEvent(event);
-        console.log('📱 クリックイベントをシミュレートしました');
-    } else {
-        console.error('❌ オーバーレイが見つかりません');
-    }
-};
+// モバイル版店舗詳細遷移のテスト関数（デバッグ用） - セキュリティのため無効化
+// window.testMobileStoreNavigation = function(storeIndex = 0) {
+//     console.log('📱 モバイル版店舗遷移テスト開始');
+//     
+//     const storeCards = document.querySelectorAll('.store-card');
+//     if (storeCards.length === 0) {
+//         console.error('❌ 店舗カードが見つかりません');
+//         return;
+//     }
+//     
+//     const targetCard = storeCards[storeIndex];
+//     if (!targetCard) {
+//         console.error(`❌ インデックス ${storeIndex} の店舗カードが見つかりません`);
+//         return;
+//     }
+//     
+//     const storeName = targetCard.querySelector('.store-name')?.textContent || 'Unknown';
+//     console.log(`📱 テスト対象店舗: ${storeName}`);
+//     
+//     // クリックイベントをシミュレート
+//     const overlay = targetCard.querySelector('.store-card-overlay');
+//     if (overlay) {
+//         const event = new Event('click', { bubbles: true, cancelable: true });
+//         overlay.dispatchEvent(event);
+//         console.log('📱 クリックイベントをシミュレートしました');
+//     } else {
+//         console.error('❌ オーバーレイが見つかりません');
+//     }
+// };
 
 // DOM読み込み完了後に実行
 document.addEventListener('DOMContentLoaded', function() {
@@ -1689,10 +1689,11 @@ document.addEventListener('DOMContentLoaded', function() {
         showEmergencyNotification('緊急モード: Supabaseから直接データを読み込みます');
     }
     
-    if (isDebugMode) {
-        console.log('🔍 デバッグモードが有効化されました');
-        addDebugPanel();
-    }
+    // デバッグパネルはセキュリティのため無効化
+    // if (isDebugMode) {
+    //     console.log('🔍 デバッグモードが有効化されました');
+    //     addDebugPanel();
+    // }
     
     // 基本機能の初期化
     initializeMobileMenu();
@@ -1735,7 +1736,7 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('📱 モバイル版機能を初期化中...');
         console.log('📱 モバイルデバイス検出 - データ同期を強化します');
         forceDataRefreshOnMobile(); // 即座に実行
-        initializeMobileDebugFeatures();
+        // initializeMobileDebugFeatures(); // セキュリティのため無効化
         
         // データ更新を定期的にチェック
         setInterval(() => {

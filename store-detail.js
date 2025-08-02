@@ -28,9 +28,9 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeStoreDetailPage();
     initializeMobileMenu();
     
-    // すべての環境でデバッグボタンを表示（デスクトップ版も含む）
-    console.log('🔧 デバッグボタン追加中...');
-    addUniversalDebugButton();
+    // すべての環境でデバッグボタンを表示（デスクトップ版も含む） - セキュリティのため無効化
+    // console.log('🔧 デバッグボタン追加中...');
+    // addUniversalDebugButton();
     
     // パソコン版での緊急修復機能を追加
     if (window.innerWidth > 768) {
