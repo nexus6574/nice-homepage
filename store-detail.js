@@ -25,36 +25,36 @@ let isEditMode = false;
 document.addEventListener('DOMContentLoaded', function() {
     console.log('🚀 店舗詳細ページ初期化開始');
     
+    // 🚨 モバイル版緊急処理：1秒で確実に反応させる
+    if (window.innerWidth <= 768) {
+        console.log('📱 モバイル版緊急初期化開始');
+        
+        // 即座に緊急タイマーを開始（1秒）
+        setTimeout(() => {
+            console.log('📱 1秒緊急タイマー作動');
+            if (document.getElementById('loading').style.display !== 'none') {
+                console.log('📱 まだ読み込み中 - 緊急フォールバック実行');
+                showMobileEmergencyFallback();
+            }
+        }, 1000);
+        
+        // より確実なモバイル専用読み込み
+        loadStoreDetailMobile();
+        return;
+    }
+    
+    // デスクトップ版の処理
     initializeStoreDetailPage();
     initializeMobileMenu();
     
-    // すべての環境でデバッグボタンを表示（デスクトップ版も含む） - セキュリティのため無効化
-    // console.log('🔧 デバッグボタン追加中...');
-    // addUniversalDebugButton();
-    
     // パソコン版での緊急修復機能を追加
-    if (window.innerWidth > 768) {
-        console.log('🖥️ パソコン版：緊急修復機能を初期化');
-        addDesktopEmergencyFix();
-    }
+    console.log('🖥️ パソコン版：緊急修復機能を初期化');
+    addDesktopEmergencyFix();
     
-    // モバイル版での詳細初期化
-    if (window.innerWidth <= 768) {
-        console.log('📱 店舗詳細ページ: モバイル版初期化');
-        initializeMobileStoreDetail();
-        
-        // モバイル版専用の最終チェック
-        setTimeout(() => {
-            performFinalMobileCheck();
-        }, 2000);
-    } else {
-        console.log('🖥️ 店舗詳細ページ: デスクトップ版初期化');
-        
-        // デスクトップ版での最終チェック
-        setTimeout(() => {
-            performFinalDesktopCheck();
-        }, 2000);
-    }
+    // デスクトップ版での最終チェック
+    setTimeout(() => {
+        performFinalDesktopCheck();
+    }, 2000);
     
     // 店舗詳細読み込み
     loadStoreDetail();
@@ -2815,5 +2815,317 @@ function tryLoadDefaultStore() {
         console.error('❌ デフォルト店舗表示エラー:', error);
         alert('店舗情報の表示に失敗しました。お電話にてお問い合わせください。');
     }
+}
+
+// 📱 モバイル版専用の店舗詳細読み込み（シンプル版）
+async function loadStoreDetailMobile() {
+    console.log('📱 モバイル版専用読み込み開始');
+    
+    try {
+        // ローディング表示
+        showLoading();
+        console.log('📱 ローディング表示開始');
+        
+        // URLから店舗情報を取得
+        const urlParams = new URLSearchParams(window.location.search);
+        const storeId = urlParams.get('id');
+        const storeName = urlParams.get('name');
+        
+        console.log('📱 URLパラメータ:', { storeId, storeName });
+        
+        // パラメータがない場合は即座にフォールバック
+        if (!storeId && !storeName) {
+            console.log('📱 パラメータなし - デフォルト店舗表示');
+            showDefaultMobileStore();
+            return;
+        }
+        
+        // シンプルなデータ取得を試行
+        console.log('📱 データ取得開始...');
+        
+        // ローカルストレージから直接取得を試行
+        const savedStores = localStorage.getItem('nice_stores');
+        let stores = [];
+        
+        if (savedStores) {
+            try {
+                stores = JSON.parse(savedStores);
+                console.log('📱 ローカルストレージから取得:', stores.length, '件');
+            } catch (e) {
+                console.error('📱 ローカルストレージ解析エラー:', e);
+            }
+        }
+        
+        // データがない場合はSupabaseから取得を試行
+        if (stores.length === 0) {
+            console.log('📱 Supabaseから取得を試行...');
+            try {
+                if (window.supabaseDB && window.supabaseDB.loadStores) {
+                    stores = await window.supabaseDB.loadStores();
+                    console.log('📱 Supabase取得成功:', stores.length, '件');
+                }
+            } catch (e) {
+                console.error('📱 Supabase取得エラー:', e);
+            }
+        }
+        
+        // それでもデータがない場合はデフォルトデータ
+        if (stores.length === 0) {
+            console.log('📱 デフォルトデータを使用');
+            stores = getDefaultMobileStores();
+        }
+        
+        // 店舗検索
+        let targetStore = null;
+        
+        // IDで検索
+        if (storeId) {
+            targetStore = stores.find(s => 
+                s.id == storeId || 
+                s.id === storeId ||
+                s.id === parseInt(storeId)
+            );
+            console.log('📱 ID検索結果:', targetStore?.name || 'なし');
+        }
+        
+        // 名前で検索（IDで見つからない場合）
+        if (!targetStore && storeName) {
+            const decodedName = decodeURIComponent(storeName);
+            targetStore = stores.find(s => 
+                s.name === decodedName ||
+                s.name.includes(decodedName) ||
+                decodedName.includes(s.name)
+            );
+            console.log('📱 名前検索結果:', targetStore?.name || 'なし');
+        }
+        
+        // どちらでも見つからない場合は最初の店舗を使用
+        if (!targetStore && stores.length > 0) {
+            targetStore = stores[0];
+            console.log('📱 フォールバック:', targetStore.name);
+        }
+        
+        // 店舗詳細を表示
+        if (targetStore) {
+            console.log('📱 店舗詳細表示:', targetStore.name);
+            displayMobileStoreDetail(targetStore);
+        } else {
+            console.log('📱 店舗が見つからない - デフォルト表示');
+            showDefaultMobileStore();
+        }
+        
+    } catch (error) {
+        console.error('📱 モバイル読み込みエラー:', error);
+        showDefaultMobileStore();
+    }
+}
+
+// 📱 モバイル版専用の店舗詳細表示
+function displayMobileStoreDetail(store) {
+    console.log('📱 モバイル店舗詳細表示:', store.name);
+    
+    try {
+        hideLoading();
+        
+        // store-contentを取得または作成
+        let storeContent = document.getElementById('store-content');
+        if (!storeContent) {
+            storeContent = document.createElement('div');
+            storeContent.id = 'store-content';
+            const mainElement = document.querySelector('main') || document.body;
+            mainElement.appendChild(storeContent);
+        }
+        
+        // シンプルなモバイル向けHTML
+        const storeName = store.name || '店舗名未設定';
+        const storePrice = store.price || '料金はお問い合わせください';
+        const storeDescription = store.description || 'お気軽にお問い合わせください。';
+        const mainImage = store.image || store.images?.[0] || 'nice-storefront.jpg';
+        
+        storeContent.innerHTML = `
+            <div class="mobile-store-detail">
+                <div class="mobile-store-header">
+                    <h1>${storeName}</h1>
+                    <p class="mobile-store-price">${storePrice}</p>
+                </div>
+                
+                <div class="mobile-store-image">
+                    <img src="${mainImage}" alt="${storeName}" onerror="this.src='nice-storefront.jpg'">
+                </div>
+                
+                <div class="mobile-store-info">
+                    <p>${storeDescription}</p>
+                    
+                    <div class="mobile-contact-info">
+                        <h3>📞 お問い合わせ</h3>
+                        <p><strong>無料案内所 NICE</strong></p>
+                        <p>📍 新宿区歌舞伎町1-2-6</p>
+                        <p>📞 03-3232-0186</p>
+                        <p>🕐 営業時間：17:00 - 05:00</p>
+                    </div>
+                </div>
+                
+                <div class="mobile-actions">
+                    <button onclick="window.history.back()" class="mobile-back-btn">
+                        ← 一覧に戻る
+                    </button>
+                    <button onclick="window.location.href='tel:03-3232-0186'" class="mobile-call-btn">
+                        📞 お電話
+                    </button>
+                </div>
+            </div>
+        `;
+        
+        // モバイル専用スタイルを追加
+        addMobileStoreDetailStyles();
+        
+        // 表示
+        storeContent.style.display = 'block';
+        
+        console.log('📱 モバイル店舗詳細表示完了');
+        
+    } catch (error) {
+        console.error('📱 モバイル表示エラー:', error);
+        showDefaultMobileStore();
+    }
+}
+
+// 📱 デフォルトモバイル店舗表示
+function showDefaultMobileStore() {
+    console.log('📱 デフォルトモバイル店舗表示');
+    
+    const defaultStore = {
+        name: 'NICE 案内所',
+        price: 'お気軽にお問い合わせください',
+        description: '新宿歌舞伎町の優良店をご案内いたします。',
+        image: 'nice-storefront.jpg'
+    };
+    
+    displayMobileStoreDetail(defaultStore);
+}
+
+// 📱 デフォルトモバイル店舗データ
+function getDefaultMobileStores() {
+    return [
+        {
+            id: 1,
+            name: 'NICE おすすめ店舗',
+            price: 'お問い合わせください',
+            description: '新宿歌舞伎町の優良店をご案内いたします。',
+            image: 'nice-storefront.jpg',
+            images: ['nice-storefront.jpg']
+        }
+    ];
+}
+
+// 📱 モバイル店舗詳細専用スタイル
+function addMobileStoreDetailStyles() {
+    const styleId = 'mobile-store-detail-styles';
+    if (document.getElementById(styleId)) return;
+    
+    const style = document.createElement('style');
+    style.id = styleId;
+    style.textContent = `
+        .mobile-store-detail {
+            padding: 15px;
+            max-width: 100%;
+            margin: 0 auto;
+            background: #fff;
+        }
+        
+        .mobile-store-header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 20px;
+            background: linear-gradient(135deg, #27ae60, #2ecc71);
+            color: white;
+            border-radius: 10px;
+        }
+        
+        .mobile-store-header h1 {
+            margin: 0 0 10px 0;
+            font-size: 22px;
+            font-weight: bold;
+        }
+        
+        .mobile-store-price {
+            margin: 0;
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        
+        .mobile-store-image {
+            margin-bottom: 20px;
+        }
+        
+        .mobile-store-image img {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .mobile-store-info {
+            margin-bottom: 20px;
+        }
+        
+        .mobile-store-info p {
+            margin: 0 0 15px 0;
+            line-height: 1.6;
+            font-size: 14px;
+        }
+        
+        .mobile-contact-info {
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        .mobile-contact-info h3 {
+            margin: 0 0 10px 0;
+            color: #27ae60;
+            font-size: 16px;
+        }
+        
+        .mobile-contact-info p {
+            margin: 5px 0;
+            font-size: 13px;
+        }
+        
+        .mobile-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .mobile-back-btn, .mobile-call-btn {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .mobile-back-btn {
+            background: #95a5a6;
+            color: white;
+        }
+        
+        .mobile-call-btn {
+            background: #27ae60;
+            color: white;
+        }
+        
+        .mobile-back-btn:active, .mobile-call-btn:active {
+            transform: scale(0.98);
+        }
+    `;
+    
+    document.head.appendChild(style);
 }
  
