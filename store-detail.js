@@ -950,6 +950,15 @@ function ensureValidStoreData(stores) {
 
 // 店舗詳細を読み込んで表示（緊急修正版）
 async function loadStoreDetail() {
+    // 🚨 モバイル版緊急修復：5秒タイマー設定
+    const mobileFixTimer = setTimeout(() => {
+        if (window.innerWidth <= 768) {
+            console.log('📱 モバイル版緊急修復：5秒タイマー作動');
+            hideLoading();
+            showMobileEmergencyFallback();
+        }
+    }, 5000);
+
     const storeId = getStoreIdFromURL();
     const storeName = decodeURIComponent(window.location.search.split('name=')[1] || '');
     
@@ -968,6 +977,7 @@ async function loadStoreDetail() {
     
     if (!storeId && !storeName) {
         console.error('❌ 店舗情報が指定されていません');
+        clearTimeout(mobileFixTimer); // タイマーを停止
         showError('店舗情報が指定されていません。');
         return;
     }
@@ -981,6 +991,7 @@ async function loadStoreDetail() {
         
         if (!stores || stores.length === 0) {
             console.error('❌ すべてのフォールバックが失敗');
+            clearTimeout(mobileFixTimer); // タイマーを停止
             showError('店舗データの読み込みに失敗しました。ページを再読み込みしてください。');
             return;
         }
@@ -1020,6 +1031,7 @@ async function loadStoreDetail() {
             const fallbackStore = stores[0];
             if (fallbackStore) {
                 console.log('✅ 緊急フォールバック成功:', fallbackStore.name);
+                clearTimeout(mobileFixTimer); // タイマーを停止
                 displayStoreDetail(fallbackStore);
                 hideLoading();
                 
@@ -1031,18 +1043,21 @@ async function loadStoreDetail() {
                 return;
             }
             
+            clearTimeout(mobileFixTimer); // タイマーを停止
             showError(`店舗が見つかりません。利用可能な店舗数: ${stores.length}件`);
             return;
         }
         
         // 店舗詳細を表示
         console.log('📋 店舗詳細表示開始:', store.name);
+        clearTimeout(mobileFixTimer); // タイマーを停止（正常終了）
         displayStoreDetail(store);
         hideLoading();
         
     } catch (error) {
         console.error('❌ 店舗詳細読み込みエラー:', error);
         console.error('❌ エラー詳細:', error.stack);
+        clearTimeout(mobileFixTimer); // タイマーを停止
         
         // 緊急フォールバック：デフォルトデータで再試行
         try {
@@ -1357,6 +1372,34 @@ function showLoading() {
 // ローディング非表示
 function hideLoading() {
     document.getElementById('loading').style.display = 'none';
+}
+
+// 📱 モバイル版詳細ローディングメッセージ表示
+function showMobileLoadingMessage(message) {
+    if (window.innerWidth > 768) return; // モバイル版のみ
+    
+    console.log('📱 モバイルローディングメッセージ:', message);
+    
+    const loadingElement = document.getElementById('loading');
+    if (loadingElement) {
+        const loadingText = loadingElement.querySelector('p');
+        if (loadingText) {
+            loadingText.textContent = message;
+        }
+        
+        // ローディングが確実に表示されるようにする
+        loadingElement.style.display = 'flex';
+        loadingElement.style.position = 'fixed';
+        loadingElement.style.top = '0';
+        loadingElement.style.left = '0';
+        loadingElement.style.width = '100%';
+        loadingElement.style.height = '100%';
+        loadingElement.style.background = 'rgba(255, 255, 255, 0.95)';
+        loadingElement.style.zIndex = '9999';
+        loadingElement.style.flexDirection = 'column';
+        loadingElement.style.justifyContent = 'center';
+        loadingElement.style.alignItems = 'center';
+    }
 }
 
 // エラー表示を隠す関数
@@ -2548,6 +2591,229 @@ function initializeGallerySlider() {
         gallery.addEventListener('mouseleave', () => {
             startAutoSlide();
         });
+    }
+}
+
+// 📱 モバイル版緊急フォールバック表示
+function showMobileEmergencyFallback() {
+    console.log('📱 モバイル版緊急フォールバック表示開始');
+    
+    // ローディングとエラー表示を隠す
+    hideLoading();
+    hideError();
+    
+    // 既存のstore-contentを取得または作成
+    let storeContent = document.getElementById('store-content');
+    if (!storeContent) {
+        storeContent = document.createElement('div');
+        storeContent.id = 'store-content';
+        const mainElement = document.querySelector('main') || document.body;
+        mainElement.appendChild(storeContent);
+    }
+    
+    // 緊急フォールバック画面のHTML
+    storeContent.innerHTML = `
+        <div class="mobile-emergency-fallback">
+            <div class="emergency-header">
+                <h1>📱 モバイル版緊急表示</h1>
+                <p>店舗詳細の読み込みでエラーが発生しました</p>
+            </div>
+            
+            <div class="emergency-content">
+                <div class="emergency-info">
+                    <h2>🏪 NICE - 新宿歌舞伎町案内所</h2>
+                    <p>申し訳ございません。店舗詳細の読み込み中にエラーが発生しました。</p>
+                    <p>下記の方法をお試しください：</p>
+                </div>
+                
+                <div class="emergency-actions">
+                    <button onclick="location.reload()" class="emergency-button primary">
+                        🔄 ページを再読み込み
+                    </button>
+                    
+                    <button onclick="window.history.back()" class="emergency-button secondary">
+                        ← 店舗一覧に戻る
+                    </button>
+                    
+                    <button onclick="window.location.href='tel:03-3232-0186'" class="emergency-button contact">
+                        📞 直接お電話
+                    </button>
+                    
+                    <button onclick="tryLoadDefaultStore()" class="emergency-button info">
+                        🏪 店舗情報を表示
+                    </button>
+                </div>
+                
+                <div class="emergency-contact">
+                    <h3>📞 お問い合わせ</h3>
+                    <p><strong>無料案内所 NICE</strong></p>
+                    <p>📍 新宿区歌舞伎町1-2-6</p>
+                    <p>📞 03-3232-0186</p>
+                    <p>🕐 営業時間：17:00 - 05:00</p>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // モバイル緊急フォールバック用のスタイルを追加
+    addMobileEmergencyStyles();
+    
+    // 表示
+    storeContent.style.display = 'block';
+    
+    console.log('📱 モバイル版緊急フォールバック表示完了');
+}
+
+// 📱 モバイル緊急フォールバック用スタイル
+function addMobileEmergencyStyles() {
+    const styleId = 'mobile-emergency-styles';
+    if (document.getElementById(styleId)) return;
+    
+    const style = document.createElement('style');
+    style.id = styleId;
+    style.textContent = `
+        .mobile-emergency-fallback {
+            padding: 20px;
+            max-width: 100%;
+            margin: 0 auto;
+            background: #fff;
+            min-height: 80vh;
+        }
+        
+        .emergency-header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+            border-radius: 15px;
+        }
+        
+        .emergency-header h1 {
+            margin: 0 0 10px 0;
+            font-size: 24px;
+        }
+        
+        .emergency-header p {
+            margin: 0;
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .emergency-content {
+            margin-bottom: 30px;
+        }
+        
+        .emergency-info {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+        
+        .emergency-info h2 {
+            color: #27ae60;
+            margin: 0 0 15px 0;
+            font-size: 20px;
+        }
+        
+        .emergency-info p {
+            margin: 0 0 10px 0;
+            line-height: 1.6;
+        }
+        
+        .emergency-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .emergency-button {
+            padding: 15px 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .emergency-button.primary {
+            background: #3498db;
+            color: white;
+        }
+        
+        .emergency-button.secondary {
+            background: #95a5a6;
+            color: white;
+        }
+        
+        .emergency-button.contact {
+            background: #27ae60;
+            color: white;
+        }
+        
+        .emergency-button.info {
+            background: #f39c12;
+            color: white;
+        }
+        
+        .emergency-button:active {
+            transform: scale(0.98);
+        }
+        
+        .emergency-contact {
+            padding: 20px;
+            background: #27ae60;
+            color: white;
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        .emergency-contact h3 {
+            margin: 0 0 15px 0;
+            font-size: 18px;
+        }
+        
+        .emergency-contact p {
+            margin: 5px 0;
+            font-size: 14px;
+        }
+        
+        .emergency-contact strong {
+            font-size: 16px;
+        }
+    `;
+    
+    document.head.appendChild(style);
+}
+
+// 🏪 デフォルト店舗情報を表示する関数
+function tryLoadDefaultStore() {
+    console.log('🏪 デフォルト店舗情報表示開始');
+    
+    const defaultStore = {
+        id: 1,
+        name: 'NICE おすすめ店舗',
+        description: '新宿歌舞伎町の優良店をご案内いたします。詳細はお電話でお問い合わせください。',
+        price: '料金はお問い合わせください',
+        badge: '優良店',
+        image: 'nice-storefront.jpg',
+        images: ['nice-storefront.jpg'],
+        features: {
+            features: ['完全無料案内', '安心・安全', '24時間営業'],
+            businessHours: { start: '17:00', end: '05:00' },
+            closedDays: ['なし']
+        }
+    };
+    
+    try {
+        displayStoreDetail(defaultStore);
+        console.log('🏪 デフォルト店舗情報表示完了');
+    } catch (error) {
+        console.error('❌ デフォルト店舗表示エラー:', error);
+        alert('店舗情報の表示に失敗しました。お電話にてお問い合わせください。');
     }
 }
  
