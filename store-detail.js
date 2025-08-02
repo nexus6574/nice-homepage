@@ -2123,7 +2123,6 @@ function displayStoreDetail(store) {
         
         // 店舗データの安全な取得
         const storeName = store.name || '店舗名不明';
-        const storeDescription = store.description || '詳細情報はお問い合わせください。';
         const storePrice = store.price || '料金要相談';
         const storeBadge = store.badge || '';
         
@@ -2227,11 +2226,6 @@ function displayStoreDetail(store) {
                 
                 <!-- 店舗情報 -->
                 <div class="store-info-section">
-                    <div class="info-item">
-                        <h3>店舗詳細</h3>
-                        <p class="store-description">${storeDescription.replace(/\n/g, '<br>')}</p>
-                    </div>
-                    
                     <div class="info-item">
                         <h3>営業時間</h3>
                         <p>${hoursDisplay}</p>
@@ -2796,7 +2790,6 @@ function tryLoadDefaultStore() {
     const defaultStore = {
         id: 1,
         name: 'NICE おすすめ店舗',
-        description: '新宿歌舞伎町の優良店をご案内いたします。詳細はお電話でお問い合わせください。',
         price: '料金はお問い合わせください',
         badge: '優良店',
         image: 'nice-storefront.jpg',
@@ -2939,7 +2932,6 @@ function displayMobileStoreDetail(store) {
         // シンプルなモバイル向けHTML
         const storeName = store.name || '店舗名未設定';
         const storePrice = store.price || '料金はお問い合わせください';
-        const storeDescription = store.description || 'お気軽にお問い合わせください。';
         const mainImage = store.image || store.images?.[0] || 'nice-storefront.jpg';
         
         storeContent.innerHTML = `
@@ -2954,8 +2946,6 @@ function displayMobileStoreDetail(store) {
                 </div>
                 
                 <div class="mobile-store-info">
-                    <p>${storeDescription}</p>
-                    
                     <div class="mobile-contact-info">
                         <h3>📞 お問い合わせ</h3>
                         <p><strong>無料案内所 NICE</strong></p>
@@ -2997,7 +2987,6 @@ function showDefaultMobileStore() {
     const defaultStore = {
         name: 'NICE 案内所',
         price: 'お気軽にお問い合わせください',
-        description: '新宿歌舞伎町の優良店をご案内いたします。',
         image: 'nice-storefront.jpg'
     };
     
@@ -3011,7 +3000,6 @@ function getDefaultMobileStores() {
             id: 1,
             name: 'NICE おすすめ店舗',
             price: 'お問い合わせください',
-            description: '新宿歌舞伎町の優良店をご案内いたします。',
             image: 'nice-storefront.jpg',
             images: ['nice-storefront.jpg']
         }
