@@ -3053,8 +3053,9 @@ function addMobileStoreDetailStyles() {
         
         .mobile-store-price {
             margin: 0;
-            font-size: 16px;
+            font-size: 20px;
             opacity: 0.9;
+            font-weight: bold;
         }
         
         .mobile-store-image {
@@ -3080,21 +3081,39 @@ function addMobileStoreDetailStyles() {
         }
         
         .mobile-business-info {
-            padding: 15px;
+            padding: 20px;
             background: #f8f9fa;
             border-radius: 10px;
             text-align: center;
+            margin-bottom: 20px;
         }
         
         .mobile-business-info h3 {
-            margin: 0 0 10px 0;
+            margin: 0 0 15px 0;
             color: #27ae60;
-            font-size: 16px;
+            font-size: 18px;
+            font-weight: bold;
         }
         
         .mobile-business-info .business-item {
-            margin: 5px 0;
-            font-size: 13px;
+            margin: 10px 0;
+            font-size: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+        }
+        
+        .mobile-business-info .business-label {
+            font-weight: bold;
+            color: #34495e;
+            font-size: 16px;
+        }
+        
+        .mobile-business-info .business-value {
+            font-size: 16px;
+            color: #2c3e50;
+            font-weight: 600;
         }
         
         .mobile-contact-info {
