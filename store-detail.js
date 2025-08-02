@@ -1346,21 +1346,7 @@ function stopGalleryAutoSlide() {
     }
 }
 
-// 詳細説明を生成 - 管理画面の備考・説明のみを表示
-function generateDetailedDescription(store) {
-    // 管理画面で設定された description をそのまま使用
-    const description = store.description || '';
-    
-    // 改行を <br> に変換し、段落に分ける
-    if (description.trim()) {
-        // 改行で分割して段落にする
-        const paragraphs = description.split('\n').filter(line => line.trim() !== '');
-        return paragraphs.map(paragraph => `<p>${paragraph.trim()}</p>`).join('');
-    } else {
-        // 説明が空の場合のデフォルトメッセージ
-        return '<p>店舗の詳細説明はまだ設定されていません。</p>';
-    }
-}
+
 
 // ローディング表示
 function showLoading() {
@@ -1779,7 +1765,6 @@ function updateStoreDisplay(store) {
     // 基本情報を更新
     document.getElementById('store-badge').textContent = store.badge || '';
     document.getElementById('store-name').textContent = store.name || '';
-    document.getElementById('store-description').textContent = store.description || '';
     document.getElementById('store-price').textContent = store.price || '';
     
     // 詳細情報を更新

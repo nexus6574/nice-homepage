@@ -109,7 +109,7 @@
 
 .gallery-slide img {
     width: 100%;
-    height: 350px;
+    height: 420px;
     object-fit: cover;
     display: block;
 }
@@ -199,16 +199,9 @@
 
 .hero-title {
     font-size: 3.5rem;
-    margin-bottom: 1rem;
+    margin-bottom: 2rem;
     text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
     line-height: 1.2;
-}
-
-.hero-description {
-    font-size: 1.3rem;
-    margin-bottom: 2rem;
-    opacity: 0.95;
-    line-height: 1.6;
 }
 
 .hero-price {
@@ -425,10 +418,6 @@
         font-size: 2.5rem;
     }
 
-    .hero-description {
-        font-size: 1.1rem;
-    }
-
     .hero-price {
         flex-direction: column;
         gap: 0.5rem;
@@ -592,13 +581,7 @@
 
     .hero-title {
         font-size: 2.5rem;
-        margin-bottom: 0.8rem;
-    }
-
-    .hero-description {
-        font-size: 1.1rem;
         margin-bottom: 1.5rem;
-        padding: 0 1rem;
     }
 
     .hero-price {
@@ -817,7 +800,7 @@
     }
 
     .gallery-slide img {
-        height: 200px;
+        height: 250px;
     }
 
     .gallery-btn {

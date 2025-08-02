@@ -440,10 +440,9 @@ function createStoreCard(store) {
             ).join('')}
          </div>` : '';
     
-    // 店舗のバッジ、価格、説明のデフォルト値設定
+    // 店舗のバッジ、価格のデフォルト値設定
     const badge = store.badge || (store.features && store.features.length > 0 ? store.features[0] : '店舗');
     const price = store.price || '要問合せ';
-    const description = store.description || store.name + 'の詳細情報です。';
     
     card.innerHTML = `
         <div class="store-image">
@@ -460,10 +459,6 @@ function createStoreCard(store) {
                 <div class="price-info">
                     <span class="price-label">料金</span>
                     <span class="price-value">${price}</span>
-                </div>
-                <div class="remarks">
-                    <span class="remarks-label">備考</span>
-                    <p class="remarks-text">${description}</p>
                 </div>
             </div>
             <div class="store-features">
@@ -1045,7 +1040,6 @@ async function updateMainPageSlider() {
             <img src="${store.image}" alt="${store.name} 店内" loading="lazy">
             <div class="slide-content">
                 <h3>${store.name}</h3>
-                <p>${store.description.split('。')[0]}。</p>
                 <span class="price">料金：${store.price}</span>
             </div>
             <div class="slide-overlay">
@@ -1964,126 +1958,4 @@ async function debugRefreshData() {
     updateDebugInfo();
 }
 
-// 🔍 ローカルストレージ表示
-function debugShowLocalStorage() {
-    const savedStores = localStorage.getItem('nice_stores');
-    if (savedStores) {
-        try {
-            const stores = JSON.parse(savedStores);
-            const storeNames = stores.map(s => s.name).join('\n');
-            alert(`ローカルストレージ (${stores.length}件):\n\n${storeNames}`);
-        } catch (error) {
-            alert('ローカルストレージのデータが破損しています');
-        }
-    } else {
-        alert('ローカルストレージが空です');
-    }
-}
-
-// 📊 ローカルストレージ変更監視機能
-function startLocalStorageMonitoring() {
-    console.log('📊 ローカルストレージ監視を開始');
-    
-    // StorageEvent（他のタブからの変更）を監視
-    window.addEventListener('storage', function(e) {
-        if (e.key === 'nice_stores' && e.newValue) {
-            console.log('📊 他のタブからのデータ更新を検出');
-            handleDataSync(e.newValue);
-        }
-    });
-    
-    // カスタムイベント（同じタブ内での変更）を監視
-    window.addEventListener('localDataUpdate', function(e) {
-        console.log('📊 同じタブ内でのデータ更新を検出');
-        if (e.detail && e.detail.stores) {
-            handleDataSync(JSON.stringify(e.detail.stores));
-        }
-    });
-    
-    // ページのvisibilityが変わった時にデータを再確認
-    document.addEventListener('visibilitychange', function() {
-        if (!document.hidden) {
-            console.log('📊 ページが再フォーカス - データ更新をチェック');
-            setTimeout(() => {
-                checkAndUpdateData();
-            }, 500);
-        }
-    });
-}
-
-// 📊 データ同期処理
-function handleDataSync(newDataJson) {
-    try {
-        const newStores = JSON.parse(newDataJson);
-        console.log('📊 新しいデータを受信:', newStores.length, '件');
-        
-        // データの検証
-        if (!Array.isArray(newStores) || newStores.length === 0) {
-            console.log('📊 無効なデータのため同期をスキップ');
-            return;
-        }
-        
-        // 現在のページに応じて更新
-        const currentPage = getCurrentPageType();
-        console.log('📊 現在のページタイプ:', currentPage);
-        
-        switch (currentPage) {
-            case 'main':
-                if (document.querySelector('.main-slider')) {
-                    console.log('📊 メインページスライダーを更新');
-                    updateMainPageSlider(newStores);
-                    showEmergencyNotification('店舗データが更新されました', 'success');
-                }
-                break;
-                
-            case 'list':
-                if (document.querySelector('.store-grid')) {
-                    console.log('📊 店舗一覧ページを更新');
-                    updateCabaretListPage(newStores);
-                    showEmergencyNotification('店舗一覧が更新されました', 'success');
-                }
-                break;
-                
-            case 'detail':
-                console.log('📊 店舗詳細ページでは手動リロードが必要');
-                showEmergencyNotification('店舗データが更新されました。ページを再読み込みしてください。', 'warning');
-                break;
-        }
-        
-    } catch (error) {
-        console.error('📊 データ同期エラー:', error);
-    }
-}
-
-// 📊 現在のページタイプを取得
-function getCurrentPageType() {
-    const path = window.location.pathname;
-    const filename = path.substring(path.lastIndexOf('/') + 1);
-    
-    if (filename === 'index.html' || filename === '' || filename === '/') {
-        return 'main';
-    } else if (filename === 'cabaret-list.html') {
-        return 'list';
-    } else if (filename === 'store-detail.html') {
-        return 'detail';
-    } else {
-        return 'other';
-    }
-}
-
-// 📊 データ更新チェック
-async function checkAndUpdateData() {
-    try {
-        const savedStores = localStorage.getItem('nice_stores');
-        if (!savedStores) {
-            console.log('📊 ローカルストレージが空 - データを再読み込み');
-            const stores = await loadStoreData();
-            if (stores && stores.length > 0) {
-                handleDataSync(JSON.stringify(stores));
-            }
-        }
-    } catch (error) {
-        console.error('📊 データ更新チェックエラー:', error);
-    }
-}
-
+// 🔍 ローカルス
