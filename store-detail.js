@@ -2934,6 +2934,24 @@ function displayMobileStoreDetail(store) {
         const storePrice = store.price || '料金はお問い合わせください';
         const mainImage = store.image || store.images?.[0] || 'nice-storefront.jpg';
         
+        // 営業時間の処理
+        let businessHours = store.business_hours || store.businessHours;
+        if (!businessHours && store.features && typeof store.features === 'object' && store.features.businessHours) {
+            businessHours = store.features.businessHours;
+        }
+        const hoursDisplay = businessHours && businessHours.start && businessHours.end 
+            ? `${businessHours.start} - ${businessHours.end}`
+            : '20:00 - 02:00';
+        
+        // 定休日の処理
+        let closedDays = store.closed_days || store.closedDays;
+        if (!closedDays && store.features && typeof store.features === 'object' && store.features.closedDays) {
+            closedDays = store.features.closedDays;
+        }
+        const closedDaysDisplay = closedDays && closedDays.length > 0 
+            ? closedDays.join('、') 
+            : '不定休';
+        
         storeContent.innerHTML = `
             <div class="mobile-store-detail">
                 <div class="mobile-store-header">
@@ -2946,6 +2964,18 @@ function displayMobileStoreDetail(store) {
                 </div>
                 
                 <div class="mobile-store-info">
+                    <div class="mobile-business-info">
+                        <h3>🕐 営業情報</h3>
+                        <div class="business-item">
+                            <span class="business-label">営業時間</span>
+                            <span class="business-value">${hoursDisplay}</span>
+                        </div>
+                        <div class="business-item">
+                            <span class="business-label">定休日</span>
+                            <span class="business-value">${closedDaysDisplay}</span>
+                        </div>
+                    </div>
+                    
                     <div class="mobile-contact-info">
                         <h3>📞 お問い合わせ</h3>
                         <p><strong>無料案内所 NICE</strong></p>
@@ -3062,6 +3092,24 @@ function addMobileStoreDetailStyles() {
             margin: 0 0 15px 0;
             line-height: 1.6;
             font-size: 14px;
+        }
+        
+        .mobile-business-info {
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        .mobile-business-info h3 {
+            margin: 0 0 10px 0;
+            color: #27ae60;
+            font-size: 16px;
+        }
+        
+        .mobile-business-info .business-item {
+            margin: 5px 0;
+            font-size: 13px;
         }
         
         .mobile-contact-info {
